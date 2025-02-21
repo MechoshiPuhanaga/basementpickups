@@ -1,0 +1,22 @@
+{
+  "endOfLine": "auto",
+  "importOrder": [
+    "^@assets(.*)|^@assets/(.*)|^@components(.*)|^@components/(.*)|^@pages(.*)|^@pages/(.*)|^@providers(.*)|^@providers/(.*)|^@services(.*)|^@services/(.*)|^@styles(.*)|^@styles/(.*)|^@type(.*)|^@type/(.*)|^@ui(.*)|^@ui/(.*)",
+    "^[./].*(?<!\\.scss)$",
+    "\\.scss$"
+  ],
+  "importOrderCaseInsensitive": true,
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "overrides": [
+    {
+      "files": "*.scss",
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ],
+  "printWidth": 100,
+  "singleQuote": true,
+  "trailingComma": "none"
+}

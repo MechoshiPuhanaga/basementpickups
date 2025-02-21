@@ -1,0 +1,58 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "alwaysStrict": true,
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "jsx": "react-jsx",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "outDir": "./out/",
+    "paths": {
+      "@assets": ["./assets"],
+      "@assets/*": ["./assets/*"],
+      "@components": ["./components"],
+      "@components/*": ["./components/*"],
+      "@pages": ["./pages"],
+      "@pages/*": ["./pages/*"],
+      "@providers": ["./providers"],
+      "@providers/*": ["./providers/*"],
+      "@services": ["./services"],
+      "@services/*": ["./services/*"],
+      "@styles": ["./styles"],
+      "@styles/*": ["./styles/*"],
+      "@type": ["./types"],
+      "@type/*": ["./types/*"],
+      "@ui": ["./ui"],
+      "@ui/*": ["./ui/*"]
+    },
+    "plugins": [
+      {
+        "name": "typescript-plugins-css-modules"
+      }
+    ],
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "ES6"
+  },
+  "exclude": [
+    "cypress",
+    "cypress.config.ts",
+    "dist",
+    "instrumented",
+    "node_modules",
+    "src/**/tests/**/*"
+  ]
+}

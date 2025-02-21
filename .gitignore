@@ -1,0 +1,14 @@
+# dependencies:
+node_modules
+
+# ide:
+.idea
+.vscode
+
+# built code:
+dist
+out
+bundle-analysis.html
+
+# logs:
+yarn-error.log

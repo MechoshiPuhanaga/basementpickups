@@ -1,0 +1,195 @@
+/* stylelint-disable plugin/no-unresolved-module */
+
+/****** Roboto Normal ******/
+@font-face {
+  font-weight: 900;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Black.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 700;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 500;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 300;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 100;
+  font-family: Roboto;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Thin.ttf") format("truetype");
+}
+
+/****** Roboto Italic ******/
+@font-face {
+  font-weight: 900;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-BlackItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 700;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-BoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 500;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-MediumItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 300;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-LightItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 100;
+  font-family: Roboto;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/roboto/Roboto-ThinItalic.ttf") format("truetype");
+}
+
+:root {
+  width: 100%;
+  height: 100%;
+
+  font-size: 16px;
+  font-family: Roboto, sans-serif;
+
+  * {
+    box-sizing: border-box;
+
+    font-family: Roboto, sans-serif;
+
+    user-select: none;
+  }
+
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  :global(#root) {
+    width: 100%;
+    height: 100%;
+  }
+
+  // Colors:
+  --color1: #081229;
+  --color2: #e5e5f0;
+  --color3: #5b8fc7;
+  --color4: #6f88c7;
+  --color5: #000;
+  --color6: #fff;
+  --color7: #d1d1d1;
+  --color8: #535353;
+  --color9: #1e1e1e;
+  --color10: #07488d;
+  --color11: #98faf8;
+  --color12: #b323b3;
+  --color13: #0485f5;
+  --color14: #cf5004;
+  --color15: #6b6b6b;
+  --color16: #f7f7f7;
+  --color17: #049108;
+  --color18: #2252c1;
+  --color19: #1d1def;
+  --color-transparent: transparent;
+
+  // Offsets:
+  --offsetZero: 0;
+  --offsetXS: 1px;
+  --offsetS: 0.5rem;
+  --offsetM: 1rem;
+  --offsetL: 1.5rem;
+  --offsetXL: 2rem;
+
+  // Font sizes:
+  --fontS: 1rem;
+  --fontM: 1.2rem;
+  --fontL: 1.4rem;
+
+  // Font families:
+  --fontFamilyCode: "Fira code", "Fira Mono", monospace;
+
+  // Line heights:
+  --lineHeightS: 1.4rem;
+  --lineHeightM: 1.5rem;
+  --lineHeightL: 1.6rem;
+
+  // Border radius:
+  --borderRadius: 4px;
+  --borderRadiusCircle: 50%;
+
+  // Transitions:
+  --transitionSlow: 600ms;
+  --transitionNormal: 300ms;
+
+  // z-index: {
+  --zIndexZero: 0;
+  --zIndexS: 1;
+
+  // Border width
+  --borderWidth: 1px;
+
+  // Custom height
+  --heightHeader: 3.75rem; // 60px
+
+  // Custom z-index:
+  --zIndexSideMenu: 1;
+  --zIndexSideMenuOpened: 2;
+  --zIndexHeader: 3;
+  --zIndexTooltip: 4;
+}
