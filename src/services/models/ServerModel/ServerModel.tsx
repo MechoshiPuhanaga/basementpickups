@@ -8,8 +8,8 @@ import { matchPath } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import serialize from 'serialize-javascript';
 
-import { InitialStateProvider } from '@providers';
-import { InitialState, SSRContext, SSRRoute } from '@type';
+import { AppStateProvider } from '@providers';
+import { AppState, SSRContext, SSRRoute } from '@type';
 
 import { GlobalModel } from '../GlobalModel/GlobalModel';
 
@@ -39,7 +39,7 @@ export class ServerModel {
   };
 
   static getInitialState = async ({ req, routes }: { req: Request; routes: SSRRoute[] }) => {
-    const promises: Promise<InitialState<unknown>>[] = [];
+    const promises: Promise<AppState>[] = [];
 
     const routesToCheck = GlobalModel.flattenRoutes(routes);
 
@@ -78,11 +78,11 @@ export class ServerModel {
     let didError = false;
 
     const stream = renderToPipeableStream(
-      <InitialStateProvider value={context.data}>
+      <AppStateProvider value={context.data}>
         <StaticRouter location={req.path}>
           <App />
         </StaticRouter>
-      </InitialStateProvider>,
+      </AppStateProvider>,
       {
         onError(err) {
           didError = true;

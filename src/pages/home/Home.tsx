@@ -1,11 +1,17 @@
 import { FC } from 'react';
 
 import { SSRRouteConfig } from '@type';
-
-import styles from './Home.scss';
+import { Heading, P, Page, Section } from '@ui';
 
 const Home: FC = () => {
-  return <section className={styles.Container}>Coming soon</section>;
+  return (
+    <Page>
+      <Section>
+        <Heading kind="h1">Welcome</Heading>
+        <P>Coming soon - news and offers</P>
+      </Section>
+    </Page>
+  );
 };
 
 Home.displayName = 'Home';

@@ -1,0 +1,25 @@
+.Container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.GapS {
+  gap: var(--offsetS);
+}
+
+.GapM {
+  gap: var(--offsetM);
+}
+
+.GapL {
+  gap: var(--offsetL);
+}
+
+.AlignStart {
+  align-items: flex-start;
+}
+
+.AlignCenter {
+  align-items: center;
+}

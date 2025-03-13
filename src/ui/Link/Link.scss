@@ -1,0 +1,13 @@
+.Container {
+  color: var(--color2);
+  line-height: var(--lineHeightM);
+  text-decoration: none;
+
+  &.Active {
+    font-weight: 700;
+  }
+
+  &.InheritColor {
+    color: inherit;
+  }
+}

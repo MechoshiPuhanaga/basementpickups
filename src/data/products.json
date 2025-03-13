@@ -1,0 +1,27 @@
+{
+  "humbuckers": [
+    {
+      "description": "Medium output. Vintage specs. Articulate and crisp. With musical and rich cleans and bite and sustain when overdriven. Great dynamics and touch sensitivity. Cleans up nicely when volume is rolled off. Warm but not muddy in neck position. Tight bottom end and controlled mids. The set can bring clarity in mahogany body guitars. Suggested capacitor - 22 nF. Suggested pot - 500 kOhm. Offered with 2-conductor or 4-conductor wire, for coil splitting. Bobbin colors - zebra, reverse zebra, black, cream, transparent glow-in-the-dark green. Not potted, but can be potted on request. Cover, pole screws and slugs color - can be customized on request.",
+      "id": "1",
+      "images": ["./public/images/macho-heaven.jpg"],
+      "name": "Macho Heaven",
+      "type": "humbucker",
+      "variants": [
+        {
+          "dcr": 7.6,
+          "inductance": 4.2,
+          "magnet": "Alnico 3",
+          "position": "bridge",
+          "spacing": 49.2
+        },
+        {
+          "dcr": 7.2,
+          "inductance": 3.8,
+          "magnet": "Alnico 3",
+          "position": "neck",
+          "spacing": 49.2
+        }
+      ]
+    }
+  ]
+}

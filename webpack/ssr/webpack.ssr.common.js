@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('node:path');
 const RobotstxtPlugin = require('robotstxt-webpack-plugin');
@@ -30,8 +31,12 @@ module.exports = (_, argv) => {
           generator: {
             filename: 'public/images/[name][ext]'
           },
-          test: /\.(png|jpe?g|gif|svg|ico)$/,
+          test: /\.(png|jpe?g|gif|ico)$/,
           type: 'asset/resource'
+        },
+        {
+          test: /\.svg$/,
+          use: ['@svgr/webpack']
         },
         {
           include: /node_modules/,
@@ -83,6 +88,9 @@ module.exports = (_, argv) => {
       publicPath: '/'
     },
     plugins: [
+      new CopyWebpackPlugin({
+        patterns: [{ from: './src/assets/images', to: 'public/images' }]
+      }),
       new MiniCssExtractPlugin({
         chunkFilename: 'public/[id].[chunkhash].css',
         filename: 'public/[name].[chunkhash].css'
@@ -90,7 +98,7 @@ module.exports = (_, argv) => {
       new RobotstxtPlugin(),
       new SitemapPlugin({
         base: isDev ? 'http://localhost:3000' : 'https://basementpickups.com',
-        paths: ['/', '/about', '/products']
+        paths: ['/', '/about', '/products', '/articles']
       })
     ],
     resolve: {

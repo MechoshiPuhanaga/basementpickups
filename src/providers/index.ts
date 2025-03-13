@@ -1,1 +1,1 @@
-export * from './InitialStateProvider';
+export * from './AppStateProvider';

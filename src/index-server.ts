@@ -2,11 +2,15 @@ import express, { Request, Response } from 'express';
 import expressStaticGzip from 'express-static-gzip';
 import path from 'node:path';
 
-import { routes } from '@pages';
 import { ServerModel } from '@services';
-import { SSRContext } from '@type';
+import { AppState, SSRContext } from '@type';
 
 import AppConfig from './App';
+import products from './data/products.json';
+
+const appState: AppState = {
+  products
+};
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,7 +29,7 @@ app.get('/favicon.png', (_, res) => res.sendFile(path.join(__dirname, 'favicon.i
 
 app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, req.url)));
 
-app.get('/*.png', (req, res) => res.sendFile(path.join(__dirname, req.url)));
+app.get('/*.jpg', (req, res) => res.sendFile(path.join(__dirname, req.url)));
 
 app.get('/sitemap.xml', (req, res) => res.sendFile(path.join(__dirname, req.url)));
 
@@ -38,10 +42,8 @@ app.get('/sw-config.js', (req, res) => res.sendFile(path.join(__dirname, req.url
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, req.url)));
 
 app.get('*', async (req: Request, res: Response) => {
-  const initialState = await ServerModel.getInitialState({ req, routes });
-
   const context: SSRContext = {
-    data: initialState,
+    data: appState,
     params: req.params,
     query: req.query,
     url: req.url

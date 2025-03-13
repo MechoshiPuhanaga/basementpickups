@@ -1,101 +1,146 @@
 /* stylelint-disable plugin/no-unresolved-module */
-
-/****** Roboto Normal ******/
 @font-face {
-  font-weight: 900;
-  font-family: Roboto;
+  font-weight: 100;
+  font-family: Barlow;
   font-style: normal;
   font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Black.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 700;
-  font-family: Roboto;
-  font-style: normal;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Bold.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 500;
-  font-family: Roboto;
-  font-style: normal;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Medium.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 400;
-  font-family: Roboto;
-  font-style: normal;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 300;
-  font-family: Roboto;
-  font-style: normal;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Light.ttf") format("truetype");
+  src: url("../../../assets/fonts/barlow/Barlow-Thin.ttf") format("truetype");
 }
 
 @font-face {
   font-weight: 100;
-  font-family: Roboto;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-ThinItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 200;
+  font-family: Barlow;
   font-style: normal;
   font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Thin.ttf") format("truetype");
-}
-
-/****** Roboto Italic ******/
-@font-face {
-  font-weight: 900;
-  font-family: Roboto;
-  font-style: italic;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-BlackItalic.ttf") format("truetype");
+  src: url("../../../assets/fonts/barlow/Barlow-ExtraLight.ttf") format("truetype");
 }
 
 @font-face {
-  font-weight: 700;
-  font-family: Roboto;
+  font-weight: 200;
+  font-family: Barlow;
   font-style: italic;
   font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-BoldItalic.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 500;
-  font-family: Roboto;
-  font-style: italic;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-MediumItalic.ttf") format("truetype");
-}
-
-@font-face {
-  font-weight: 400;
-  font-family: Roboto;
-  font-style: italic;
-  font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-Italic.ttf") format("truetype");
+  src: url("../../../assets/fonts/barlow/Barlow-ExtraLightItalic.ttf") format("truetype");
 }
 
 @font-face {
   font-weight: 300;
-  font-family: Roboto;
-  font-style: italic;
+  font-family: Barlow;
+  font-style: normal;
   font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-LightItalic.ttf") format("truetype");
+  src: url("../../../assets/fonts/barlow/Barlow-Light.ttf") format("truetype");
 }
 
 @font-face {
-  font-weight: 100;
-  font-family: Roboto;
+  font-weight: 300;
+  font-family: Barlow;
   font-style: italic;
   font-display: swap;
-  src: url("../../../assets/fonts/roboto/Roboto-ThinItalic.ttf") format("truetype");
+  src: url("../../../assets/fonts/barlow/Barlow-LightItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 500;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 500;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-MediumItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 600;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 600;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-SemiBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 700;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 700;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-BoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 800;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-ExtraBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 800;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-ExtraBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 900;
+  font-family: Barlow;
+  font-style: normal;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-Black.ttf") format("truetype");
+}
+
+@font-face {
+  font-weight: 900;
+  font-family: Barlow;
+  font-style: italic;
+  font-display: swap;
+  src: url("../../../assets/fonts/barlow/Barlow-BlackItalic.ttf") format("truetype");
 }
 
 :root {
@@ -103,12 +148,13 @@
   height: 100%;
 
   font-size: 16px;
-  font-family: Roboto, sans-serif;
+  font-family: Barlow, sans-serif;
 
   * {
     box-sizing: border-box;
+    min-width: 0;
 
-    font-family: Roboto, sans-serif;
+    font-family: Barlow, sans-serif;
 
     user-select: none;
   }
@@ -122,14 +168,16 @@
   }
 
   :global(#root) {
-    width: 100%;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
   }
 
   // Colors:
-  --color1: #081229;
-  --color2: #e5e5f0;
-  --color3: #5b8fc7;
+  --color1: #232323;
+  --color2: #d9d4d4;
+  --color3: #e78d00;
   --color4: #6f88c7;
   --color5: #000;
   --color6: #fff;
@@ -155,6 +203,7 @@
   --offsetM: 1rem;
   --offsetL: 1.5rem;
   --offsetXL: 2rem;
+  --offsetXXL: 4rem;
 
   // Font sizes:
   --fontS: 1rem;

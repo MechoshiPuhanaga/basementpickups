@@ -1,0 +1,32 @@
+.Container {
+  max-width: 600px;
+}
+
+.Images {
+  display: flex;
+  justify-content: center;
+}
+
+.Variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--offsetXXL);
+  padding: 0;
+}
+
+.Variant {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--offsetS);
+  min-width: 180px;
+  max-width: 240px;
+
+  list-style: none;
+}
+
+.VariantProperty {
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,11 +1,32 @@
 import { Request } from 'express';
 import { FC, ForwardedRef, ReactNode } from 'react';
 
-// TODO: Think how we can type this:
-export type InitialState<T> = T;
+interface PickupVariant {
+  dcr: number;
+  inductance: number;
+  magnet: string;
+  position: string;
+  spacing: number;
+}
+export interface Pickup {
+  description: string;
+  id: string;
+  images: Array<string>;
+  name: string;
+  type: string;
+  variants: Array<PickupVariant>;
+}
+
+export interface Products {
+  humbuckers: Array<Pickup>;
+}
+
+export interface AppState {
+  products: Products;
+}
 
 export interface SSRContext {
-  data: InitialState<unknown>;
+  data: AppState;
   params: Request['params'];
   query?: Request['query'];
   url: Request['url'];
@@ -22,7 +43,7 @@ export interface Ref {
 }
 
 export interface SSRRouteConfig {
-  loadData?: (args: LoadDataArgs) => Promise<InitialState<unknown>>;
+  loadData?: (args: LoadDataArgs) => Promise<AppState>;
   pages?: SSRRoute[];
 }
 

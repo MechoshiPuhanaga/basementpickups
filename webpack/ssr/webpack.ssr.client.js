@@ -43,6 +43,7 @@ const client = (_, argv) => {
             assets.home = '/';
             assets.about = '/about';
             assets.products = '/products';
+            assets.articles = '/articles';
 
             fs.writeFileSync(
               path.resolve(__dirname, '..', '..', 'dist', 'sw-config.js'),

@@ -36,6 +36,7 @@
         "name": "typescript-plugins-css-modules"
       }
     ],
+    "resolveJsonModule": true,
     "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true,
