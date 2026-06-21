@@ -1,0 +1,38 @@
+.separator {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--color-line-gold);
+}
+
+.line {
+  flex: 1 1 auto;
+  height: 1px;
+  background: currentcolor;
+}
+
+.diamond {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin: 0 var(--space-3);
+}
+
+.variant-double-line {
+  flex-direction: column;
+  gap: 3px;
+}
+
+.variant-double-line .line {
+  width: 100%;
+}
+
+.variant-small {
+  max-width: 120px;
+}
+
+.variant-small .diamond {
+  width: 8px;
+  height: 8px;
+  margin: 0 var(--space-2);
+}

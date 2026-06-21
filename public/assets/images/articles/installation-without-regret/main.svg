@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Installation Without Regret article placeholder">
+  <rect width="400" height="300" fill="#181410"/>
+  <g fill="none" stroke="#c9a24a" stroke-width="1" stroke-linecap="square">
+    <path d="M14 30 L14 14 L30 14"/>
+    <path d="M370 14 L386 14 L386 30"/>
+    <path d="M14 270 L14 286 L30 286"/>
+    <path d="M370 286 L386 286 L386 270"/>
+  </g>
+  <g fill="none" stroke="#c9a24a" stroke-width="1">
+    <circle cx="130" cy="160" r="22"/>
+    <circle cx="200" cy="160" r="22"/>
+    <circle cx="270" cy="160" r="22"/>
+    <line x1="152" y1="160" x2="178" y2="160" stroke-opacity="0.65"/>
+    <line x1="222" y1="160" x2="248" y2="160" stroke-opacity="0.65"/>
+  </g>
+  <g fill="none" stroke="#c9a24a" stroke-width="0.75" stroke-opacity="0.7">
+    <path d="M130 138 L130 100 L100 100"/>
+    <path d="M270 138 L270 100 L300 100"/>
+    <path d="M200 182 L200 220 L160 220"/>
+    <path d="M200 220 L240 220"/>
+  </g>
+  <g fill="#c9a24a">
+    <circle cx="130" cy="160" r="3"/>
+    <circle cx="200" cy="160" r="3"/>
+    <circle cx="270" cy="160" r="3"/>
+  </g>
+  <g fill="none" stroke="#c9a24a" stroke-width="0.6" stroke-opacity="0.5">
+    <path d="M100 100 l-6 0 l0 -6"/>
+    <path d="M300 100 l6 0 l0 -6"/>
+  </g>
+  <text x="200" y="260" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#9a8e74" letter-spacing="2.5">INSTALLATION WITHOUT REGRET</text>
+</svg>

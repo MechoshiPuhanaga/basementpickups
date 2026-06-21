@@ -1,0 +1,6 @@
+.ornament {
+  display: inline-block;
+  color: var(--color-line-gold);
+  pointer-events: none;
+  vertical-align: middle;
+}

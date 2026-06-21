@@ -1,0 +1,21 @@
+.corner {
+  display: block;
+  color: var(--color-line-gold);
+  pointer-events: none;
+}
+
+.position-top-left {
+  transform: rotate(0deg);
+}
+
+.position-top-right {
+  transform: rotate(90deg);
+}
+
+.position-bottom-right {
+  transform: rotate(180deg);
+}
+
+.position-bottom-left {
+  transform: rotate(270deg);
+}

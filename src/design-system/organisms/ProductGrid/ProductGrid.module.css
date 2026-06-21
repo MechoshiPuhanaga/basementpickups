@@ -1,0 +1,9 @@
+.root {
+  display: block;
+  inline-size: 100%;
+}
+
+.header {
+  max-inline-size: 48rem;
+  margin-inline: auto;
+}

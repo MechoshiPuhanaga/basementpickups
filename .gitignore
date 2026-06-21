@@ -1,14 +1,23 @@
-# dependencies:
 node_modules
-
-# ide:
-.idea
-.vscode
-
-# built code:
 dist
-out
-bundle-analysis.html
+coverage
 
-# logs:
-yarn-error.log
+.DS_Store
+Thumbs.db
+
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+.env
+.env.*
+!.env.example
+
+.vite
+.cache
+.tmp
+
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

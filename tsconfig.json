@@ -1,59 +1,45 @@
 {
   "compilerOptions": {
-    "allowJs": false,
-    "alwaysStrict": true,
-    "baseUrl": "./src",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "outDir": "./out/",
-    "paths": {
-      "@assets": ["./assets"],
-      "@assets/*": ["./assets/*"],
-      "@components": ["./components"],
-      "@components/*": ["./components/*"],
-      "@pages": ["./pages"],
-      "@pages/*": ["./pages/*"],
-      "@providers": ["./providers"],
-      "@providers/*": ["./providers/*"],
-      "@services": ["./services"],
-      "@services/*": ["./services/*"],
-      "@styles": ["./styles"],
-      "@styles/*": ["./styles/*"],
-      "@type": ["./types"],
-      "@type/*": ["./types/*"],
-      "@ui": ["./ui"],
-      "@ui/*": ["./ui/*"]
-    },
-    "plugins": [
-      {
-        "name": "typescript-plugins-css-modules"
-      }
-    ],
+    "types": ["node"],
+
+    "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
+    "useDefineForClassFields": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
     "strict": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "noImplicitThis": true,
+    "noImplicitAny": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
     "strictPropertyInitialization": true,
-    "target": "ES6"
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+
+    "noEmit": true
   },
-  "exclude": [
-    "cypress",
-    "cypress.config.ts",
-    "dist",
-    "instrumented",
-    "node_modules",
-    "src/**/tests/**/*"
-  ]
+  "include": ["src", "server"],
+  "exclude": ["node_modules", "dist"]
 }

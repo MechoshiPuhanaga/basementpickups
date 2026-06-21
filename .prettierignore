@@ -1,8 +1,5 @@
-coverage/
-dist/
-node_modules/
-out/
-yarn.lock
-
-# Allows importing prism modules in a specific unsorted order
-src/**/prism.ts
+node_modules
+dist
+public
+pnpm-lock.yaml
+.github

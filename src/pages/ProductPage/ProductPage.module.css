@@ -1,0 +1,30 @@
+.specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-5);
+  inline-size: 100%;
+}
+
+.specRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-block: var(--space-2);
+  border-block-start: 1px solid var(--color-line);
+}
+
+.variantRow {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-3);
+}
+
+.variantRow > * {
+  flex-shrink: 0;
+}
+
+@media (width <= 540px) {
+  .specs {
+    grid-template-columns: 1fr;
+  }
+}

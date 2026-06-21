@@ -1,0 +1,29 @@
+.frame {
+  position: relative;
+  display: block;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.frame[data-padding='none'] .content {
+  padding: 0;
+}
+
+.frame[data-padding='sm'] .content {
+  padding: var(--space-4);
+}
+
+.frame[data-padding='md'] .content {
+  padding: var(--space-5);
+}
+
+.frame[data-padding='lg'] .content {
+  padding: var(--space-6);
+}
+
+.frame[data-padding='xl'] .content {
+  padding: var(--space-7);
+}

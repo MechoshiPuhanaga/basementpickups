@@ -1,0 +1,100 @@
+.layout {
+  inline-size: 100%;
+  max-inline-size: 56rem;
+  margin-inline: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--space-5);
+  padding-block: var(--space-5);
+  border-block-start: 1px solid var(--color-line);
+}
+
+.row:last-child {
+  border-block-end: 1px solid var(--color-line);
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.qtyValue {
+  min-inline-size: 1.5rem;
+  font-family: var(--font-body);
+  font-size: var(--type-scale-body);
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+.lineTotal {
+  min-inline-size: 5rem;
+  text-align: end;
+}
+
+.removeCell {
+  justify-self: end;
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-5);
+}
+
+@media (width <= 640px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'name total'
+      'qty remove';
+    gap: var(--space-4);
+  }
+
+  .name {
+    grid-area: name;
+  }
+
+  .lineTotal {
+    grid-area: total;
+  }
+
+  .qty {
+    grid-area: qty;
+  }
+
+  .removeCell {
+    grid-area: remove;
+  }
+
+  .actions {
+    justify-content: space-between;
+  }
+}

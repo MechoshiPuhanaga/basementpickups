@@ -1,0 +1,47 @@
+.layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-8);
+  inline-size: 100%;
+  max-inline-size: 56rem;
+  margin-inline: auto;
+}
+
+.formSide {
+  flex: 0 0 58%;
+}
+
+.info {
+  flex: 0 0 36%;
+}
+
+.emailLink {
+  font-family: var(--font-editorial);
+  font-size: var(--type-scale-body);
+  color: var(--color-accent-gold);
+  text-decoration: none;
+  transition: color var(--motion-base) var(--motion-easing);
+}
+
+.emailLink:hover {
+  text-decoration: underline;
+}
+
+.emailLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (width <= 768px) {
+  .layout {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .formSide,
+  .info {
+    flex-basis: auto;
+    inline-size: 100%;
+  }
+}

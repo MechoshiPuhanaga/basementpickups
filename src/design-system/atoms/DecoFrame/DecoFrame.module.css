@@ -1,0 +1,60 @@
+.frame {
+  position: absolute;
+  inset: 0;
+  color: var(--color-line-gold);
+  pointer-events: none;
+}
+
+.border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentcolor;
+}
+
+.cornerTL {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.cornerTR {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.cornerBR {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.cornerBL {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.variant-product-card .border::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid currentcolor;
+  opacity: 0.45;
+}
+
+.variant-hero .border {
+  border-width: 1px;
+}
+
+.variant-hero .border::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid currentcolor;
+  opacity: 0.55;
+}
+
+.variant-image .border {
+  opacity: 0.8;
+}

@@ -1,0 +1,51 @@
+.box {
+  display: block;
+}
+
+.box[data-padding='sm'] {
+  padding: var(--space-3);
+}
+
+.box[data-padding='md'] {
+  padding: var(--space-5);
+}
+
+.box[data-padding='lg'] {
+  padding: var(--space-6);
+}
+
+.box[data-padding='xl'] {
+  padding: var(--space-7);
+}
+
+.box[data-padding-inline='sm'] {
+  padding-inline: var(--space-3);
+}
+
+.box[data-padding-inline='md'] {
+  padding-inline: var(--space-5);
+}
+
+.box[data-padding-inline='lg'] {
+  padding-inline: var(--space-6);
+}
+
+.box[data-padding-inline='xl'] {
+  padding-inline: var(--space-7);
+}
+
+.box[data-padding-block='sm'] {
+  padding-block: var(--space-3);
+}
+
+.box[data-padding-block='md'] {
+  padding-block: var(--space-5);
+}
+
+.box[data-padding-block='lg'] {
+  padding-block: var(--space-6);
+}
+
+.box[data-padding-block='xl'] {
+  padding-block: var(--space-7);
+}

@@ -1,0 +1,27 @@
+.root {
+  inline-size: 100%;
+}
+
+.imageWrap {
+  position: relative;
+  inline-size: 100%;
+  overflow: hidden;
+  background-color: var(--color-surface-sunken);
+}
+
+.imageWrap[data-ratio='landscape'] {
+  aspect-ratio: 3 / 2;
+}
+
+.imageWrap[data-ratio='square'] {
+  aspect-ratio: 1 / 1;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center;
+}

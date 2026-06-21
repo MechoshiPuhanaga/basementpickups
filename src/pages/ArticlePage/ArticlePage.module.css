@@ -1,0 +1,16 @@
+.heroWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  inline-size: 100%;
+}
+
+.hero {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+  background-color: var(--color-surface-sunken);
+}

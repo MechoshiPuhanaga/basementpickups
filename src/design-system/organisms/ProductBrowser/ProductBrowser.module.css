@@ -1,0 +1,47 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.controls {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-block-end: var(--space-4);
+  border-block-end: 1px solid var(--color-line);
+}
+
+.fields {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.count {
+  flex-shrink: 0;
+  padding-block-end: var(--space-2);
+}
+
+@media (width <= 540px) {
+  .controls {
+    align-items: stretch;
+  }
+
+  .fields {
+    inline-size: 100%;
+  }
+
+  .field {
+    flex: 1 1 12rem;
+  }
+}

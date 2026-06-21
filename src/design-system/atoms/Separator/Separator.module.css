@@ -1,0 +1,27 @@
+.separator {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.separator[data-orientation='horizontal'] {
+  display: block;
+  width: 100%;
+  block-size: 1px;
+}
+
+.separator[data-orientation='vertical'] {
+  display: inline-block;
+  block-size: 100%;
+  min-block-size: 1em;
+  inline-size: 1px;
+}
+
+.separator[data-tone='line'] {
+  background-color: var(--color-line);
+}
+
+.separator[data-tone='gold'] {
+  background-color: var(--color-line-gold);
+}

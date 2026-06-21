@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline | Basement Pickups</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/logo/BP_Gold_logo.svg" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #0e0c0a;
+        color: #f1e7d0;
+        font-family: 'Inter', system-ui, sans-serif;
+        text-align: center;
+        padding: 2rem;
+        box-sizing: border-box;
+      }
+
+      .panel {
+        max-width: 28rem;
+      }
+
+      img {
+        width: 4.5rem;
+        height: auto;
+        margin-bottom: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        margin: 0 0 0.75rem;
+        color: #c9a24a;
+      }
+
+      p {
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        color: #9a8e74;
+        margin: 0 0 1.5rem;
+      }
+
+      button {
+        font: inherit;
+        font-size: 0.875rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #c9a24a;
+        background: transparent;
+        border: 1px solid #a8853a;
+        padding: 0.6rem 1.5rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <img src="/assets/logo/BP_Gold_logo.svg" alt="Basement Pickups" />
+      <h1>You're offline</h1>
+      <p>
+        This page isn't available without a connection. Pages you've already
+        visited still work — reconnect to load the rest.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,119 @@
+WHITE PEARL — STRAT-STYLE HUMBUCKER SET
+
+Neck Pickup
+• Magnet: Alnico 3
+• DCR: 5.9kΩ
+• Inductance: 2.8H
+• Self-Resonant Peak: 8.4 kHz
+• Loaded Resonant Peak: 3.9 kHz
+
+Description:
+The White Pearl neck pickup was designed for players seeking maximum clarity, openness, and articulation from a humbucker-equipped Strat-style guitar. Its relatively low inductance and high resonant frequency create an airy top end with excellent note separation and dynamic response. Clean tones remain sparkling and detailed, while overdriven sounds reveal complex harmonic content without becoming harsh. The bass response is intentionally controlled and tight, avoiding the excessive boominess often associated with neck humbuckers. The result is a balanced, musical voice that responds beautifully to picking dynamics and volume control adjustments.
+
+Bridge Pickup
+• Magnet: Alnico 4
+• DCR: 6.8kΩ
+• Inductance: 3.5H
+• Self-Resonant Peak: 7.4 kHz
+• Loaded Resonant Peak: 3.4 kHz
+
+Description:
+The White Pearl bridge pickup complements the neck with additional authority, harmonic richness, and sustain while preserving the set's overall clarity. It delivers articulate lows, detailed mids, and smooth highs that cut through a mix without sounding aggressive. Rich overtones emerge naturally when driven, making it equally suitable for expressive lead work and rhythm playing. Its balanced frequency response and controlled low end make it particularly effective in Strat-style instruments where definition and responsiveness are essential.
+
+
+MACHO HEAVEN — VINTAGE PAF SET
+
+Neck Pickup
+• Magnet: Alnico 3
+• DCR: 7.4kΩ
+• Inductance: 4.3H
+• Self-Resonant Peak: 6.8 kHz
+• Loaded Resonant Peak: 2.9 kHz
+
+Description:
+The Macho Heaven neck pickup captures the sweetness and expressiveness of a classic PAF while eliminating the muddiness often found in traditional neck humbuckers. Its voice is warm, open, and highly articulate, allowing every note within complex chords to remain distinct. The low end is tight and controlled, while the midrange carries a vocal quality that enhances both clean and overdriven tones. It excels in Les Paul-style guitars where additional clarity and definition are often desired.
+
+Bridge Pickup
+• Magnet: Alnico 4
+• DCR: 8.1kΩ
+• Inductance: 5.1H
+• Self-Resonant Peak: 6.2 kHz
+• Loaded Resonant Peak: 2.6 kHz
+
+Description:
+The bridge pickup delivers classic PAF dynamics with slightly increased aggression and authority. Despite its vintage output level, it offers impressive articulation and punch, producing a focused attack with balanced lows and smooth highs. The response remains tight and controlled under gain, making it ideal for expressive blues, rock, and classic lead tones. Together with the neck, it forms a versatile set capable of covering a wide range of vintage-inspired sounds.
+
+
+CHOW CHOW
+
+Neck Pickup
+• Magnet: Alnico 2
+• DCR: 7.6kΩ
+• Inductance: 4.4H
+• Self-Resonant Peak: 6.5 kHz
+• Loaded Resonant Peak: 3.0 kHz
+
+Description:
+This neck pickup delivers the unmistakable warmth and sweetness associated with classic Alnico 2 PAF designs. Rich mids, smooth highs, and natural compression create an expressive and musical response. Single notes bloom with harmonic complexity, while chords remain full and balanced. It is particularly well suited for vintage rock, blues, and melodic lead playing.
+
+Bridge Pickup
+• Magnet: Alnico 2
+• DCR: 8.3kΩ
+• Inductance: 5.3H
+• Self-Resonant Peak: 5.7 kHz
+• Loaded Resonant Peak: 2.6 kHz
+
+Description:
+The bridge pickup expands on the classic Alnico 2 character with additional midrange presence and sustain. Its tone is rich, smooth, and harmonically dense, delivering the iconic vintage rock sound associated with legendary late-70s and early-80s recordings. Dynamic and responsive, it cleans up beautifully with the guitar volume while remaining powerful enough for soaring lead tones and punchy rhythm work.
+
+
+ROCKROACH — HIGH OUTPUT ROCK HUMBUCKER
+
+Bridge Pickup
+• Magnet: Alnico 5
+• DCR: 12.2kΩ
+• Inductance: 5.9H
+• Self-Resonant Peak: 5.3 kHz
+• Loaded Resonant Peak: 2.4 kHz
+
+Description:
+The Rockroach was developed for players who need a powerful bridge pickup capable of delivering classic hard rock and traditional metal tones. Its Alnico 5 magnet provides strong attack, tight bass response, and excellent note definition. High output combines with articulate highs and focused mids to create a tone that remains clear even under significant distortion. Whether driving heavy rhythm parts or cutting through a mix with lead work, the Rockroach maintains clarity, punch, and harmonic richness.
+
+
+KARAKONJUL — EXTREME OUTPUT HUMBUCKER
+
+Bridge Pickup
+• Magnet: Alnico 8
+• DCR: 17.9kΩ
+• Inductance: 8.8H
+• Self-Resonant Peak: 4.2 kHz
+• Loaded Resonant Peak: 1.8 kHz
+
+Description:
+Karakonjul is the most powerful pickup in the lineup, engineered for players demanding maximum impact without sacrificing articulation. The Alnico 8 magnet produces immense output, dense mids, and exceptionally tight lows. Despite its aggressive nature, the pickup avoids muddiness and retains excellent note separation during complex chords and fast rhythm playing. Harmonics jump effortlessly from the strings, making it equally effective for crushing rhythm tones and expressive lead work. Coil splitting reveals an unexpectedly balanced and clear voice, adding versatility far beyond what its output specifications suggest.
+
+
+LITTLE KARAKONJUL
+
+Bridge Pickup
+• Magnet: Alnico 8
+• DCR: 5.6kΩ
+• Inductance: 3.2H
+• Self-Resonant Peak: 7.4 kHz
+• Loaded Resonant Peak: 3.2 kHz
+
+Description:
+The Little Karakonjul uses a thicker winding wire to achieve a unique combination of low DCR and surprisingly strong output. Fast attack, pronounced harmonics, and exceptional clarity define its character. The bass remains tight and percussive, while the highs are lively and filled with rich overtones. Although compact in specification, it delivers a bold and energetic voice that feels significantly larger than its measured output suggests. It is ideal for players seeking articulation, punch, and dynamic responsiveness.
+
+
+TWIN BLISS — DUAL MAGNET PAF HUMBUCKER
+
+Pickup Specifications
+• Magnet: Dual Alnico 5 Bar Magnets
+• DCR: 7.4kΩ
+• Inductance: 4.0H
+• Self-Resonant Peak: 7.0 kHz
+• Loaded Resonant Peak: 3.2 kHz
+
+Description:
+Twin Bliss features an innovative dual-magnet architecture, employing two smaller Alnico 5 magnets positioned beneath the slug and screw rows rather than a single central bar magnet. This design contributes to its exceptionally balanced frequency response and dynamic feel. In the neck position it produces smooth, velvety cleans with remarkable clarity and no muddiness. In the bridge position it delivers articulate vintage tones with tight lows, detailed mids, and sweet highs. Its versatility, responsiveness, and classic PAF character make it an excellent all-purpose humbucker suitable for a wide variety of guitars and musical styles. 

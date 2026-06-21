@@ -1,0 +1,31 @@
+.root {
+  display: block;
+  inline-size: 100%;
+}
+
+.hero {
+  inline-size: 100%;
+  max-inline-size: 48rem;
+  margin-inline: auto;
+  margin-block-end: var(--space-7);
+}
+
+.header {
+  inline-size: 100%;
+  max-inline-size: 48rem;
+  margin-inline: auto;
+  margin-block-end: var(--space-7);
+}
+
+.body {
+  inline-size: 100%;
+  max-inline-size: 40rem;
+  margin-inline: auto;
+}
+
+.aside {
+  inline-size: 100%;
+  max-inline-size: var(--layout-max-inline);
+  margin-inline: auto;
+  margin-block-start: var(--space-8);
+}

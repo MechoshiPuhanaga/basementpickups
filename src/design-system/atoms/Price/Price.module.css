@@ -1,0 +1,44 @@
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1em;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-text-primary);
+}
+
+.price[data-size='sm'] {
+  font-size: var(--type-scale-body);
+}
+
+.price[data-size='md'] {
+  font-size: var(--type-scale-lead);
+}
+
+.price[data-size='lg'] {
+  font-size: var(--type-scale-h3);
+}
+
+.price[data-tone='primary'] {
+  color: var(--color-text-primary);
+}
+
+.price[data-tone='gold'] {
+  color: var(--color-accent-gold);
+}
+
+.price[data-tone='muted'] {
+  color: var(--color-text-muted);
+}
+
+.currency {
+  font-size: 0.7em;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+}

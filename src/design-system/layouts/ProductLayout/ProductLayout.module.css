@@ -1,0 +1,28 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-8);
+  inline-size: 100%;
+}
+
+.gallery {
+  flex: 0 0 52%;
+}
+
+.details {
+  flex: 0 0 42%;
+}
+
+@media (width <= 900px) {
+  .root {
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+
+  .gallery,
+  .details {
+    flex-basis: auto;
+    inline-size: 100%;
+  }
+}

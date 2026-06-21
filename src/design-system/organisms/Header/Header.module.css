@@ -1,0 +1,124 @@
+.root {
+  display: block;
+  background-color: var(--color-surface-base);
+  color: var(--color-text-primary);
+  position: relative;
+  z-index: var(--z-nav);
+}
+
+.brand {
+  display: inline-block;
+  color: var(--color-accent-gold);
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+
+.logo {
+  display: block;
+  block-size: 5rem;
+  inline-size: auto;
+}
+
+.rightGroup {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav {
+  display: block;
+}
+
+.navList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navItem {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navItem + .navItem::before {
+  content: '';
+  display: inline-block;
+  inline-size: 4px;
+  block-size: 4px;
+  margin-inline: var(--space-4);
+  background-color: var(--color-line-gold);
+  transform: rotate(45deg);
+  opacity: 0.6;
+}
+
+.navLink {
+  display: inline-block;
+  padding-block: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--type-scale-step-down);
+  font-weight: 500;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color var(--motion-base) var(--motion-easing);
+}
+
+.navLink:hover {
+  color: var(--color-accent-gold);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+
+.navLinkActive {
+  color: var(--color-accent-gold);
+}
+
+.borderRow {
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+  block-size: 16px;
+  color: var(--color-line-gold);
+}
+
+.borderLine {
+  flex: 1 1 auto;
+  block-size: 1px;
+  background-color: currentcolor;
+}
+
+.corner {
+  flex: 0 0 auto;
+}
+
+@media (width <= 540px) {
+  .logo {
+    block-size: 3.5rem;
+  }
+
+  .navItem + .navItem::before {
+    margin-inline: var(--space-3);
+  }
+}

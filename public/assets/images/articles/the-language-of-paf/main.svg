@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="The Language of PAF article placeholder">
+  <rect width="400" height="300" fill="#181410"/>
+  <g fill="none" stroke="#c9a24a" stroke-width="1" stroke-linecap="square">
+    <path d="M14 30 L14 14 L30 14"/>
+    <path d="M370 14 L386 14 L386 30"/>
+    <path d="M14 270 L14 286 L30 286"/>
+    <path d="M370 286 L386 286 L386 270"/>
+    <rect x="120" y="120" width="160" height="60"/>
+    <line x1="200" y1="120" x2="200" y2="180" stroke-opacity="0.4"/>
+  </g>
+  <g fill="#c9a24a">
+    <circle cx="138" cy="140" r="3.5"/><circle cx="156" cy="140" r="3.5"/><circle cx="174" cy="140" r="3.5"/>
+    <circle cx="192" cy="140" r="3.5"/><circle cx="138" cy="160" r="3.5"/><circle cx="156" cy="160" r="3.5"/>
+    <circle cx="174" cy="160" r="3.5"/><circle cx="192" cy="160" r="3.5"/>
+    <circle cx="208" cy="140" r="3.5"/><circle cx="226" cy="140" r="3.5"/><circle cx="244" cy="140" r="3.5"/>
+    <circle cx="262" cy="140" r="3.5"/><circle cx="208" cy="160" r="3.5"/><circle cx="226" cy="160" r="3.5"/>
+    <circle cx="244" cy="160" r="3.5"/><circle cx="262" cy="160" r="3.5"/>
+  </g>
+  <g fill="none" stroke="#c9a24a" stroke-width="0.75" stroke-opacity="0.55">
+    <line x1="50" y1="150" x2="100" y2="150"/>
+    <line x1="300" y1="150" x2="350" y2="150"/>
+    <path d="M100 145 l5 5 -5 5"/>
+    <path d="M300 145 l-5 5 5 5"/>
+  </g>
+  <text x="200" y="230" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#9a8e74" letter-spacing="2.5">THE LANGUAGE OF PAF</text>
+</svg>

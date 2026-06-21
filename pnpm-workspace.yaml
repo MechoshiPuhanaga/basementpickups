@@ -1,0 +1,11 @@
+allowBuilds:
+  esbuild: true
+
+# Exact pins for security-sensitive transitive build-chain deps. The current
+# tree already resolves to these safe versions (pnpm audit is clean without
+# this block), so these are a fixed-version guard against resolution drift,
+# matching the project's exact-version policy. Bump deliberately.
+overrides:
+  esbuild: '0.28.1'
+  js-yaml: '4.2.0'
+  '@babel/core': '7.29.7'
