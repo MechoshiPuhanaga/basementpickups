@@ -290,7 +290,7 @@ Verified post-fix: each route emits exactly one PageShell in SSR HTML; `window._
 - React Router's `StaticRouterProvider` emits an inline hydration `<script>` (`window.__staticRouterHydrationData`); it now carries the per-request CSP **nonce**. Revisit serialization/escaping only if/when real loader data is added.
 - No route-level code splitting (direct imports + hydrationData — see memory `project-ssr-router-pattern`); the client ships as one main bundle (re-adding `lazy` needs preloads + Suspense, the trap noted in that memory).
 - ~~Pickup prices are placeholders~~ — **resolved 2026-06-21**: real euro prices edited directly into `pickups.ts` by the developer (e.g. €125 / €140).
-- `data/svg-art-source` was briefly used (Magnific Art Deco vectors) but reverted at the developer's request — see the 2026-06-20 session entry. The source sheets sit unused in `public/assets/svg-art/`.
+- `data/svg-art-source` was briefly used (Magnific Art Deco vectors) but reverted at the developer's request — see the 2026-06-20 session entry. **The Magnific sheets were deleted 2026-06-21** (`public/assets/svg-art/` now empty). For the Art Deco ornamentation roadmap task the developer will provide new SVGs. See memory `feedback-magnific-vectors-rejected`.
 
 ---
 
@@ -318,10 +318,33 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 - ~~404 status for the splat route~~ — **done** (`getStatusForUrl` → real 404s)
 - Consider compiling `server/index.ts` to JS for production instead of running via tsx (small perf gain; current setup keeps `tsx` in `dependencies`)
 - **PWA SW**: bump `VERSION` in `public/sw.js` on any worker change; needs a real-browser install/offline test before launch
+- **Cloudflare: turn Email Obfuscation OFF** (Scrape Shield) — it rewrites the `/contact` email + injects a decode script that Trusted Types blocks → React #418 hydration error + broken email for users. Keep Rocket Loader / Mirage off too. See memory `project-cloudflare-ssr-conflicts`.
+
+## Roadmap (next)
+
+1. **Responsive design pass** — improve phone/tablet layouts: audit breakpoints, nav, grids, hero / product / article layouts, touch-target sizes, and 320px/200% reflow on real devices. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) — restack/wrap at breakpoints rather than compress.
+2. **Art Deco SVG ornamentation** — expand the **in-house** `DecoCorner` / `DecoFrame` / `DecoSeparator` / `DecoOrnament` atoms across the site (section corners, panel/hero frames, editorial separators, CTA/footer ornaments) for a more elegant, sophisticated feel. Derive from `design/references/` + `SVG_SYSTEM.md`. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`).
 
 ---
 
 # Session Log
+
+## 2026-06-21 — Full Lighthouse audit + fixes + audit tooling
+
+Ran Lighthouse across all 17 live pages (sitemap-driven). **A11y 100 everywhere; SEO 100** (cart 69 = intentional `noindex`); **Best Practices 100** (contact 93); **Performance 83–98**.
+
+Fixes applied (code):
+
+- **Article hero was a lazy LCP** (all 4 article pages) — added `priority` to the `ArticlePage` hero `<Image>` (eager + fetchpriority=high).
+- **Logo `unsized-images`** (all 17 pages) — added `width`/`height` (2735×1001, ~2.73:1) to the header/footer logo `<img>`.
+- **`label-content-name-mismatch`** (card grids) — removed the custom `aria-label` from ProductCard/ArticleCard links so the accessible name contains the visible text. (a11y was already 100; this clears the flagged audit.)
+
+Not in code (action items):
+
+- **Contact best-practices 93 = Cloudflare Email Obfuscation.** It rewrites the email + injects a decode script Trusted Types blocks → React #418 hydration error **and a broken email for users**. Fix is a Cloudflare toggle (see follow-ups + memory `project-cloudflare-ssr-conflicts`).
+- Perf hints (render-blocking CSS, unused JS) are known SSR trade-offs.
+
+New tooling: `scripts/audit-lighthouse.mjs` + `pnpm run audit:lighthouse [baseUrl]` (sitemap-driven; pulls Lighthouse via npx, no dependency added) + skill `docs/ai/skills/audit-lighthouse.md`. Verified typecheck/lint/stylelint/format/build green.
 
 ## 2026-06-21 — Open Graph link-preview images (photo-less previews fixed)
 
@@ -433,8 +456,9 @@ The big remaining perf item. All built in the design system; originals kept as f
   rejected the new frames ("use the old frames"), then chose to drop the
   divider and page corners too. All `Art*` atoms, the extracted
   `assets/svg/*.svg`, and the footer attribution were removed; the UI is back to
-  the original `DecoFrame`/`DecoSeparator`/`DecoCorner`. The original Magnific
-  sheets remain in `public/assets/svg-art/` (unused).
+  the original `DecoFrame`/`DecoSeparator`/`DecoCorner`. **The Magnific sheets
+  were deleted 2026-06-21** (`public/assets/svg-art/` now empty); the developer
+  will provide new SVGs for the Art Deco ornamentation roadmap task.
   - **If any Magnific vector is reused later**, their free license requires a
     visible footer credit "Designed by Magnific" linking www.magnific.com, and
     the original files must not be publicly downloadable (move them out of

@@ -24,11 +24,7 @@ export function ProductCard({ pickup, className }: ProductCardProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <Link
-      to={`/products/${pickup.slug}`}
-      className={classes}
-      aria-label={`${pickup.name} — view pickup details`}
-    >
+    <Link to={`/products/${pickup.slug}`} className={classes}>
       <Frame variant="product-card" padding="sm">
         <Stack direction="column" gap="md" align="stretch">
           <div className={styles['imageWrap']}>

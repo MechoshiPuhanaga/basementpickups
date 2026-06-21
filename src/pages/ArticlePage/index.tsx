@@ -71,6 +71,7 @@ export default function ArticlePage() {
               src={article.mainImage.src}
               alt={article.mainImage.alt}
               sizes="(max-width: 768px) 90vw, 720px"
+              priority
               className={styles['hero']}
             />
             {article.mainImage.caption !== undefined && (

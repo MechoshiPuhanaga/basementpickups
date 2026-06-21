@@ -32,7 +32,8 @@
     "format:check": "prettier --check .",
     "stylelint": "stylelint \"src/**/*.css\"",
     "typecheck": "tsc --noEmit",
-    "optimize:images": "node scripts/optimize-images.mjs"
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "audit:lighthouse": "node scripts/audit-lighthouse.mjs"
   },
   "dependencies": {
     "express": "5.2.1",

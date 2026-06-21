@@ -20,7 +20,13 @@ export function Header({ className, actions }: HeaderProps) {
       <Box paddingBlock="md" paddingInline="lg">
         <Stack direction="row" gap="lg" align="center" justify="between" wrap>
           <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
-            <img src="/assets/logo/BP_Gold_horizont.svg" alt="" className={styles['logo']} />
+            <img
+              src="/assets/logo/BP_Gold_horizont.svg"
+              alt=""
+              width={273}
+              height={100}
+              className={styles['logo']}
+            />
           </Link>
           <div className={styles['rightGroup']}>
             <nav aria-label="Primary" className={styles['nav']}>

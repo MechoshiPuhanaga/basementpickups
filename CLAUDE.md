@@ -174,6 +174,7 @@ create-svg-frame.md
 review-component.md
 optimize-images.md
 add-product.md
+audit-lighthouse.md
 ```
 
 Examples:
@@ -199,6 +200,9 @@ Adding or optimizing a photo
 
 Adding new products / updating the catalog
   -> read skills/add-product.md
+
+Auditing quality (perf / a11y / best-practices / SEO)
+  -> read skills/audit-lighthouse.md
 ```
 
 Skills are implementation contracts.

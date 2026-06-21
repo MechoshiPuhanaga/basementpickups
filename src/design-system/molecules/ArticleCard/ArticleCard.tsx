@@ -31,11 +31,7 @@ export function ArticleCard({ article, className }: ArticleCardProps) {
   const metaLabel = `${dateLabel} · ${formatReadingTime(article.body)}`;
 
   return (
-    <Link
-      to={`/articles/${article.slug}`}
-      className={classes}
-      aria-label={`${article.headline} — read article`}
-    >
+    <Link to={`/articles/${article.slug}`} className={classes}>
       <Stack direction="column" gap="md" align="stretch">
         <div className={styles['imageWrap']}>
           <Image
