@@ -9,6 +9,7 @@ The goal is consistent, automatic, lossy-but-premium image delivery:
 
 - modern formats (AVIF, then WebP) with the original as fallback
 - responsive widths (so a small card never downloads a full-resolution photo)
+- a small 1200x630 JPEG per photo for link previews (Open Graph)
 - originals always kept, untouched
 - zero runtime image processing (everything is generated ahead of time)
 
@@ -72,8 +73,34 @@ or older than its source, so adding one photo only processes that photo.
    />
    ```
 
-4. Commit the originals, the generated `.avif`/`.webp` files, and the updated
-   `imageManifest.ts` together.
+4. Commit the originals, the generated `.avif`/`.webp`/`-og.jpg` files, and the
+   updated `imageManifest.ts` together.
+
+---
+
+# Open Graph (link-preview) image
+
+When someone pastes a page link into WhatsApp/Twitter/Facebook/Slack/iMessage,
+the preview photo comes from the `og:image` meta tag — **not** the on-page
+`<picture>`. Scrapers differ from browsers in three ways that drive the design:
+
+- they read only JPEG/PNG (not AVIF/WebP),
+- they ignore `srcset`/`<picture>` (no responsive picking) and use one URL,
+- they cap file size (WhatsApp ~300 KB) and prefer a wide 1200x630 (1.91:1).
+
+So the optimizer also emits one **`<name>-og.jpg`** (1200x630, ~30–100 KB) per
+source photo:
+
+- **wide photos** (ratio ≥ 1.7, e.g. spirit/hero) are scaled to cover the frame,
+- **square photos** (products) are centered on the brand charcoal so nothing is
+  cropped.
+
+The SEO layer references it **by convention** — `src/seo/getSeoForUrl.ts`
+`toOgImage()` maps `…/name.png` → `…/name-og.jpg`. Non-raster sources (article
+placeholder SVGs) fall back to the site default OG image. `server/seo.ts` emits
+`og:image` + `og:image:secure_url`/`:type`/`:width`/`:height` (dims are constant
+1200x630). Do **not** point `og:image` at an AVIF/WebP derivative or the heavy
+original — scrapers can't read the former and drop the latter for size.
 
 ---
 
@@ -101,8 +128,8 @@ Paint on a route (home hero, product gallery main). Everything else stays lazy.
 - Never modify or delete an original to "save space" — it is the fallback and
   the re-encode source.
 - Never hand-edit `imageManifest.ts`; regenerate it.
-- Keep `og:image` (in `src/seo/getSeoForUrl.ts`) pointed at the **original**
-  PNG/JPG — social scrapers handle AVIF/WebP inconsistently.
+- `og:image` points at the generated `<name>-og.jpg` (1200x630 JPEG), never an
+  AVIF/WebP derivative or the heavy original (see Open Graph section above).
 - `sharp` is a **devDependency** used only here, at author time. The committed
   outputs mean the Heroku/Docker build does no image work.
 - If you change `WIDTH_LADDER`, old per-width files for removed widths become
@@ -118,6 +145,7 @@ Defined at the top of `scripts/optimize-images.mjs`:
 WIDTH_LADDER  [480, 768, 1200, 1600]  (never upscales; source width always included)
 AVIF          quality 50, effort 4
 WebP          quality 74, effort 4
+OG image      1200x630 JPEG, quality 80 (mozjpeg), charcoal #0e0c0a pad
 ```
 
 Adjust deliberately and re-run; treat quality changes as a visual decision and

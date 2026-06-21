@@ -14,7 +14,7 @@ All six pages + the enquiry cart, the full design system, the real product catal
 
 - ~~Image optimization~~ — **done 2026-06-21**: AVIF/WebP responsive derivatives + DS `Image` atom (`<picture>`); ~2 MB PNGs now serve at ~6–55 KB. See session log.
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
-- A dedicated **1200×630 OG image**, and real **article photos** (still placeholder SVGs).
+- Real **article photos** (still placeholder SVGs — they fall back to the default OG image in link previews until replaced).
 
 Prior milestones (2026-05-23): infrastructure complete, then design-system complete.
 
@@ -306,7 +306,7 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 4. ~~DS layouts~~ — **done 2026-05-23**
 5. ~~Page visual implementations~~ — **done 2026-05-23**
 6. ~~Real product data + photos~~ — **done 2026-06-20** (article copy real; article _images_ still placeholder SVGs)
-7. Open Graph imagery — partial: product/spirit photos used as `og:image`; **dedicated 1200×630 OG art still TODO**
+7. ~~Open Graph imagery~~ — **done 2026-06-21**: optimizer emits a 1200×630 JPEG (`<name>-og.jpg`) per photo; `og:image` (+ secure_url/type/width/height) points at it. Fixes photo-less link previews (heavy PNG was over scraper size caps).
 8. ~~Accessibility audit~~ — **done 2026-06-20** (color + keyboard/SR); **manual browser/AT pass still TODO**
 9. Performance pass — **woff2 fonts done**; **image optimization done 2026-06-21** (AVIF/WebP responsive `<picture>`); bundle is reasonable
 
@@ -322,6 +322,16 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-21 — Open Graph link-preview images (photo-less previews fixed)
+
+Pasting a product/home link showed text but no photo: `og:image` pointed at the ~2 MB original PNG, which scrapers drop (WhatsApp caps ~300 KB) — and it was square, not the 1.91:1 platforms want. Scrapers also can't use the AVIF/WebP derivatives (JPEG/PNG only) and ignore `srcset`/`<picture>`.
+
+- **Optimizer** (`scripts/optimize-images.mjs`) now also emits one **`<name>-og.jpg`** (1200×630, mozjpeg q80) per source: wide photos (ratio ≥ 1.7) covered, square photos (products) centered on charcoal `#0e0c0a` so nothing is cropped. ~27 KB (product) / ~100 KB (spirit). Generated OG files are skipped when scanning for sources (`-og.jpg` regex). Not in the image manifest.
+- **SEO** (`getSeoForUrl.ts`) — `toOgImage()` maps `…/name.png` → `…/name-og.jpg` by convention; SVG sources (article placeholders) fall back to the site default OG. `SeoMeta` gained `ogImageWidth`/`Height`/`Type` (constant 1200×630 / image/jpeg). `server/seo.ts` now emits `og:image:secure_url` / `:type` / `:width` / `:height`.
+- **Browser experience unchanged** — OG image is scraper-only; on-page images still use the `Image` atom (AVIF/WebP).
+- **Skill** `docs/ai/skills/optimize-images.md` updated (new Open Graph section; fixed the now-wrong "point og:image at the original PNG" rule).
+- Verified: typecheck/lint/format/build green; prod smoke test shows `og:image` → `…-og.jpg` + dimension tags, files serve as image/jpeg at 28 KB / 100 KB. Article previews still use the default OG until real article photos land.
 
 ## 2026-06-21 — Lighthouse best-practices: HSTS + CSP hardening
 

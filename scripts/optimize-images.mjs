@@ -41,6 +41,17 @@ const SOURCE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg']);
 const AVIF_OPTIONS = { quality: 50, effort: 4 };
 const WEBP_OPTIONS = { quality: 74, effort: 4 };
 
+// Open Graph / link-preview image. Scrapers only read JPEG/PNG (not AVIF/WebP),
+// only the single `og:image` URL (not srcset/<picture>), and cap file size
+// (WhatsApp ~300 KB). So each photo also gets one small 1200x630 JPEG: wide
+// photos are covered, square photos are centered on the brand charcoal so
+// nothing is cropped. Referenced by convention (`<name>-og.jpg`) in the SEO layer.
+const OG_SIZE = { width: 1200, height: 630 };
+const OG_BACKGROUND = '#0e0c0a';
+const OG_JPEG_OPTIONS = { quality: 80, mozjpeg: true };
+// Generated OG filenames must be skipped when scanning for source images.
+const OG_SUFFIX_RE = /-og\.jpe?g$/i;
+
 /** Map an absolute file path under /public to its served URL path. */
 function toUrlPath(absPath) {
   return '/' + path.relative(PUBLIC_DIR, absPath).split(path.sep).join('/');
@@ -111,6 +122,7 @@ async function main() {
     for (const file of files) {
       const ext = path.extname(file).toLowerCase();
       if (!SOURCE_EXTENSIONS.has(ext)) continue;
+      if (OG_SUFFIX_RE.test(file)) continue;
 
       const absSource = path.join(absDir, file);
       const base = path.basename(file, ext);
@@ -137,6 +149,26 @@ async function main() {
           encoded += 1;
         else upToDate += 1;
         webp.push({ width, src: toUrlPath(webpOut) });
+      }
+
+      // Open Graph image: wide photos are covered, square photos padded onto charcoal.
+      const ogOut = path.join(absDir, `${base}-og.jpg`);
+      if (await isStale(ogOut, mtimeMs)) {
+        const fit = metadata.width / metadata.height >= 1.7 ? 'cover' : 'contain';
+        await sharp(absSource)
+          .resize({
+            width: OG_SIZE.width,
+            height: OG_SIZE.height,
+            fit,
+            position: 'centre',
+            background: OG_BACKGROUND,
+          })
+          .flatten({ background: OG_BACKGROUND })
+          .jpeg(OG_JPEG_OPTIONS)
+          .toFile(ogOut);
+        encoded += 1;
+      } else {
+        upToDate += 1;
       }
 
       entries[toUrlPath(absSource)] = {

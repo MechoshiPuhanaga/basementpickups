@@ -173,6 +173,7 @@ create-page.md
 create-svg-frame.md
 review-component.md
 optimize-images.md
+add-product.md
 ```
 
 Examples:
@@ -195,6 +196,9 @@ Reviewing existing code
 
 Adding or optimizing a photo
   -> read skills/optimize-images.md
+
+Adding new products / updating the catalog
+  -> read skills/add-product.md
 ```
 
 Skills are implementation contracts.

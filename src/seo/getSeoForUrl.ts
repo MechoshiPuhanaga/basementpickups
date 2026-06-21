@@ -7,8 +7,25 @@ const DEFAULT_DESCRIPTION =
   'Handcrafted boutique guitar pickups. Premium tone, restrained design, deliberate craftsmanship.';
 const DEFAULT_OG_IMAGE = '/assets/images/spirit-photos/bp-spirit-1.png';
 
+// All link-preview images are the generated 1200x630 JPEGs (see
+// scripts/optimize-images.mjs), so the dimensions are constant.
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 630;
+const OG_IMAGE_TYPE = 'image/jpeg';
+
 function withSiteName(title: string): string {
   return `${title} | ${SITE_NAME}`;
+}
+
+/**
+ * Map a source image path to its generated Open Graph JPEG (`<name>-og.jpg`).
+ * Non-raster sources (article placeholder SVGs) fall back to the site default.
+ */
+function toOgImage(imagePath: string): string {
+  if (/\.(png|jpe?g)$/i.test(imagePath)) {
+    return imagePath.replace(/\.(png|jpe?g)$/i, '-og.jpg');
+  }
+  return DEFAULT_OG_IMAGE.replace(/\.png$/i, '-og.jpg');
 }
 
 interface SeoInput {
@@ -31,7 +48,10 @@ function build(origin: string, input: SeoInput): SeoMeta {
     ogDescription: input.description,
     ogType: input.ogType,
     ogUrl: url,
-    ogImage: `${base}${input.ogImage ?? DEFAULT_OG_IMAGE}`,
+    ogImage: `${base}${toOgImage(input.ogImage ?? DEFAULT_OG_IMAGE)}`,
+    ogImageWidth: OG_IMAGE_WIDTH,
+    ogImageHeight: OG_IMAGE_HEIGHT,
+    ogImageType: OG_IMAGE_TYPE,
     ...(input.robots !== undefined ? { robots: input.robots } : {}),
   };
 }
@@ -120,15 +140,14 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
     const slug = articleMatch[1] ?? '';
     const article = getArticleBySlug(slug);
     if (article) {
-      // Article placeholder images are SVG; social platforms want raster, so
-      // fall back to the default OG image for now.
-      const image = article.mainImage.src.endsWith('.svg') ? undefined : article.mainImage.src;
+      // Article placeholder images are SVG; toOgImage() falls those back to the
+      // site default OG image until real raster article photos exist.
       return build(origin, {
         title: withSiteName(article.headline),
         description: article.excerpt,
         path: `/articles/${article.slug}`,
         ogType: 'article',
-        ...(image !== undefined ? { ogImage: image } : {}),
+        ogImage: article.mainImage.src,
       });
     }
   }
