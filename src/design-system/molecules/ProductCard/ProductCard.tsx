@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 
 import { Frame } from '../../atoms/Frame';
 import { Heading } from '../../atoms/Heading';
+import { Image } from '../../atoms/Image';
 import { Price } from '../../atoms/Price';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
@@ -31,7 +32,12 @@ export function ProductCard({ pickup, className }: ProductCardProps) {
       <Frame variant="product-card" padding="sm">
         <Stack direction="column" gap="md" align="stretch">
           <div className={styles['imageWrap']}>
-            <img src={pickup.images.main} alt="" className={styles['image']} loading="lazy" />
+            <Image
+              src={pickup.images.main}
+              alt=""
+              sizes="(max-width: 768px) 90vw, 33vw"
+              className={styles['image']}
+            />
           </div>
           <Stack direction="column" gap="xs" align="center">
             <Text variant="label" tone="muted">

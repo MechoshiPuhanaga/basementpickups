@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Frame } from '../../atoms/Frame';
+import { Image } from '../../atoms/Image';
 import styles from './ProductGallery.module.css';
 
 export interface ProductGalleryImage {
@@ -29,7 +30,13 @@ export function ProductGallery({ images, productName, className }: ProductGaller
     <div className={classes}>
       <Frame variant="image" padding="sm">
         <div className={styles['mainWrap']}>
-          <img src={active.src} alt={activeAlt} className={styles['mainImage']} />
+          <Image
+            src={active.src}
+            alt={activeAlt}
+            sizes="(max-width: 900px) 90vw, 50vw"
+            priority
+            className={styles['mainImage']}
+          />
         </div>
       </Frame>
       {images.length > 1 && (
@@ -52,7 +59,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
                   setActiveIndex(index);
                 }}
               >
-                <img src={image.src} alt="" className={styles['thumbImage']} loading="lazy" />
+                <Image src={image.src} alt="" sizes="72px" className={styles['thumbImage']} />
               </button>
             );
           })}

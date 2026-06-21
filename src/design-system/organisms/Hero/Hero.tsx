@@ -1,6 +1,7 @@
 import { Button } from '../../atoms/Button';
 import { Frame } from '../../atoms/Frame';
 import { Heading } from '../../atoms/Heading';
+import { Image } from '../../atoms/Image';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import styles from './Hero.module.css';
@@ -41,7 +42,13 @@ export function Hero({
         <div className={styles['imageSide']}>
           <Frame variant="hero" padding="sm">
             <div className={styles['imageWrap']}>
-              <img src={imageSrc} alt={imageAlt} className={styles['image']} loading="eager" />
+              <Image
+                src={imageSrc}
+                alt={imageAlt}
+                sizes="(max-width: 768px) 90vw, 45vw"
+                priority
+                className={styles['image']}
+              />
             </div>
           </Frame>
         </div>

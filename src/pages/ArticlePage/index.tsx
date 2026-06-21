@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 
 import { Button } from '../../design-system/atoms/Button';
 import { Heading } from '../../design-system/atoms/Heading';
+import { Image } from '../../design-system/atoms/Image';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
 import { ArticleLayout } from '../../design-system/layouts/ArticleLayout';
@@ -66,9 +67,10 @@ export default function ArticlePage() {
       <ArticleLayout
         hero={
           <div className={styles['heroWrap']}>
-            <img
+            <Image
               src={article.mainImage.src}
               alt={article.mainImage.alt}
+              sizes="(max-width: 768px) 90vw, 720px"
               className={styles['hero']}
             />
             {article.mainImage.caption !== undefined && (

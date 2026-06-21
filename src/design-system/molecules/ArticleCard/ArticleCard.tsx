@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 
 import { Heading } from '../../atoms/Heading';
+import { Image } from '../../atoms/Image';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import type { Article } from '../../../data/articles';
@@ -37,7 +38,12 @@ export function ArticleCard({ article, className }: ArticleCardProps) {
     >
       <Stack direction="column" gap="md" align="stretch">
         <div className={styles['imageWrap']}>
-          <img src={article.mainImage.src} alt="" className={styles['image']} loading="lazy" />
+          <Image
+            src={article.mainImage.src}
+            alt=""
+            sizes="(max-width: 768px) 90vw, 33vw"
+            className={styles['image']}
+          />
         </div>
         <Stack direction="column" gap="xs">
           <Text variant="label" tone="muted">

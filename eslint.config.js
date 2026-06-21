@@ -44,10 +44,13 @@ export default tseslint.config(
   },
   {
     files: ['**/*.js', '**/*.mjs'],
+    ...tseslint.configs.disableTypeChecked,
+  },
+  {
+    files: ['**/*.js', '**/*.mjs'],
     languageOptions: {
       globals: { ...globals.node },
     },
-    ...tseslint.configs.disableTypeChecked,
   },
   prettierConfig,
 );

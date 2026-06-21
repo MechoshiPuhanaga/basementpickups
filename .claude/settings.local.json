@@ -67,7 +67,13 @@
       "Bash(convert -background \"#0e0c0a\" -density 600 /tmp/mark-gold.svg -resize 320x320 -gravity center -extent 512x512 public/icons/icon-maskable-512.png)",
       "Read(//home/mechoshi/Documents/projects/basementpickups/**)",
       "Read(//home/mechoshi/Documents/projects/basementpickups/.github/**)",
-      "Bash(rsync -a --exclude='node_modules' --exclude='dist' --exclude='.git' /home/mechoshi/Documents/projects/basementpickups_v2/ /home/mechoshi/Documents/projects/basementpickups/)"
+      "Bash(rsync -a --exclude='node_modules' --exclude='dist' --exclude='.git' /home/mechoshi/Documents/projects/basementpickups_v2/ /home/mechoshi/Documents/projects/basementpickups/)",
+      "Bash(command -v gh)",
+      "Bash(gh --version)",
+      "Bash(awk '{ printf \"%.2f MB\\\\t%s\\\\n\", $1/1048576, $2 }')",
+      "Bash(awk '{s+=$1} END { printf \"%.2f MB\\\\n\", s/1048576 }')",
+      "Bash(git check-ignore *)",
+      "Bash(docker build *)"
     ]
   }
 }

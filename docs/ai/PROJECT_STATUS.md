@@ -12,7 +12,7 @@ All six pages + the enquiry cart, the full design system, the real product catal
 
 **Not blocking, still open:**
 
-- **Image optimization** — product/spirit PNGs are ~2 MB each (top priority; ties to perf + PWA cache size).
+- ~~Image optimization~~ — **done 2026-06-21**: AVIF/WebP responsive derivatives + DS `Image` atom (`<picture>`); ~2 MB PNGs now serve at ~6–55 KB. See session log.
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
 - A dedicated **1200×630 OG image**, and real **article photos** (still placeholder SVGs).
 
@@ -308,7 +308,7 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 6. ~~Real product data + photos~~ — **done 2026-06-20** (article copy real; article _images_ still placeholder SVGs)
 7. Open Graph imagery — partial: product/spirit photos used as `og:image`; **dedicated 1200×630 OG art still TODO**
 8. ~~Accessibility audit~~ — **done 2026-06-20** (color + keyboard/SR); **manual browser/AT pass still TODO**
-9. Performance pass — **woff2 fonts done**; **image optimization still TODO** (the big one); bundle is reasonable
+9. Performance pass — **woff2 fonts done**; **image optimization done 2026-06-21** (AVIF/WebP responsive `<picture>`); bundle is reasonable
 
 ## Open infrastructure follow-ups
 
@@ -322,6 +322,21 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-21 — Image optimization (AVIF/WebP responsive `<picture>`)
+
+The big remaining perf item. All built in the design system; originals kept as fallback + re-encode source.
+
+- **Build-time optimizer** `scripts/optimize-images.mjs` (sharp, **devDependency** `0.35.2`, exact-pinned). Scans `public/assets/images/{product-photos,spirit-photos}`, emits `<name>-<w>.avif` + `<name>-<w>.webp` siblings on a non-upscaling width ladder `[480,768,1200,1600]` (source width always included). **Idempotent** (skips derivatives newer than source), so adding one photo only processes that photo. `pnpm run optimize:images`. AVIF q50/effort4, WebP q74/effort4.
+- **Generated typed manifest** `src/assets/imageManifest.ts` (+ hand-written `imageManifest.types.ts`): original URL → intrinsic `width`/`height` + `avif[]`/`webp[]` variants. **Do not hand-edit**; regenerate.
+- **DS atom `src/design-system/atoms/Image`** — emits `<picture>` (AVIF → WebP → original `<img>`) from the manifest, with `srcset`/`sizes`, intrinsic `width`/`height` (CLS), `decoding=async`, and `priority` → `loading=eager` + `fetchPriority=high`. **Sources not in the manifest (SVG logos, placeholder article art) fall back to a plain `<img>`** — safe everywhere. Picture wrapper is `display:contents` so existing absolute-positioned image CSS is untouched.
+- **Routed 6 `<img>` sites** through `Image`: ProductCard, ProductGallery (main = priority, thumbs), ArticleCard, Hero (priority), FramedImage (new `sizes` prop), ArticlePage hero. Per-slot `sizes` documented in the skill.
+- **Results**: white-pearl 2008 KB PNG → 42 KB full-res AVIF (~98%); a product card loads the 480px AVIF at ~6 KB. All-widths derivative footprint: AVIF 1.17 MB + WebP 1.66 MB total (browser fetches one width per image).
+- **Kept**: `og:image` still points at PNG originals (social scrapers); SW still caches images on-demand (smaller files shrink the cache). Originals committed alongside derivatives + manifest.
+- **Skill**: `docs/ai/skills/optimize-images.md` (added to the CLAUDE.md skill index) — the repeatable add-a-photo contract.
+- **Fixed a latent ESLint-config bug**: the `**/*.{js,mjs}` block spread `disableTypeChecked` _after_ `languageOptions`, clobbering `globals.node` (so node globals never applied to any `.mjs`). Split into two flat-config entries so `parserOptions` + `globals` both survive. Surfaced because the optimizer is the first `.mjs` using `console`/`process`.
+- **Docker note**: sharp's musl + glibc prebuilt variants are in `pnpm-lock.yaml`, so the alpine `--frozen-lockfile` build resolves. sharp is dev-only and never used at deploy/runtime (derivatives are committed). Recommend a `docker build` before the next deploy to confirm.
+- Verified (Node 24.16.0): typecheck / lint / stylelint / format:check / build all green; prod SSR renders `<picture>` + avif/webp/srcset/sizes across all 7 products, home hero serves AVIF eagerly with `fetchPriority=high`; routes 200, unknown 404.
 
 ## 2026-06-21 — Trusted Types blocked SW registration (prod PWA fix)
 

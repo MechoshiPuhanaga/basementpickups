@@ -172,6 +172,7 @@ create-molecule.md
 create-page.md
 create-svg-frame.md
 review-component.md
+optimize-images.md
 ```
 
 Examples:
@@ -191,6 +192,9 @@ Creating decorative SVG framing
 
 Reviewing existing code
   -> read skills/review-component.md
+
+Adding or optimizing a photo
+  -> read skills/optimize-images.md
 ```
 
 Skills are implementation contracts.
