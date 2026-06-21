@@ -71,6 +71,12 @@ type RenderFn = (request: Request, nonce: string) => Promise<SsrRenderResult>;
  * dangerous DOM sinks (innerHTML, script.src, eval, …) to receive a typed,
  * policy-vetted value instead of a raw string. No `trusted-types` allowlist is
  * set, so libraries may still create policies as needed.
+ *
+ * `'unsafe-inline'` is a backward-compatibility fallback only: CSP3 browsers
+ * ignore it whenever a nonce/hash is present (so modern security is unchanged),
+ * while pre-nonce browsers fall back to it instead of breaking. We deliberately
+ * do NOT use `'strict-dynamic'` — it would make `'self'` ignored and block the
+ * Vite-injected module <script> tags, which are allowed via `'self'`, not a nonce.
  */
 function contentSecurityPolicy(nonce: string): string {
   return [
@@ -82,7 +88,7 @@ function contentSecurityPolicy(nonce: string): string {
     "font-src 'self'",
     "connect-src 'self'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
     `style-src 'self' 'nonce-${nonce}'`,
     "require-trusted-types-for 'script'",
   ].join('; ');
@@ -177,7 +183,11 @@ async function start(): Promise<void> {
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
     if (isProd) {
-      res.setHeader('Strict-Transport-Security', 'max-age=15552000');
+      // 2-year max-age + includeSubDomains + preload satisfies the HSTS preload
+      // list requirements. NB: includeSubDomains forces HTTPS on every subdomain;
+      // `preload` is the prerequisite directive, but actual enrollment is a
+      // separate one-time submission at https://hstspreload.org (and hard to undo).
+      res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     }
     next();
   });

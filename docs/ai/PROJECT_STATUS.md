@@ -323,6 +323,14 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 
 # Session Log
 
+## 2026-06-21 — Lighthouse best-practices: HSTS + CSP hardening
+
+From a prod Lighthouse "Trust and Safety" audit (`server/index.ts`):
+
+- **HSTS** was `max-age=15552000` (180d), no `includeSubDomains`/`preload` → flagged (max-age too low / missing directives). Now **`max-age=63072000; includeSubDomains; preload`** (prod only). NB: the `preload` directive is the prerequisite, but enrolling in the browser preload list is a **separate manual submission at hstspreload.org** and is hard to reverse; `includeSubDomains` forces HTTPS on every subdomain (fine behind Cloudflare).
+- **CSP** flagged "consider adding `unsafe-inline` for backward compatibility". Added **`'unsafe-inline'` to `script-src`** — CSP3 browsers ignore it when a nonce is present (modern security unchanged), pre-nonce browsers degrade gracefully. Deliberately **did not add `'strict-dynamic'`**: it makes `'self'` ignored and would block the Vite-injected module `<script>` tags (allowed via `'self'`, not a nonce).
+- Verified: typecheck/lint/format/build green; prod headers confirmed via smoke test (`Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`, `script-src 'self' 'nonce-…' 'unsafe-inline'`). Re-run Lighthouse after deploy to confirm green. See memory `project-security-seo`.
+
 ## 2026-06-21 — Image optimization (AVIF/WebP responsive `<picture>`)
 
 The big remaining perf item. All built in the design system; originals kept as fallback + re-encode source.

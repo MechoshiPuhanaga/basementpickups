@@ -73,7 +73,9 @@
       "Bash(awk '{ printf \"%.2f MB\\\\t%s\\\\n\", $1/1048576, $2 }')",
       "Bash(awk '{s+=$1} END { printf \"%.2f MB\\\\n\", s/1048576 }')",
       "Bash(git check-ignore *)",
-      "Bash(docker build *)"
+      "Bash(docker build *)",
+      "Bash(pkill -f \"tsx watch server/index.ts\")",
+      "Bash(pkill -f \"server/index.ts\")"
     ]
   }
 }
