@@ -14,7 +14,7 @@ All six pages + the enquiry cart, the full design system, the real product catal
 
 - **Image optimization** — product/spirit PNGs are ~2 MB each (top priority; ties to perf + PWA cache size).
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
-- Real **pricing** (current prices are placeholders), a dedicated **1200×630 OG image**, and real **article photos** (still placeholder SVGs).
+- A dedicated **1200×630 OG image**, and real **article photos** (still placeholder SVGs).
 
 Prior milestones (2026-05-23): infrastructure complete, then design-system complete.
 
@@ -289,7 +289,7 @@ Verified post-fix: each route emits exactly one PageShell in SSR HTML; `window._
 - ~~The `*` catch-all returns 200~~ — **resolved**: `getStatusForUrl` now sends real 404s for the splat route + unknown slugs.
 - React Router's `StaticRouterProvider` emits an inline hydration `<script>` (`window.__staticRouterHydrationData`); it now carries the per-request CSP **nonce**. Revisit serialization/escaping only if/when real loader data is added.
 - No route-level code splitting (direct imports + hydrationData — see memory `project-ssr-router-pattern`); the client ships as one main bundle (re-adding `lazy` needs preloads + Suspense, the trap noted in that memory).
-- **Pickup prices are placeholders** — `data/pickups-data.txt` carries no pricing, so the values in `pickups.ts` are plausible boutique numbers to be replaced with real pricing.
+- ~~Pickup prices are placeholders~~ — **resolved 2026-06-21**: real euro prices edited directly into `pickups.ts` by the developer (e.g. €125 / €140).
 - `data/svg-art-source` was briefly used (Magnific Art Deco vectors) but reverted at the developer's request — see the 2026-06-20 session entry. The source sheets sit unused in `public/assets/svg-art/`.
 
 ---
@@ -322,6 +322,14 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-21 — Trusted Types blocked SW registration (prod PWA fix)
+
+- **Bug from live deploy console**: `entry-client.tsx` — `Failed to execute 'register' on 'ServiceWorkerContainer': This document requires 'TrustedScriptURL' assignment.` The prod-only CSP's `require-trusted-types-for 'script'` makes `serviceWorker.register()`'s URL a TrustedScriptURL sink, so the raw string `'/sw.js'` was blocked — meaning **the PWA service worker never registered in production** (no offline, no install). This was the "verify TT in a real browser" carry-forward; now confirmed failing and fixed.
+- **Fix** (`src/entry-client.tsx`): wrap the SW URL in a `bp-sw` Trusted Types policy (`createPolicy(...).createScriptURL('/sw.js')`) before `register()`, falling back to the raw string where `window.trustedTypes` is absent. No server/CSP change needed — the CSP deliberately sets no `trusted-types` allowlist, so policy creation is permitted.
+- **Types**: TS 6.0.3's DOM lib has no Trusted Types globals; added minimal `TrustedScriptURL`/`TrustedTypePolicy`/`TrustedTypePolicyFactory` + `Window.trustedTypes?` declarations to `src/vite-env.d.ts`. `register()` is still typed `string | URL`, so the trusted object is passed via `as unknown as string` (runtime honors it).
+- The other live-console lines (`ObjectMultiplex`, `app-init-liveness`/`background-liveness`, `MaxListenersExceededWarning`, "Failed to get subsystem status") are **MetaMask browser-extension noise**, not our app.
+- Verified: typecheck / lint / stylelint / format:check / build all green; `bp-sw` + `createScriptURL` present in the built client bundle. **Still needs a real-browser prod check** that the SW now registers + serves offline.
 
 ## 2026-06-21 — v2 → production repo migration (this is now THE repo)
 
