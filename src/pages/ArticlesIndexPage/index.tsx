@@ -1,3 +1,4 @@
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
@@ -16,6 +17,7 @@ export default function ArticlesIndexPage() {
           <Heading level={1} variant="display" align="center">
             Articles
           </Heading>
+          <DecoSeparator variant="medallion" />
           <Text variant="lead" tone="muted" align="center">
             Notes from the bench on winding, magnets, tone, and the work that doesn&rsquo;t make it
             into spec sheets.

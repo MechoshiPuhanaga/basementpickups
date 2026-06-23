@@ -48,7 +48,7 @@ export function ProductGrid({
             )}
           </Stack>
         )}
-        <Grid columns={columns} gap="lg" align="start">
+        <Grid columns={columns} mobileColumns={2} gap="lg" align="stretch">
           {pickups.map((pickup) => (
             <ProductCard key={pickup.id} pickup={pickup} />
           ))}

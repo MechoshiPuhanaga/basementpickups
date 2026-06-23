@@ -1,3 +1,4 @@
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Grid } from '../../design-system/atoms/Grid';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
@@ -19,6 +20,7 @@ export default function AboutPage() {
             <Heading level={1} variant="display" align="center">
               Passion for sound
             </Heading>
+            <DecoSeparator variant="medallion" />
             <Text variant="lead" tone="muted" align="center">
               Basement Pickups is the offspring of my lifelong love and passion for rock music and
               the fascinating sound of the electric guitar.
@@ -40,7 +42,7 @@ export default function AboutPage() {
               &ndash; that I sincerely want to share with you.
             </Text>
             <Stack direction="column" gap="none" align="start">
-              <Text variant="editorial" tone="primary" italic>
+              <Text variant="lead" tone="primary" italic>
                 Roumen Kirov
               </Text>
               <Text variant="label" tone="gold">

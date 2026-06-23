@@ -9,6 +9,8 @@ export type GridAlign = 'start' | 'center' | 'end' | 'stretch';
 export interface GridProps {
   as?: ElementType | undefined;
   columns?: GridColumns | undefined;
+  /** Column count on phones/tablets (≤768px). Defaults to 1 (single column). */
+  mobileColumns?: 1 | 2 | undefined;
   gap?: GridGap | undefined;
   align?: GridAlign | undefined;
   className?: string | undefined;
@@ -18,6 +20,7 @@ export interface GridProps {
 export function Grid({
   as: Tag = 'div',
   columns = 3,
+  mobileColumns = 1,
   gap = 'lg',
   align,
   className,
@@ -26,7 +29,13 @@ export function Grid({
   const classes = [styles['grid'], className].filter(Boolean).join(' ');
 
   return (
-    <Tag className={classes} data-columns={columns} data-gap={gap} data-align={align}>
+    <Tag
+      className={classes}
+      data-columns={columns}
+      data-mobile-columns={mobileColumns}
+      data-gap={gap}
+      data-align={align}
+    >
       {children}
     </Tag>
   );

@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 
 import { Box } from '../../atoms/Box';
-import { DecoCorner } from '../../atoms/DecoCorner';
+import { DecoSeparator } from '../../atoms/DecoSeparator';
 import { Grid } from '../../atoms/Grid';
 import { Heading } from '../../atoms/Heading';
 import { Stack } from '../../atoms/Stack';
@@ -19,11 +19,7 @@ export function Footer({ className }: FooterProps) {
 
   return (
     <footer className={classes}>
-      <div className={styles['borderRow']} aria-hidden="true">
-        <DecoCorner variant="simple" position="top-left" size={16} className={styles['corner']} />
-        <span className={styles['borderLine']} />
-        <DecoCorner variant="simple" position="top-right" size={16} className={styles['corner']} />
-      </div>
+      <DecoSeparator variant="crest" />
       <Box paddingBlock="xl" paddingInline="lg">
         <Stack direction="column" gap="xl" align="stretch">
           <Grid columns={2} gap="xl" align="start">

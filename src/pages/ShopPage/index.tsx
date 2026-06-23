@@ -1,3 +1,4 @@
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
@@ -16,6 +17,7 @@ export default function ShopPage() {
           <Heading level={1} variant="display" align="center">
             Shop Pickups
           </Heading>
+          <DecoSeparator variant="medallion" />
           <Text variant="lead" tone="muted" align="center">
             Handwound humbuckers, each voiced for a specific musical character. Calibrated neck and
             bridge sets are noted where available.

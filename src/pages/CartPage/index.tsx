@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 
 import { Button } from '../../design-system/atoms/Button';
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { IconButton } from '../../design-system/atoms/IconButton';
 import { Price } from '../../design-system/atoms/Price';
@@ -31,6 +32,7 @@ export default function CartPage() {
           <Heading level={1} variant="display" align="center">
             Your enquiry
           </Heading>
+          <DecoSeparator variant="medallion" />
           <Text variant="lead" tone="muted" align="center">
             Your enquiry list is empty. Add a few pickups and send them to the workshop in a single
             message.
@@ -54,6 +56,7 @@ export default function CartPage() {
             <Heading level={1} variant="display" align="center">
               Your enquiry
             </Heading>
+            <DecoSeparator variant="medallion" />
             <Text variant="lead" tone="muted" align="center">
               Review your pickups, then send them to the workshop as one message. Nothing is charged
               — we reply to every enquiry personally.

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Select } from '../../atoms/Select';
 import { Text } from '../../atoms/Text';
 import { VisuallyHidden } from '../../atoms/VisuallyHidden';
+import { FilterDisclosure } from '../../molecules/FilterDisclosure';
 import { ProductGrid } from '../ProductGrid';
 import type { Pickup, PickupMagnet, PickupType } from '../../../data/pickups';
 import styles from './ProductBrowser.module.css';
@@ -22,6 +23,16 @@ type SortKey =
   | 'inductance-desc';
 type MagnetFilter = 'all' | PickupMagnet;
 type TypeFilter = 'all' | PickupType;
+
+const SORT_LABEL: Record<SortKey, string> = {
+  featured: 'Featured',
+  name: 'Name (A–Z)',
+  'name-desc': 'Name (Z–A)',
+  'price-asc': 'Price (low to high)',
+  'price-desc': 'Price (high to low)',
+  'inductance-asc': 'Inductance (low to high)',
+  'inductance-desc': 'Inductance (high to low)',
+};
 
 const TYPE_LABEL: Record<PickupType, string> = {
   humbucker: 'Humbucker',
@@ -131,71 +142,78 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
   }, [pickups, sort, magnet, type]);
 
   const classes = [styles['root'], className].filter(Boolean).join(' ');
+  const activeFilters = [
+    SORT_LABEL[sort],
+    type !== 'all' ? TYPE_LABEL[type] : undefined,
+    magnet !== 'all' ? MAGNET_LABEL[magnet] : undefined,
+  ].filter((value): value is string => value !== undefined);
 
   return (
     <div className={classes}>
       <VisuallyHidden as="h2">All pickups</VisuallyHidden>
       <div className={styles['controls']}>
-        <div className={styles['fields']}>
-          <label className={styles['field']}>
-            <Text variant="label" tone="muted" as="span">
-              Sort
-            </Text>
-            <Select
-              selectSize="sm"
-              value={sort}
-              onChange={(event) => {
-                setSort(event.target.value as SortKey);
-              }}
-            >
-              <option value="featured">Featured</option>
-              <option value="name">Name (A–Z)</option>
-              <option value="name-desc">Name (Z–A)</option>
-              <option value="price-asc">Price (low to high)</option>
-              <option value="price-desc">Price (high to low)</option>
-              <option value="inductance-asc">Inductance (low to high)</option>
-              <option value="inductance-desc">Inductance (high to low)</option>
-            </Select>
-          </label>
-          <label className={styles['field']}>
-            <Text variant="label" tone="muted" as="span">
-              Type
-            </Text>
-            <Select
-              selectSize="sm"
-              value={type}
-              onChange={(event) => {
-                setType(event.target.value as TypeFilter);
-              }}
-            >
-              <option value="all">All types</option>
-              {availableTypes.map((value) => (
-                <option key={value} value={value}>
-                  {TYPE_LABEL[value]}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label className={styles['field']}>
-            <Text variant="label" tone="muted" as="span">
-              Magnet
-            </Text>
-            <Select
-              selectSize="sm"
-              value={magnet}
-              onChange={(event) => {
-                setMagnet(event.target.value as MagnetFilter);
-              }}
-            >
-              <option value="all">All magnets</option>
-              {availableMagnets.map((value) => (
-                <option key={value} value={value}>
-                  {MAGNET_LABEL[value]}
-                </option>
-              ))}
-            </Select>
-          </label>
-        </div>
+        <FilterDisclosure filters={activeFilters}>
+          <div className={styles['fields']}>
+            <label className={styles['field']}>
+              <Text variant="label" tone="muted" as="span">
+                Sort
+              </Text>
+              <Select
+                selectSize="sm"
+                value={sort}
+                onChange={(event) => {
+                  setSort(event.target.value as SortKey);
+                }}
+              >
+                <option value="featured">Featured</option>
+                <option value="name">Name (A–Z)</option>
+                <option value="name-desc">Name (Z–A)</option>
+                <option value="price-asc">Price (low to high)</option>
+                <option value="price-desc">Price (high to low)</option>
+                <option value="inductance-asc">Inductance (low to high)</option>
+                <option value="inductance-desc">Inductance (high to low)</option>
+              </Select>
+            </label>
+            <label className={styles['field']}>
+              <Text variant="label" tone="muted" as="span">
+                Type
+              </Text>
+              <Select
+                selectSize="sm"
+                value={type}
+                onChange={(event) => {
+                  setType(event.target.value as TypeFilter);
+                }}
+              >
+                <option value="all">All types</option>
+                {availableTypes.map((value) => (
+                  <option key={value} value={value}>
+                    {TYPE_LABEL[value]}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label className={styles['field']}>
+              <Text variant="label" tone="muted" as="span">
+                Magnet
+              </Text>
+              <Select
+                selectSize="sm"
+                value={magnet}
+                onChange={(event) => {
+                  setMagnet(event.target.value as MagnetFilter);
+                }}
+              >
+                <option value="all">All magnets</option>
+                {availableMagnets.map((value) => (
+                  <option key={value} value={value}>
+                    {MAGNET_LABEL[value]}
+                  </option>
+                ))}
+              </Select>
+            </label>
+          </div>
+        </FilterDisclosure>
         <div className={styles['count']} role="status" aria-live="polite">
           <Text variant="meta" tone="muted">
             {visible.length} {visible.length === 1 ? 'model' : 'models'}

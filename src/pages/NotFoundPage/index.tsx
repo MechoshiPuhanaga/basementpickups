@@ -1,4 +1,5 @@
 import { Button } from '../../design-system/atoms/Button';
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
@@ -14,6 +15,7 @@ export default function NotFoundPage() {
         <Heading level={1} variant="display" align="center">
           Off the bench
         </Heading>
+        <DecoSeparator variant="medallion" />
         <Text variant="lead" tone="muted" align="center">
           The page you were looking for isn&rsquo;t here. It may have moved, or never existed. Take
           the workshop tour instead.

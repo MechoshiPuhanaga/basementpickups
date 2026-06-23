@@ -41,12 +41,22 @@
   max-inline-size: none;
 }
 
+/* On mobile, trim the top padding one step to reclaim vertical space while keeping
+   the (slightly reduced) bottom padding for section-to-section rhythm. */
 @media (width <= 768px) {
+  .root[data-spacing='sm'] {
+    padding-block: var(--space-5) var(--space-6);
+  }
+
+  .root[data-spacing='md'] {
+    padding-block: var(--space-6) var(--space-7);
+  }
+
   .root[data-spacing='lg'] {
-    padding-block: var(--space-7);
+    padding-block: var(--space-6) var(--space-7);
   }
 
   .root[data-spacing='xl'] {
-    padding-block: var(--space-8);
+    padding-block: var(--space-7) var(--space-8);
   }
 }

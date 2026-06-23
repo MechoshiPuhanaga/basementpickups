@@ -4,6 +4,10 @@
   pointer-events: none;
 }
 
+.variant-bracket {
+  opacity: 0.45;
+}
+
 .position-top-left {
   transform: rotate(0deg);
 }

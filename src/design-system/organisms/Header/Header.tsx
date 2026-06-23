@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router';
 
 import { Box } from '../../atoms/Box';
-import { DecoCorner } from '../../atoms/DecoCorner';
+import { DecoSeparator } from '../../atoms/DecoSeparator';
 import { Stack } from '../../atoms/Stack';
 import { primaryNav } from '../../../data/navigation';
 import styles from './Header.module.css';
@@ -10,15 +10,23 @@ import styles from './Header.module.css';
 export interface HeaderProps {
   className?: string | undefined;
   actions?: ReactNode;
+  mobileNav?: ReactNode;
 }
 
-export function Header({ className, actions }: HeaderProps) {
+export function Header({ className, actions, mobileNav }: HeaderProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
     <header className={classes}>
       <Box paddingBlock="md" paddingInline="lg">
-        <Stack direction="row" gap="lg" align="center" justify="between" wrap>
+        <Stack
+          direction="row"
+          gap="lg"
+          align="center"
+          justify="between"
+          wrap
+          className={styles['bar']}
+        >
           <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
             <img
               src="/assets/logo/BP_Gold_horizont.svg"
@@ -48,25 +56,12 @@ export function Header({ className, actions }: HeaderProps) {
                 ))}
               </ul>
             </nav>
+            {mobileNav !== undefined && <div className={styles['mobileNav']}>{mobileNav}</div>}
             {actions !== undefined && <div className={styles['actions']}>{actions}</div>}
           </div>
         </Stack>
       </Box>
-      <div className={styles['borderRow']} aria-hidden="true">
-        <DecoCorner
-          variant="simple"
-          position="bottom-left"
-          size={16}
-          className={styles['corner']}
-        />
-        <span className={styles['borderLine']} />
-        <DecoCorner
-          variant="simple"
-          position="bottom-right"
-          size={16}
-          className={styles['corner']}
-        />
-      </div>
+      <DecoSeparator variant="crest" />
     </header>
   );
 }

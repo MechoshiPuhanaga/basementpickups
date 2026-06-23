@@ -27,6 +27,39 @@
   width: 100%;
 }
 
+.variant-medallion {
+  justify-content: center;
+}
+
+.medallion {
+  flex: 0 0 auto;
+  width: 76px;
+  height: auto;
+}
+
+.variant-crest {
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-6);
+  color: var(--color-line-gold);
+}
+
+.crestEmblem {
+  flex: 0 0 auto;
+  inline-size: 30px;
+  block-size: 30px;
+  background-color: currentcolor;
+  mask: url('/assets/svg-art/noun-art-deco-3292686.svg') center / contain no-repeat;
+}
+
+.crestDiamond {
+  flex: 0 0 auto;
+  inline-size: 4px;
+  block-size: 4px;
+  background-color: currentcolor;
+  transform: rotate(45deg);
+}
+
 .variant-small {
   max-width: 120px;
 }

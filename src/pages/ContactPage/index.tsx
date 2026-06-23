@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router';
 
+import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
@@ -44,6 +45,7 @@ export default function ContactPage() {
           <Heading level={1} variant="display" align="center">
             Contact the workshop
           </Heading>
+          <DecoSeparator variant="medallion" />
           <Text variant="lead" tone="muted" align="center">
             For custom builds, repairs, press, or anything else — drop us a line. We answer every
             message personally.

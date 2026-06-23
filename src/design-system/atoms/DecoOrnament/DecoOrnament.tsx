@@ -5,10 +5,12 @@ export type DecoOrnamentVariant = 'diamond' | 'centerpiece';
 export interface DecoOrnamentProps {
   variant?: DecoOrnamentVariant | undefined;
   size?: number | undefined;
+  /** Render the diamond as a solid fill instead of an outline. */
+  filled?: boolean | undefined;
   className?: string | undefined;
 }
 
-export function DecoOrnament({ variant = 'diamond', size, className }: DecoOrnamentProps) {
+export function DecoOrnament({ variant = 'diamond', size, filled, className }: DecoOrnamentProps) {
   const classes = [styles['ornament'], styles[`variant-${variant}`], className]
     .filter(Boolean)
     .join(' ');
@@ -40,8 +42,8 @@ export function DecoOrnament({ variant = 'diamond', size, className }: DecoOrnam
       width={size ?? 14}
       height={size ?? 14}
       viewBox="0 0 14 14"
-      fill="none"
-      stroke="currentColor"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke={filled ? 'none' : 'currentColor'}
       strokeWidth="1"
       strokeLinecap="square"
       aria-hidden="true"

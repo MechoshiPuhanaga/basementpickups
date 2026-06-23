@@ -37,7 +37,14 @@
       "Read(//home/mechoshi/Documents/projects/basementpickups/**)",
       "Read(//home/mechoshi/.nvm/**)",
       "Read(//tmp/**)",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/shop)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/articles)",
+      "Bash(google-chrome --headless --disable-gpu --hide-scrollbars --window-size=390,900 --screenshot=/tmp/bp-header-390.png http://localhost:3000/)",
+      "Bash(google-chrome --headless --disable-gpu --hide-scrollbars --window-size=768,900 --screenshot=/tmp/bp-header-768.png http://localhost:3000/)",
+      "Bash(git *)"
     ]
   }
 }

@@ -25,8 +25,8 @@ export function ProductCard({ pickup, className }: ProductCardProps) {
 
   return (
     <Link to={`/products/${pickup.slug}`} className={classes}>
-      <Frame variant="product-card" padding="sm">
-        <Stack direction="column" gap="md" align="stretch">
+      <Frame variant="product-card" padding="sm" className={styles['frame']}>
+        <div className={styles['body']}>
           <div className={styles['imageWrap']}>
             <Image
               src={pickup.images.main}
@@ -42,9 +42,11 @@ export function ProductCard({ pickup, className }: ProductCardProps) {
             <Heading level={3} variant="section" align="center">
               {pickup.name}
             </Heading>
-            <Price amount={pickup.price} size="md" tone="primary" />
           </Stack>
-        </Stack>
+          <div className={styles['price']}>
+            <Price amount={pickup.price} size="md" tone="primary" />
+          </div>
+        </div>
       </Frame>
     </Link>
   );

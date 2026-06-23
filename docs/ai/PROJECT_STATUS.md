@@ -16,6 +16,8 @@ All six pages + the enquiry cart, the full design system, the real product catal
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
 - Real **article photos** (still placeholder SVGs — they fall back to the default OG image in link previews until replaced).
 
+**In progress (uncommitted, 2026-06-23):** responsive / mobile-nav pass + Art Deco separator. New `MobileMenu` organism (burger → full-screen dialog overlay) wired via `MobileNav` + a `NavIcon` atom; a `FilterDisclosure` molecule that collapses the shop filters behind a toggle ≤768px; responsive restacking across `ProductBrowser` / `ArticleBrowser` / `ProductGrid` / `Grid` / `ProductCard`; tighter `Section` top padding on mobile; and a new `DecoSeparator` `crest` variant now used as the header/footer/mobile-menu rule. See the 2026-06-23 session-log entry. Advances roadmap items 1 (responsive) and 2 (Art Deco). **Not yet committed; manual real-device verification still pending.**
+
 Prior milestones (2026-05-23): infrastructure complete, then design-system complete.
 
 ---
@@ -290,7 +292,7 @@ Verified post-fix: each route emits exactly one PageShell in SSR HTML; `window._
 - React Router's `StaticRouterProvider` emits an inline hydration `<script>` (`window.__staticRouterHydrationData`); it now carries the per-request CSP **nonce**. Revisit serialization/escaping only if/when real loader data is added.
 - No route-level code splitting (direct imports + hydrationData — see memory `project-ssr-router-pattern`); the client ships as one main bundle (re-adding `lazy` needs preloads + Suspense, the trap noted in that memory).
 - ~~Pickup prices are placeholders~~ — **resolved 2026-06-21**: real euro prices edited directly into `pickups.ts` by the developer (e.g. €125 / €140).
-- `data/svg-art-source` was briefly used (Magnific Art Deco vectors) but reverted at the developer's request — see the 2026-06-20 session entry. **The Magnific sheets were deleted 2026-06-21** (`public/assets/svg-art/` now empty). For the Art Deco ornamentation roadmap task the developer will provide new SVGs. See memory `feedback-magnific-vectors-rejected`.
+- `data/svg-art-source` was briefly used (Magnific Art Deco vectors) but reverted at the developer's request — see the 2026-06-20 session entry. **The Magnific sheets were deleted 2026-06-21.** The developer has since **repopulated `public/assets/svg-art/` with a new vector library (2026-06-23)** — Noun Project Art Deco corners/dividers/frames/stamps/patterns + brand `noun-logo-*` marks. These are the developer-provided replacements, **not** the rejected Magnific sheets. First use: the `DecoSeparator` `crest` variant tints `noun-art-deco-3292686.svg` as its centre emblem via CSS `mask` + `currentColor`. These assets are a *source palette* — keep ornamentation expressed through the in-house `Deco*` atoms (mask/inline + `currentColor`), do **not** drop raw `<img>` vectors into pages. See memory `feedback-magnific-vectors-rejected`.
 
 ---
 
@@ -322,12 +324,41 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 
 ## Roadmap (next)
 
-1. **Responsive design pass** — improve phone/tablet layouts: audit breakpoints, nav, grids, hero / product / article layouts, touch-target sizes, and 320px/200% reflow on real devices. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) — restack/wrap at breakpoints rather than compress.
-2. **Art Deco SVG ornamentation** — expand the **in-house** `DecoCorner` / `DecoFrame` / `DecoSeparator` / `DecoOrnament` atoms across the site (section corners, panel/hero frames, editorial separators, CTA/footer ornaments) for a more elegant, sophisticated feel. Derive from `design/references/` + `SVG_SYSTEM.md`. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`).
+1. **Responsive design pass** — _in progress (2026-06-23, uncommitted)_: mobile nav overlay, collapsible filters, browser/grid restacking, and tighter mobile section padding landed. **Still to do:** real-device verification of breakpoints, touch-target sizes, and 320px/200% reflow. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) — restack/wrap at breakpoints rather than compress.
+2. **Art Deco SVG ornamentation** — _in progress (2026-06-23)_: new `DecoSeparator` `crest` variant now rules the header/footer/mobile menu. **Still to do:** expand the **in-house** `DecoCorner` / `DecoFrame` / `DecoSeparator` / `DecoOrnament` atoms across the site (section corners, panel/hero frames, editorial separators, CTA/footer ornaments). Derive from `design/references/` + `SVG_SYSTEM.md`, drawing from the new `svg-art` palette. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`).
+3. **Prefetch all resources on load (non-blocking) for offline** — after first paint and while the connection is idle, warm the cache with the rest of the site's assets (route chunks, product/spirit images + their AVIF/WebP derivatives, fonts) so a subsequent offline visit has everything. Must be **non-blocking**: kick off after `load`, ideally gated on `requestIdleCallback` and `navigator.connection` (skip on save-data / slow links). Coordinate with the existing hand-rolled service worker (`public/sw.js`, approach A) — bump its `VERSION` and decide between SW-side precache vs. client-driven `fetch`/`<link rel=prefetch>`. Respect the CSP and don't regress LCP/TBT.
+4. **Bobbin / slug colour selection per pickup** — add per-product available colour options for **bobbins** (and slugs/covers where applicable) to the data model, then a DS widget to choose the bobbin colour **before** adding to the enquiry. The chosen configuration is stored on the enquiry-cart line and is **editable in the enquiry per configured pickup**. Stays within the no-payments enquiry-cart model (memory `project-enquiry-cart`): the selection just enriches the prefilled contact mailto. Touches `DATA_MODEL.md` (pickup colour options), the cart line shape, ProductCard/ProductBrowser (selector), and the CartPage (per-line edit).
 
 ---
 
 # Session Log
+
+## 2026-06-23 — Responsive / mobile-nav pass + Art Deco `crest` separator
+
+Large uncommitted working set (responsive design pass, roadmap item 1) plus a new Art Deco rule (roadmap item 2). Developer to commit + push after this doc sync; a11y of the changes to be discussed next.
+
+**Mobile navigation**
+
+- New **`MobileMenu` organism** — burger trigger → full-screen `role="dialog"` `aria-modal` overlay with scroll-lock, focus-trap, Esc-to-close, and close-on-route-change. Wired through `MobileNav` (cart-count aware) and passed to `Header` via the new `mobileNav` prop / `PageShell`.
+- New **`NavIcon` atom** (per-link glyphs) and a **`FilterDisclosure` molecule** that collapses the shop filter controls behind a toggle ≤768px (selected filters shown as chips), inline on larger screens.
+- `Header` now shows the desktop `.nav` and the `.mobileNav` burger mutually exclusively at the 1024px breakpoint (`display:none` either side — no duplicate tab stops/landmarks).
+
+**Responsive layout**
+
+- Restacking / breakpoint work across `ProductBrowser`, `ArticleBrowser`, `ProductGrid`, `Grid`, `ProductCard`, `Frame`, `DecoCorner`, `DecoOrnament`.
+- `Section` — trimmed **top** padding one step on mobile (≤768px) via the two-value `padding-block` shorthand, keeping bottom padding for inter-section rhythm. More vertical real estate.
+
+**Art Deco `crest` separator**
+
+- New `DecoSeparator` **`crest`** variant: centre emblem (`noun-art-deco-3292686.svg`, tinted via CSS `mask` + `currentColor`) flanked by gold lines ending in tiny solid rotated-square diamonds (matching the nav-link diamonds). Replaced the old `DecoCorner` corner-line-corner border rows in `Header` (bottom) and `Footer` (top), and added under the `MobileMenu` logo bar.
+- Header logo bar and the mobile-menu top bar given the same `min-block-size: 5rem` + `--space-5` bottom gap so the logo and separator **don't shift** when the menu opens; the menu separator drops its own inline padding (`padding-inline:0`) to avoid a double inset and stay centred; +20px (`1.25rem`) breather above the menu nav.
+- `medallion` separator shrunk 100px → **76px**. `AboutPage` gained a `medallion` under the H1 and the "Roumen Kirov" signature bumped `editorial` → `lead`.
+- `public/assets/svg-art/` repopulated by the developer with a new vector palette (see Carry-Forward) — the `crest` emblem is its first use.
+
+**Quality**
+
+- eslint / stylelint / prettier clean on the touched files (fixed a `-webkit-mask` vendor-prefix flag + a duplicate `mask` declaration the auto-fixer left). Typecheck green; prod build green. Visual checks via headless Chrome at 390px (header, open menu, shop).
+- a11y review of the changes: decorative separators correctly `aria-hidden`; no new focusable elements; nav not duplicated to AT. Note carried forward: the `MobileMenu` dialog relies on `aria-modal` without `inert`/`aria-hidden` on background content (pre-existing) — to discuss.
 
 ## 2026-06-21 — Full Lighthouse audit + fixes + audit tooling
 

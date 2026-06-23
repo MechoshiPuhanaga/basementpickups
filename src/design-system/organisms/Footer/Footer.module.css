@@ -4,24 +4,6 @@
   color: var(--color-text-primary);
 }
 
-.borderRow {
-  display: flex;
-  align-items: center;
-  inline-size: 100%;
-  block-size: 16px;
-  color: var(--color-line-gold);
-}
-
-.borderLine {
-  flex: 1 1 auto;
-  block-size: 1px;
-  background-color: currentcolor;
-}
-
-.corner {
-  flex: 0 0 auto;
-}
-
 .brand {
   display: inline-block;
   color: var(--color-accent-gold);

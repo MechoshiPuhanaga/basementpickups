@@ -5,6 +5,7 @@ import { PageShell } from '../design-system/layouts/PageShell';
 import { CartAnnouncer } from '../cart/CartAnnouncer';
 import { CartProvider } from '../cart/CartContext';
 import { CartLink } from '../cart/CartLink';
+import { MobileNav } from '../cart/MobileNav';
 
 export default function App() {
   const { pathname } = useLocation();
@@ -25,7 +26,7 @@ export default function App() {
   return (
     <CartProvider>
       <CartAnnouncer />
-      <PageShell headerActions={<CartLink />}>
+      <PageShell headerActions={<CartLink />} headerMobileNav={<MobileNav />}>
         <Outlet />
       </PageShell>
     </CartProvider>
