@@ -89,6 +89,38 @@
   }
 }
 
+/* Exit: reverse the enter and hold the end frame (forwards) so the overlay
+   stays off-screen / transparent until React unmounts it on animationend. */
+.scrim[data-state='closing'] {
+  animation-name: fade-out;
+  animation-fill-mode: forwards;
+}
+
+.panel[data-state='closing'] {
+  animation-name: slide-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 .overlayTop {
   display: flex;
   align-items: center;
@@ -304,7 +336,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .scrim,
-  .panel {
+  .panel,
+  .scrim[data-state='closing'],
+  .panel[data-state='closing'] {
     animation: none;
   }
 }

@@ -31,6 +31,22 @@ function iconForHref(href: string): NavIconName {
   return ICON_BY_HREF[href] ?? 'articles';
 }
 
+/**
+ * `closing` keeps the overlay mounted while its exit animation plays; it
+ * unmounts on `closed`. The closed → open → closing → closed cycle is what
+ * lets the menu animate out instead of being removed abruptly by React.
+ */
+type MenuState = 'closed' | 'open' | 'closing';
+
+/** Safety net: unmount the overlay even if `animationend` never fires. */
+const EXIT_FALLBACK_MS = 400;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 /** Phone/tablet navigation: a burger toggle that opens a full-screen overlay. */
 export function MobileMenu({
   links,
@@ -39,13 +55,24 @@ export function MobileMenu({
   enquiryLabel = 'Enquiry',
   className,
 }: MobileMenuProps) {
-  const [open, setOpen] = useState(false);
+  const [state, setState] = useState<MenuState>('closed');
+  const open = state === 'open';
+  const rendered = state !== 'closed';
   const { pathname } = useLocation();
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
+  // Begin the exit: animate out unless reduced-motion is on, in which case no
+  // animationend would fire so we drop straight to closed.
   const close = useCallback(() => {
-    setOpen(false);
+    setState((current) =>
+      current === 'open' ? (prefersReducedMotion() ? 'closed' : 'closing') : current,
+    );
+  }, []);
+
+  // Finish the exit: the overlay leaves the DOM only after the animation ends.
+  const finishClose = useCallback(() => {
+    setState((current) => (current === 'closing' ? 'closed' : current));
   }, []);
 
   // Close on route change so navigating from inside the overlay dismisses it.
@@ -53,9 +80,19 @@ export function MobileMenu({
   useEffect(() => {
     if (lastPath.current !== pathname) {
       lastPath.current = pathname;
-      setOpen(false);
+      close();
     }
-  }, [pathname]);
+  }, [pathname, close]);
+
+  // Belt-and-braces: if animationend is missed (or animations are disabled),
+  // still unmount after the exit window.
+  useEffect(() => {
+    if (state !== 'closing') return undefined;
+    const timer = window.setTimeout(finishClose, EXIT_FALLBACK_MS);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [state, finishClose]);
 
   // Lock body scroll, move focus into the dialog, and restore on close.
   useEffect(() => {
@@ -69,7 +106,7 @@ export function MobileMenu({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        setOpen(false);
+        close();
         return;
       }
       if (event.key !== 'Tab') return;
@@ -95,7 +132,7 @@ export function MobileMenu({
       document.removeEventListener('keydown', onKeyDown);
       trigger?.focus();
     };
-  }, [open]);
+  }, [open, close]);
 
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
@@ -109,7 +146,7 @@ export function MobileMenu({
         aria-expanded={open}
         aria-haspopup="dialog"
         onClick={() => {
-          setOpen(true);
+          setState('open');
         }}
       >
         <span className={styles['burger']} aria-hidden="true">
@@ -119,21 +156,28 @@ export function MobileMenu({
         </span>
       </button>
 
-      {open && (
+      {rendered && (
         <>
           <button
             type="button"
             className={styles['scrim']}
+            data-state={state}
             aria-label="Close menu"
             onClick={close}
+            inert={state === 'closing'}
           />
           <div
             ref={dialogRef}
             className={styles['panel']}
+            data-state={state}
             role="dialog"
             aria-modal="true"
             aria-label="Site menu"
             tabIndex={-1}
+            inert={state === 'closing'}
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) finishClose();
+            }}
           >
             <div className={styles['overlayTop']}>
               <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
