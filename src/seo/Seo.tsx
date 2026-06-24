@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 import { getSeoForUrl } from './getSeoForUrl';
+import type { SeoMeta } from './seoTypes';
 
 /**
  * Client-side SEO updater. The canonical, crawler-facing meta tags are injected
@@ -45,6 +46,33 @@ function setRobots(robots: string | undefined): void {
   }
 }
 
+/**
+ * Sync the article:* Open Graph tags. They exist only on article pages, so on
+ * any other route we remove whatever the previous article left behind. `tags`
+ * map to repeated article:tag meta, so those are cleared and rebuilt each time.
+ */
+function setArticleMeta(article: SeoMeta['article']): void {
+  const head = document.head;
+  head.querySelectorAll('meta[property^="article:"]').forEach((el) => {
+    el.remove();
+  });
+  if (article === undefined) return;
+
+  upsertMeta('property', 'article:published_time', article.publishedTime);
+  if (article.modifiedTime !== undefined) {
+    upsertMeta('property', 'article:modified_time', article.modifiedTime);
+  }
+  if (article.author !== undefined) {
+    upsertMeta('property', 'article:author', article.author);
+  }
+  for (const tag of article.tags ?? []) {
+    const el = document.createElement('meta');
+    el.setAttribute('property', 'article:tag');
+    el.setAttribute('content', tag);
+    head.appendChild(el);
+  }
+}
+
 export function Seo() {
   const location = useLocation();
 
@@ -59,9 +87,12 @@ export function Seo() {
     upsertMeta('property', 'og:description', seo.ogDescription);
     upsertMeta('property', 'og:url', seo.ogUrl);
     upsertMeta('property', 'og:image', seo.ogImage);
+    upsertMeta('property', 'og:image:alt', seo.ogImageAlt);
+    setArticleMeta(seo.article);
     upsertMeta('name', 'twitter:title', seo.ogTitle);
     upsertMeta('name', 'twitter:description', seo.ogDescription);
     upsertMeta('name', 'twitter:image', seo.ogImage);
+    upsertMeta('name', 'twitter:image:alt', seo.ogImageAlt);
   }, [location.pathname]);
 
   return null;

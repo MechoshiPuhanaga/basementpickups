@@ -44,7 +44,18 @@
       "Bash(curl -s http://localhost:3000/articles)",
       "Bash(google-chrome --headless --disable-gpu --hide-scrollbars --window-size=390,900 --screenshot=/tmp/bp-header-390.png http://localhost:3000/)",
       "Bash(google-chrome --headless --disable-gpu --hide-scrollbars --window-size=768,900 --screenshot=/tmp/bp-header-768.png http://localhost:3000/)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(curl -sf -o /dev/null http://localhost:4321/robots.txt)",
+      "Bash(curl -s -o /dev/null -w '%{http_code} %{content_type}' http://localhost:4321/robots.txt)",
+      "Bash(curl -s http://localhost:4321/robots.txt)",
+      "Bash(curl -s -o /dev/null -w '%{http_code} %{content_type}' http://localhost:4321/sitemap.xml)",
+      "Bash(curl -s http://localhost:4321/sitemap.xml)",
+      "Bash(curl -s http://localhost:4321/)",
+      "Bash(curl -s -X POST)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"tsx server/index.ts\")",
+      "Bash(curl -sf -o /dev/null http://localhost:4321/)",
+      "Bash(curl -s http://localhost:4321/products/white-pearl)"
     ]
   }
 }

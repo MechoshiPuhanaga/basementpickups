@@ -257,14 +257,14 @@ Open Graph description
 Open Graph image
 ```
 
-Optional later additions:
+Implemented on top of this foundation:
 
 - Twitter cards
-- structured data
-- product schema
-- article schema
+- `og:image:alt` / `twitter:image:alt`
+- `article:*` Open Graph tags (article pages)
+- JSON-LD structured data: `Organization`, `WebSite`, `Product` (+ `Offer`/`AggregateOffer`), `BlogPosting`, `BreadcrumbList`
 
-The MVP should establish a clean foundation.
+JSON-LD is resolved per pathname in `src/seo/getJsonLdForUrl.ts` and rendered as escaped `application/ld+json` data scripts by `server/seo.ts` (`renderJsonLd`).
 
 ---
 
@@ -448,16 +448,20 @@ Avoid:
 
 # Future SEO Expansion
 
-The architecture should later support:
+Done:
 
-- structured data
-- sitemap generation
-- robots configuration
+- structured data (JSON-LD) — `src/seo/getJsonLdForUrl.ts`
+- sitemap generation — `/sitemap.xml` (SSR, data-driven)
+- robots configuration — `/robots.txt` (SSR)
+- `llms.txt` — `/llms.txt` (SSR, curated site map for AI crawlers)
+- Open Graph imagery — generated 1200×630 JPEGs per photo
+
+Still open, without architectural rewrites:
+
 - dynamic OG image generation
 - CMS integration
-- richer metadata systems
-
-without architectural rewrites.
+- `FAQPage` / review / `aggregateRating` schema
+- variant canonical strategy (neck/bridge currently self-canonical)
 
 ---
 

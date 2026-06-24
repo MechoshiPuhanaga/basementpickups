@@ -8,7 +8,7 @@ This file is the operational memory of the project. Update it at the end of each
 
 **MVP feature-complete + hardened (2026-06-20).**
 
-All six pages + the enquiry cart, the full design system, the real product catalog with real photos, the real logo/favicon, server-driven SEO (absolute meta, robots, sitemap), security hardening (baseline headers, prod nonce-CSP + Trusted Types, COOP/CORP), the accessibility passes (color + keyboard/screen-reader), woff2 fonts, real 404s, latest-safe dependencies (React 19.2.7, React Router 8.0.1, Vite 8.0.16, TS 6.0.3, ESLint 9), and an offline **PWA** (hand-rolled SW, approach A). All checks green (typecheck / lint / stylelint / prettier / audit / build) in dev + prod.
+All six pages + the enquiry cart, the full design system, the real product catalog with real photos, the real logo/favicon, server-driven SEO (absolute meta, robots, sitemap, JSON-LD structured data, `llms.txt`), security hardening (baseline headers, prod nonce-CSP + Trusted Types, COOP/CORP), the accessibility passes (color + keyboard/screen-reader), woff2 fonts, real 404s, latest-safe dependencies (React 19.2.7, React Router 8.0.1, Vite 8.0.16, TS 6.0.3, ESLint 9), and an offline **PWA** (hand-rolled SW, approach A). All checks green (typecheck / lint / stylelint / prettier / audit / build) in dev + prod.
 
 **Not blocking, still open:**
 
@@ -60,9 +60,13 @@ Prior milestones (2026-05-23): infrastructure complete, then design-system compl
 
 ## SEO
 
-- `src/seo/seoTypes.ts` — `SeoMeta` type
-- `src/seo/getSeoForUrl.ts` — pathname-driven SEO resolution with product/article slug lookups against local data
-- Server resolves SEO **before** streaming, injects head tags into the HTML head
+- `src/seo/seoTypes.ts` — `SeoMeta` type (incl. `ogImageAlt` + optional `article` block: published/modified time, author, tags)
+- `src/seo/getSeoForUrl.ts` — pathname-driven SEO resolution with product/article slug lookups against local data; also resolves OG image alt text and article OG metadata
+- `src/seo/getJsonLdForUrl.ts` — pathname-driven JSON-LD: `Organization` + `WebSite` (home), `Product` with `Offer`/`AggregateOffer` (products + variants, EUR, `MadeToOrder`), `BlogPosting` (articles), and `BreadcrumbList` (products + articles)
+- `server/seo.ts` — `renderSeoTags` (incl. `og:image:alt`, `twitter:image:alt`, `article:*`) + `renderJsonLd` (escaped non-executable data scripts; noindex pages emit none)
+- `src/seo/Seo.tsx` — client updater keeps the dynamic subset (incl. image-alt + `article:*`, cleared on non-article routes) in sync on SPA navigation
+- Server resolves SEO **before** streaming, injects head tags + JSON-LD into the HTML head
+- `/robots.txt`, `/sitemap.xml`, `/llms.txt` served dynamically by the SSR server (`server/index.ts`) with absolute, request-derived origins
 
 ## Data
 
@@ -332,6 +336,16 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-24 — JSON-LD structured data, `llms.txt`, richer OG metadata
+
+Confirmed `/robots.txt` + `/sitemap.xml` were already served by the SSR server; added structured data and discovery surfaces on top. SSR is the source of truth; the client `Seo` updater keeps the new tags in sync on SPA navigation.
+
+- **JSON-LD** (new `src/seo/getJsonLdForUrl.ts` + `renderJsonLd` in `server/seo.ts`): `Organization` + `WebSite` on home, `Product` with single `Offer` (variant/simple) or `AggregateOffer` (base-with-variants), `BlogPosting` on articles, and `BreadcrumbList` on every product (variant-aware via `getPickupAndParent`) and article page. Availability `MadeToOrder`, currency `EUR` (matches the enquiry model + the `Price` atom default). Rendered as non-executable `application/ld+json` data scripts — not subject to `script-src`, so no nonce; `<` escaped to prevent breakout. noindex pages (e.g. `/cart`) emit zero blocks.
+- **`/llms.txt`** (new route + `buildLlmsTxt` in `server/index.ts`): curated brand summary + page/product/article map, request-derived absolute origin.
+- **OG/Twitter `image:alt`** on all pages; **`article:*`** OG tags (published/modified time, author, one `article:tag` per keyword) on article pages, with client-side cleanup on non-article routes. `SeoMeta` gained `ogImageAlt` + optional `article`.
+- **Quality**: typecheck / lint clean; prod build + smoke test confirmed all endpoints, meta tags, and JSON-LD (2 blocks each on home/product/variant/article, 0 on `/cart`); all JSON-LD parses.
+- **Not done (developer's call)**: variant canonical strategy (neck/bridge are self-canonical near-dupes of the base); off-site SEO (Search Console / Bing submission, backlinks); `FAQPage` schema; shorter SERP meta descriptions; `sameAs`/review schema; product `lastmod` in sitemap; RSS feed.
 
 ## 2026-06-23 — Responsive / mobile-nav pass + Art Deco `crest` separator
 

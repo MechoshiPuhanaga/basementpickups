@@ -131,6 +131,37 @@ function buildRobotsTxt(origin: string): string {
   return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
 }
 
+function buildLlmsTxt(origin: string): string {
+  const products = pickups
+    .map((p) => `- [${p.name}](${origin}/products/${p.slug}): ${p.description}`)
+    .join('\n');
+  const posts = articles
+    .map((a) => `- [${a.headline}](${origin}/articles/${a.slug}): ${a.excerpt}`)
+    .join('\n');
+
+  return `# Basement Pickups
+
+> Handcrafted boutique guitar pickups. Premium tone, restrained design, deliberate craftsmanship. Every pickup is wound to order in-house.
+
+Basement Pickups is a boutique workshop building hand-wound electric guitar pickups (humbuckers, single-coils, P-90s). There is no online checkout: customers assemble an enquiry and send it to the workshop, and pickups are made to order.
+
+## Pages
+
+- [Shop](${origin}/shop): The full collection of available pickups.
+- [About](${origin}/about): The workshop, the craft, and the philosophy.
+- [Articles](${origin}/articles): Editorial on winding, tone, magnets, and process.
+- [Contact](${origin}/contact): Get in touch with the workshop.
+
+## Products
+
+${products}
+
+## Articles
+
+${posts}
+`;
+}
+
 function buildSitemapXml(origin: string): string {
   const entries: { path: string; lastmod?: string }[] = [
     '/',
@@ -221,6 +252,10 @@ async function start(): Promise<void> {
 
   app.get('/sitemap.xml', (req, res) => {
     res.type('application/xml').send(buildSitemapXml(getRequestOrigin(req)));
+  });
+
+  app.get('/llms.txt', (req, res) => {
+    res.type('text/plain').send(buildLlmsTxt(getRequestOrigin(req)));
   });
 
   app.use(async (req, res, next) => {

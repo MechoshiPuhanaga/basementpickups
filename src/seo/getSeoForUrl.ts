@@ -6,6 +6,7 @@ const SITE_NAME = 'Basement Pickups';
 const DEFAULT_DESCRIPTION =
   'Handcrafted boutique guitar pickups. Premium tone, restrained design, deliberate craftsmanship.';
 const DEFAULT_OG_IMAGE = '/assets/images/spirit-photos/bp-spirit-1.png';
+const DEFAULT_OG_IMAGE_ALT = 'Basement Pickups — handcrafted boutique guitar pickups';
 
 // All link-preview images are the generated 1200x630 JPEGs (see
 // scripts/optimize-images.mjs), so the dimensions are constant.
@@ -34,7 +35,9 @@ interface SeoInput {
   readonly path: string;
   readonly ogType: SeoMeta['ogType'];
   readonly ogImage?: string;
+  readonly ogImageAlt?: string;
   readonly robots?: string;
+  readonly article?: SeoMeta['article'];
 }
 
 function build(origin: string, input: SeoInput): SeoMeta {
@@ -52,7 +55,9 @@ function build(origin: string, input: SeoInput): SeoMeta {
     ogImageWidth: OG_IMAGE_WIDTH,
     ogImageHeight: OG_IMAGE_HEIGHT,
     ogImageType: OG_IMAGE_TYPE,
+    ogImageAlt: input.ogImageAlt ?? DEFAULT_OG_IMAGE_ALT,
     ...(input.robots !== undefined ? { robots: input.robots } : {}),
+    ...(input.article !== undefined ? { article: input.article } : {}),
   };
 }
 
@@ -131,6 +136,7 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
         path: `/products/${pickup.slug}`,
         ogType: 'product',
         ogImage: pickup.images.main,
+        ogImageAlt: `${pickup.name} — Basement Pickups`,
       });
     }
   }
@@ -148,6 +154,15 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
         path: `/articles/${article.slug}`,
         ogType: 'article',
         ogImage: article.mainImage.src,
+        ogImageAlt: article.mainImage.alt,
+        article: {
+          publishedTime: article.metadata.publishedAt,
+          ...(article.metadata.updatedAt !== undefined
+            ? { modifiedTime: article.metadata.updatedAt }
+            : {}),
+          ...(article.metadata.author !== undefined ? { author: article.metadata.author } : {}),
+          ...(article.keywords.length > 0 ? { tags: article.keywords } : {}),
+        },
       });
     }
   }
