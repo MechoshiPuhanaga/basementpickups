@@ -59,8 +59,11 @@ per-position `variants[]`), and `rockroach`, `karakonjul`, `little-karakonjul`,
   `selfResonantPeak` / `loadedResonantPeak` to carry them.
 - For **set** parents, `specs.dcr` / `specs.inductance` are shown as ranges
   (e.g. `5.9k–6.8k`); each variant carries its exact figures + resonant peaks.
-- **Prices are placeholders** — the source data has no prices. They are
-  plausible boutique values and should be replaced with real pricing.
+- **Prices are real** — the developer set real euro prices directly in
+  `pickups.ts` (e.g. €125 / €140).
+- **Hardware/config is real** (2026-06-24) — string spacing, bobbin colors,
+  pole pieces, cover, and 7-string options come verbatim from the source data's
+  per-pickup "Configuration" blocks and live on `pickup.hardware`.
 - Images point at `/assets/images/product-photos/<slug>.png` (the developer's
   square cinematic product photos). The old per-product placeholder SVGs under
   `public/assets/images/products/` were removed.
@@ -120,6 +123,16 @@ export type PickupSpecs = {
   loadedResonantPeak?: string; // e.g. "3.9 kHz"
 };
 
+export type PickupPolepiece = 'chrome' | 'black' | 'nickel' | 'gold';
+
+export type PickupHardware = {
+  spacingMm?: number; // string spacing, e.g. 50, 52, 49.2
+  bobbinColors: string[]; // name tokens, e.g. 'white' | 'cream' | 'light-blue' (never hex)
+  polepieces: PickupPolepiece;
+  cover?: { material: string; optional: boolean }; // absent = no cover offered
+  sevenString?: { colors: string[] }; // absent = 7-string not offered
+};
+
 export type Pickup = {
   id: string;
 
@@ -137,7 +150,7 @@ export type Pickup = {
 
   positions: PickupPosition[];
 
-  colors: string[];
+  hardware: PickupHardware;
 
   conductors: PickupConductor[];
 
@@ -153,6 +166,21 @@ export type Pickup = {
   variants?: Pickup[];
 };
 ```
+
+`hardware` carries the physical build/configuration (added 2026-06-24). The
+earlier free-form `colors: string[]` field was superseded by it. `hardware` is
+also surfaced in the Product JSON-LD as `material` (magnet) +
+`additionalProperty` (`getJsonLdForUrl.ts`) and on the product page specs list.
+
+**Bobbin colors are name tokens, never hex.** `bobbinColors` holds tokens like
+`cream`, `light-blue`, `black`. The canonical token → human-readable label map
+lives in `src/data/bobbinColors.ts` (`bobbinColorLabel`) — the single source so
+product specs, JSON-LD, and (later) the enquiry message all read the same names.
+The hex values are only an **approximation** for the visual chip and live solely
+in the DS `Swatch` atom's CSS module (`data-color="<token>"` → fill), because the
+strict prod CSP forbids inline `style`. Three places list the token set — keep
+them in sync: `bobbinColors.ts`, `STANDARD_BOBBIN_COLORS` in `pickups.ts`, and
+`Swatch.module.css`.
 
 ````
 

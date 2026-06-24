@@ -27,6 +27,36 @@ export interface PickupImages {
   readonly gallery?: readonly string[];
 }
 
+/** Pole-piece finish offered for a pickup. */
+export type PickupPolepiece = 'chrome' | 'black' | 'nickel' | 'gold';
+
+/** A metal cover option. Present on a pickup means a cover is offered. */
+export interface PickupCover {
+  readonly material: string;
+  /** True when the cover is an option rather than fitted by default. */
+  readonly optional: boolean;
+}
+
+/** A 7-string variant option. Present means the pickup is offered in 7-string. */
+export interface PickupSevenString {
+  /** Bobbin colors the 7-string version is available in. */
+  readonly colors: readonly string[];
+}
+
+/**
+ * Physical build / configuration of a pickup. Bobbin colors are tokens the DS
+ * `Swatch` atom can render (`white`/`cream`/`black` or a hex string from the
+ * boutique palette). Spacing is the string spacing in millimetres.
+ */
+export interface PickupHardware {
+  /** String spacing in mm. An array means it's offered in more than one. */
+  readonly spacingMm?: number | readonly number[];
+  readonly bobbinColors: readonly string[];
+  readonly polepieces: PickupPolepiece;
+  readonly cover?: PickupCover;
+  readonly sevenString?: PickupSevenString;
+}
+
 export interface Pickup {
   readonly id: string;
   readonly slug: string;
@@ -36,7 +66,7 @@ export interface Pickup {
   readonly magnet: PickupMagnet;
   readonly price: number;
   readonly positions: readonly PickupPosition[];
-  readonly colors: readonly string[];
+  readonly hardware: PickupHardware;
   readonly conductors: readonly PickupConductor[];
   readonly potting: PickupPotting;
   readonly specs: PickupSpecs;
@@ -45,6 +75,25 @@ export interface Pickup {
 }
 
 const PHOTO = (slug: string): string => `/assets/images/product-photos/${slug}.png`;
+
+/**
+ * The boutique bobbin-color palette shared by the high-output single humbuckers
+ * (Rockroach, Little Karakonjul, Twin Bliss). These are name tokens (not hex) —
+ * resolved to display labels via `bobbinColorLabel` and to swatch fills by the
+ * DS `Swatch` atom. See `src/data/bobbinColors.ts`.
+ */
+const STANDARD_BOBBIN_COLORS: readonly string[] = [
+  'black',
+  'white',
+  'cream',
+  'coral',
+  'red',
+  'blue',
+  'light-blue',
+  'pink',
+  'green',
+  'orange',
+];
 
 export const pickups: readonly Pickup[] = [
   {
@@ -57,7 +106,7 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-4',
     price: 125,
     positions: ['neck', 'bridge'],
-    colors: ['cream', 'parchment', 'aged-white'],
+    hardware: { polepieces: 'chrome', bobbinColors: ['white'] },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',
     specs: { dcr: '5.9k–6.8k', inductance: '2.8H–3.5H' },
@@ -73,7 +122,7 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-3',
         price: 125,
         positions: ['neck'],
-        colors: ['cream', 'parchment', 'aged-white'],
+        hardware: { spacingMm: 50, polepieces: 'chrome', bobbinColors: ['white'] },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -94,7 +143,7 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-4',
         price: 125,
         positions: ['bridge'],
-        colors: ['cream', 'parchment', 'aged-white'],
+        hardware: { spacingMm: 52, polepieces: 'chrome', bobbinColors: ['white'] },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -117,7 +166,12 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-4',
     price: 140,
     positions: ['neck', 'bridge'],
-    colors: ['gold-cover', 'nickel', 'aged-nickel'],
+    hardware: {
+      spacingMm: 49.2,
+      polepieces: 'chrome',
+      bobbinColors: ['cream', 'black'],
+      cover: { material: 'nickel', optional: true },
+    },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',
     specs: { dcr: '7.4k–8.1k', inductance: '4.3H–5.1H' },
@@ -133,7 +187,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-3',
         price: 140,
         positions: ['neck'],
-        colors: ['gold-cover', 'nickel', 'aged-nickel'],
+        hardware: {
+          spacingMm: 49.2,
+          polepieces: 'chrome',
+          bobbinColors: ['cream', 'black'],
+          cover: { material: 'nickel', optional: true },
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -154,7 +213,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-4',
         price: 140,
         positions: ['bridge'],
-        colors: ['gold-cover', 'nickel', 'aged-nickel'],
+        hardware: {
+          spacingMm: 49.2,
+          polepieces: 'chrome',
+          bobbinColors: ['cream', 'black'],
+          cover: { material: 'nickel', optional: true },
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -177,7 +241,12 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-2',
     price: 140,
     positions: ['neck', 'bridge'],
-    colors: ['nickel', 'black', 'zebra'],
+    hardware: {
+      spacingMm: 49.2,
+      polepieces: 'chrome',
+      bobbinColors: ['cream', 'black'],
+      cover: { material: 'nickel', optional: true },
+    },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',
     specs: { dcr: '7.6k–8.3k', inductance: '4.4H–5.3H' },
@@ -193,7 +262,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-2',
         price: 140,
         positions: ['neck'],
-        colors: ['nickel', 'black', 'zebra'],
+        hardware: {
+          spacingMm: 49.2,
+          polepieces: 'chrome',
+          bobbinColors: ['cream', 'black'],
+          cover: { material: 'nickel', optional: true },
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -214,7 +288,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-2',
         price: 140,
         positions: ['bridge'],
-        colors: ['nickel', 'black', 'zebra'],
+        hardware: {
+          spacingMm: 49.2,
+          polepieces: 'chrome',
+          bobbinColors: ['cream', 'black'],
+          cover: { material: 'nickel', optional: true },
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -237,7 +316,12 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-5',
     price: 125,
     positions: ['bridge'],
-    colors: ['black', 'nickel'],
+    hardware: {
+      spacingMm: 52,
+      polepieces: 'black',
+      bobbinColors: STANDARD_BOBBIN_COLORS,
+      sevenString: { colors: ['black'] },
+    },
     conductors: ['4-conductor'],
     potting: 'potted',
     specs: {
@@ -258,7 +342,12 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-8',
     price: 125,
     positions: ['bridge'],
-    colors: ['black', 'gold-cover'],
+    hardware: {
+      spacingMm: 52,
+      polepieces: 'black',
+      bobbinColors: ['black'],
+      sevenString: { colors: ['black'] },
+    },
     conductors: ['4-conductor'],
     potting: 'potted',
     specs: {
@@ -279,7 +368,12 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-8',
     price: 140,
     positions: ['bridge'],
-    colors: ['black', 'nickel'],
+    hardware: {
+      spacingMm: 52,
+      polepieces: 'black',
+      bobbinColors: STANDARD_BOBBIN_COLORS,
+      sevenString: { colors: ['black'] },
+    },
     conductors: ['4-conductor'],
     potting: 'potted',
     specs: {
@@ -300,7 +394,11 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-5',
     price: 140,
     positions: ['neck', 'bridge'],
-    colors: ['aged-nickel', 'gold-cover', 'zebra'],
+    hardware: {
+      spacingMm: [50, 52],
+      polepieces: 'black',
+      bobbinColors: STANDARD_BOBBIN_COLORS,
+    },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',
     specs: {

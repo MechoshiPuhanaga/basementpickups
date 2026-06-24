@@ -1,5 +1,6 @@
 import { getPickupAndParent } from '../data/pickups';
 import type { Pickup } from '../data/pickups';
+import { bobbinColorLabel } from '../data/bobbinColors';
 import { getArticleBySlug } from '../data/articles';
 
 const SITE_NAME = 'Basement Pickups';
@@ -9,6 +10,82 @@ const PRICE_CURRENCY = 'EUR';
 // Pickups are wound to order rather than held as stock — schema.org/MadeToOrder
 // is the honest availability for the enquiry-based (no checkout) model.
 const AVAILABILITY = 'https://schema.org/MadeToOrder';
+
+const MAGNET_LABEL: Record<string, string> = {
+  'alnico-2': 'Alnico 2',
+  'alnico-3': 'Alnico 3',
+  'alnico-4': 'Alnico 4',
+  'alnico-5': 'Alnico 5',
+  'alnico-8': 'Alnico 8',
+  ceramic: 'Ceramic',
+  neodymium: 'Neodymium',
+};
+
+const POLEPIECE_LABEL: Record<string, string> = {
+  chrome: 'Chrome',
+  black: 'Black',
+  nickel: 'Nickel',
+  gold: 'Gold',
+};
+
+/** Expose the build/hardware spec as schema.org PropertyValue entries. */
+function productProperties(pickup: Pickup): JsonLd[] {
+  const h = pickup.hardware;
+  const props: JsonLd[] = [
+    {
+      '@type': 'PropertyValue',
+      name: 'Magnet',
+      value: MAGNET_LABEL[pickup.magnet] ?? pickup.magnet,
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'Pole pieces',
+      value: POLEPIECE_LABEL[h.polepieces] ?? h.polepieces,
+    },
+  ];
+  if (h.spacingMm !== undefined) {
+    const spacing = h.spacingMm;
+    props.push(
+      typeof spacing === 'number'
+        ? {
+            '@type': 'PropertyValue',
+            name: 'String spacing',
+            value: spacing,
+            unitCode: 'MMT',
+            unitText: 'mm',
+          }
+        : {
+            '@type': 'PropertyValue',
+            name: 'String spacing',
+            value: `${spacing.join(' or ')} mm`,
+          },
+    );
+  }
+  props.push({
+    '@type': 'PropertyValue',
+    name: 'Cover',
+    value: h.cover ? `${h.cover.material}${h.cover.optional ? ' (optional)' : ''}` : 'None',
+  });
+  if (h.sevenString) {
+    props.push({
+      '@type': 'PropertyValue',
+      name: '7-string',
+      value: `Available (${h.sevenString.colors.map(bobbinColorLabel).join(', ').toLowerCase()} only)`,
+    });
+  }
+  props.push({
+    '@type': 'PropertyValue',
+    name: 'Bobbin colours',
+    value: h.bobbinColors.map(bobbinColorLabel).join(', '),
+  });
+  if (pickup.specs.dcr !== undefined) {
+    props.push({ '@type': 'PropertyValue', name: 'DCR', value: pickup.specs.dcr });
+  }
+  if (pickup.specs.inductance !== undefined) {
+    props.push({ '@type': 'PropertyValue', name: 'Inductance', value: pickup.specs.inductance });
+  }
+  return props;
+}
 
 /**
  * A single JSON-LD block. The shape is intentionally loose: schema.org graphs
@@ -67,6 +144,8 @@ function productLd(base: string, pickup: Pickup): JsonLd {
     image: `${base}${pickup.images.main}`,
     url: `${base}/products/${pickup.slug}`,
     brand: { '@type': 'Brand', name: SITE_NAME },
+    material: MAGNET_LABEL[pickup.magnet] ?? pickup.magnet,
+    additionalProperty: productProperties(pickup),
     offers,
   };
 }

@@ -5,16 +5,21 @@ import { Button } from '../../design-system/atoms/Button';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Price } from '../../design-system/atoms/Price';
 import { Stack } from '../../design-system/atoms/Stack';
+import { Swatch } from '../../design-system/atoms/Swatch';
 import { Text } from '../../design-system/atoms/Text';
 import { ProductLayout } from '../../design-system/layouts/ProductLayout';
 import { Section } from '../../design-system/layouts/Section';
 import { ProductGallery } from '../../design-system/molecules/ProductGallery';
 import { useCart } from '../../cart/CartContext';
+import { bobbinColorLabel } from '../../data/bobbinColors';
 import {
   getPickupAndParent,
   type Pickup,
+  type PickupCover,
   type PickupMagnet,
+  type PickupPolepiece,
   type PickupPosition,
+  type PickupSevenString,
   type PickupType,
 } from '../../data/pickups';
 import styles from './ProductPage.module.css';
@@ -36,6 +41,29 @@ const MAGNET_LABEL: Record<PickupMagnet, string> = {
 };
 
 const POSITION_ORDER: readonly PickupPosition[] = ['neck', 'middle', 'bridge'];
+
+const POLEPIECE_LABEL: Record<PickupPolepiece, string> = {
+  chrome: 'Chrome',
+  black: 'Black',
+  nickel: 'Nickel',
+  gold: 'Gold',
+};
+
+function formatSpacing(mm: number | readonly number[]): string {
+  const values: readonly number[] = typeof mm === 'number' ? [mm] : mm;
+  return `${values.map((n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))).join(' or ')} mm`;
+}
+
+function formatCover(cover: PickupCover | undefined): string {
+  if (cover === undefined) return 'None';
+  const material = cover.material.charAt(0).toUpperCase() + cover.material.slice(1);
+  return cover.optional ? `${material} (optional)` : material;
+}
+
+function formatSevenString(sevenString: PickupSevenString | undefined): string | undefined {
+  if (sevenString === undefined) return undefined;
+  return `Available (${sevenString.colors.map(bobbinColorLabel).join(', ').toLowerCase()} only)`;
+}
 
 /**
  * On the base (parent) view, if the calibrated neck/bridge variants use
@@ -71,6 +99,46 @@ function formatMagnet(active: Pickup, parent: Pickup): string {
   return MAGNET_LABEL[active.magnet];
 }
 
+/**
+ * Like {@link formatMagnet}: on the base view of a set, show string spacing per
+ * position (e.g. "50 mm (neck) · 52 mm (bridge)") when the variants differ, or a
+ * single value when they match. Variant/single pages show their own spacing.
+ * Returns undefined when no spacing is known.
+ */
+function formatSpacingRow(active: Pickup, parent: Pickup): string | undefined {
+  const isBase = active.slug === parent.slug;
+  const variants = parent.variants ?? [];
+
+  if (isBase && variants.length > 0) {
+    const positional = variants
+      .map((variant) => ({
+        spacing: variant.hardware.spacingMm,
+        position: variant.positions.length === 1 ? variant.positions[0] : undefined,
+      }))
+      .filter(
+        (entry): entry is { spacing: number | readonly number[]; position: PickupPosition } =>
+          entry.position !== undefined && entry.spacing !== undefined,
+      );
+
+    const first = positional[0];
+    if (first !== undefined) {
+      const distinct = new Set(positional.map((entry) => formatSpacing(entry.spacing)));
+      if (distinct.size > 1) {
+        return positional
+          .slice()
+          .sort((a, b) => POSITION_ORDER.indexOf(a.position) - POSITION_ORDER.indexOf(b.position))
+          .map((entry) => `${formatSpacing(entry.spacing)} (${entry.position})`)
+          .join(' · ');
+      }
+      return formatSpacing(first.spacing);
+    }
+  }
+
+  return active.hardware.spacingMm !== undefined
+    ? formatSpacing(active.hardware.spacingMm)
+    : undefined;
+}
+
 function buildGalleryImages(pickup: Pickup) {
   const main = { src: pickup.images.main, alt: pickup.name };
   const extras = (pickup.images.gallery ?? []).map((src) => ({
@@ -87,6 +155,21 @@ function SpecRow({ label, value }: { label: string; value: string }) {
         {label}
       </Text>
       <Text variant="body">{value}</Text>
+    </div>
+  );
+}
+
+function SwatchRow({ label, colors }: { label: string; colors: readonly string[] }) {
+  return (
+    <div className={styles['specRow']}>
+      <Text variant="label" tone="muted">
+        {label}
+      </Text>
+      <Stack direction="row" gap="xs" wrap>
+        {colors.map((color) => (
+          <Swatch key={color} color={color} label={bobbinColorLabel(color)} size="sm" />
+        ))}
+      </Stack>
     </div>
   );
 }
@@ -149,6 +232,8 @@ export default function ProductPage() {
 
   const { pickup, parent } = found;
   const images = buildGalleryImages(pickup);
+  const sevenStringLabel = formatSevenString(pickup.hardware.sevenString);
+  const spacingRow = formatSpacingRow(pickup, parent);
   const inEnquiry = cart.items.find((i) => i.slug === pickup.slug)?.qty ?? 0;
   // The base view of a set (neck + bridge variants) is ambiguous — the buyer
   // must choose a position before it can go into the enquiry.
@@ -198,7 +283,13 @@ export default function ProductPage() {
                 {pickup.specs.loadedResonantPeak !== undefined && (
                   <SpecRow label="Loaded resonant peak" value={pickup.specs.loadedResonantPeak} />
                 )}
-                <SpecRow label="Colors" value={pickup.colors.join(', ')} />
+                {spacingRow !== undefined && <SpecRow label="String spacing" value={spacingRow} />}
+                <SpecRow label="Pole pieces" value={POLEPIECE_LABEL[pickup.hardware.polepieces]} />
+                <SpecRow label="Cover" value={formatCover(pickup.hardware.cover)} />
+                {sevenStringLabel !== undefined && (
+                  <SpecRow label="7-string" value={sevenStringLabel} />
+                )}
+                <SwatchRow label="Bobbin colours" colors={pickup.hardware.bobbinColors} />
               </div>
             </Stack>
             {isBaseWithVariants ? (

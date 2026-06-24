@@ -81,10 +81,7 @@ export function NavIcon({ name, size = 22, className }: NavIconProps) {
 
       {name === 'cart' && (
         <>
-          <path
-            d="M3 4 L5 4 L7.2 15 L18.5 15 L20.5 7 L6.2 7"
-            vectorEffect="non-scaling-stroke"
-          />
+          <path d="M3 4 L5 4 L7.2 15 L18.5 15 L20.5 7 L6.2 7" vectorEffect="non-scaling-stroke" />
           <circle cx="8.5" cy="19" r="1.4" fill="currentColor" stroke="none" />
           <circle cx="17" cy="19" r="1.4" fill="currentColor" stroke="none" />
         </>

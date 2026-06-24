@@ -1,0 +1,73 @@
+/* Art Deco color chip: a chamfered octagon framed by a thin gold edge. The
+   gold frame is the wrapper's background showing through its padding; the color
+   fill sits on ::before so it can be set per-value in CSS (the strict prod CSP
+   forbids inline styles). Both layers share the same octagon clip. */
+.swatch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 1.5px;
+  background-color: var(--color-accent-gold);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.swatch::before {
+  content: '';
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  background-color: var(--color-surface-raised);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.swatch[data-size='sm'] {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+}
+
+.swatch[data-size='md'] {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+/* Boutique bobbin palette. data-color is a NAME TOKEN (see
+   src/data/bobbinColors.ts); the hex here is only an approximate fill for the
+   chip. Keep tokens in sync with bobbinColors.ts + STANDARD_BOBBIN_COLORS. */
+.swatch[data-color='white']::before {
+  background-color: #f4f1ea;
+}
+
+.swatch[data-color='cream']::before {
+  background-color: #efe4c4;
+}
+
+.swatch[data-color='black']::before {
+  background-color: #171513;
+}
+
+.swatch[data-color='coral']::before {
+  background-color: #f65d71;
+}
+
+.swatch[data-color='red']::before {
+  background-color: #bf474a;
+}
+
+.swatch[data-color='blue']::before {
+  background-color: #0e138a;
+}
+
+.swatch[data-color='light-blue']::before {
+  background-color: #569ece;
+}
+
+.swatch[data-color='pink']::before {
+  background-color: #dc5ea3;
+}
+
+.swatch[data-color='green']::before {
+  background-color: #4db456;
+}
+
+.swatch[data-color='orange']::before {
+  background-color: #f6a449;
+}
