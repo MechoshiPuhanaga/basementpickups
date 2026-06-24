@@ -6,6 +6,7 @@ import ProductPage from '../pages/ProductPage';
 import ArticlesIndexPage from '../pages/ArticlesIndexPage';
 import ArticlePage from '../pages/ArticlePage';
 import AboutPage from '../pages/AboutPage';
+import FaqPage from '../pages/FaqPage';
 import ContactPage from '../pages/ContactPage';
 import CartPage from '../pages/CartPage';
 import NotFoundPage from '../pages/NotFoundPage';
@@ -21,6 +22,7 @@ export const routes: RouteObject[] = [
       { path: 'articles', Component: ArticlesIndexPage },
       { path: 'articles/:slug', Component: ArticlePage },
       { path: 'about', Component: AboutPage },
+      { path: 'faq', Component: FaqPage },
       { path: 'contact', Component: ContactPage },
       { path: 'cart', Component: CartPage },
       { path: '*', Component: NotFoundPage },

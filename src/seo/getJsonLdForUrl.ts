@@ -2,6 +2,7 @@ import { getPickupAndParent } from '../data/pickups';
 import type { Pickup } from '../data/pickups';
 import { bobbinColorLabel } from '../data/bobbinColors';
 import { getArticleBySlug } from '../data/articles';
+import { FAQ_ITEMS } from '../data/faq';
 
 const SITE_NAME = 'Basement Pickups';
 const SITE_DESCRIPTION =
@@ -177,6 +178,24 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
 
   if (normalized === '/') {
     return [organizationLd(base), websiteLd(base)];
+  }
+
+  if (normalized === '/faq') {
+    return [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: FAQ_ITEMS.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
+      },
+      breadcrumbLd(base, [
+        { name: 'Home', path: '/' },
+        { name: 'Q&A', path: '/faq' },
+      ]),
+    ];
   }
 
   const productMatch = /^\/products\/([^/]+)$/.exec(normalized);

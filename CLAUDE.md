@@ -175,6 +175,7 @@ review-component.md
 optimize-images.md
 add-product.md
 audit-lighthouse.md
+add-faq-item.md
 ```
 
 Examples:
@@ -203,6 +204,9 @@ Adding new products / updating the catalog
 
 Auditing quality (perf / a11y / best-practices / SEO)
   -> read skills/audit-lighthouse.md
+
+Adding a Q&A / FAQ entry (wording + Art Deco icon)
+  -> read skills/add-faq-item.md
 ```
 
 Skills are implementation contracts.

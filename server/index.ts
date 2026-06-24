@@ -150,6 +150,7 @@ Basement Pickups is a boutique workshop building hand-wound electric guitar pick
 - [Shop](${origin}/shop): The full collection of available pickups.
 - [About](${origin}/about): The workshop, the craft, and the philosophy.
 - [Articles](${origin}/articles): Editorial on winding, tone, magnets, and process.
+- [Q&A](${origin}/faq): How pickups are made and measured, lead times, and what to expect.
 - [Contact](${origin}/contact): Get in touch with the workshop.
 
 ## Products
@@ -168,6 +169,7 @@ function buildSitemapXml(origin: string): string {
     '/shop',
     '/about',
     '/articles',
+    '/faq',
     '/contact',
   ].map((path) => ({ path }));
 

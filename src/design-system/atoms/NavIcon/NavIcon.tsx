@@ -1,6 +1,6 @@
 import styles from './NavIcon.module.css';
 
-export type NavIconName = 'home' | 'about' | 'shop' | 'articles' | 'contact' | 'cart';
+export type NavIconName = 'home' | 'about' | 'shop' | 'articles' | 'faq' | 'contact' | 'cart';
 
 export interface NavIconProps {
   name: NavIconName;
@@ -69,6 +69,13 @@ export function NavIcon({ name, size = 22, className }: NavIconProps) {
           <path d="M9 8 L15 8" vectorEffect="non-scaling-stroke" />
           <path d="M9 12 L15 12" vectorEffect="non-scaling-stroke" />
           <path d="M9 16 L13 16" vectorEffect="non-scaling-stroke" />
+        </>
+      )}
+
+      {name === 'faq' && (
+        <>
+          <path d="M8 9 A 4 4 0 1 1 12 13 L 12 15" vectorEffect="non-scaling-stroke" />
+          <circle cx="12" cy="19" r="1.1" fill="currentColor" stroke="none" />
         </>
       )}
 

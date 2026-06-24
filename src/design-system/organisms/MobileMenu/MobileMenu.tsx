@@ -24,6 +24,7 @@ const ICON_BY_HREF: Record<string, NavIconName> = {
   '/about': 'about',
   '/shop': 'shop',
   '/articles': 'articles',
+  '/faq': 'faq',
   '/contact': 'contact',
 };
 

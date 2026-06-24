@@ -116,6 +116,16 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
     });
   }
 
+  if (normalized === '/faq') {
+    return build(origin, {
+      title: withSiteName('Q&A'),
+      description:
+        'How Basement Pickups are made and measured, and what to expect when you order — lead times, the marks of handwork, batch variation, and measurement conditions.',
+      path: '/faq',
+      ogType: 'website',
+    });
+  }
+
   if (normalized === '/contact') {
     return build(origin, {
       title: withSiteName('Contact'),
@@ -176,7 +186,7 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
   });
 }
 
-const STATIC_PATHS = new Set(['/', '/shop', '/about', '/articles', '/contact', '/cart']);
+const STATIC_PATHS = new Set(['/', '/shop', '/about', '/articles', '/faq', '/contact', '/cart']);
 
 /**
  * HTTP status for a pathname: 404 for the splat route and for unknown
