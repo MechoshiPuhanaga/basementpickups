@@ -8,9 +8,9 @@ import { pickups } from '../../data/pickups';
 
 export default function ShopPage() {
   return (
-    <Section spacing="lg" maxWidth="default">
-      <Stack direction="column" gap="xl" align="stretch">
-        <Stack direction="column" gap="xs" align="center">
+    <Section spacing="sm" maxWidth="default">
+      <Stack direction="column" gap="lg" align="stretch">
+        <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
             Catalog
           </Text>

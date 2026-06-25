@@ -8,7 +8,7 @@ import { FAQ_ITEMS } from '../../data/faq';
 
 export default function FaqPage() {
   return (
-    <Section spacing="lg" maxWidth="narrow">
+    <Section spacing="sm" maxWidth="narrow">
       <Stack direction="column" gap="xl" align="stretch">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">

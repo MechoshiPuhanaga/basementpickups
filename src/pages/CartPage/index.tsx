@@ -17,7 +17,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <Section spacing="lg" maxWidth="narrow">
+      <Section spacing="sm" maxWidth="narrow">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
             Enquiry
@@ -39,10 +39,10 @@ export default function CartPage() {
   }
 
   return (
-    <Section spacing="lg" maxWidth="default">
+    <Section spacing="sm" maxWidth="default">
       <div className={styles['layout']}>
         <Stack direction="column" gap="xl" align="stretch">
-          <Stack direction="column" gap="xs" align="center">
+          <Stack direction="column" gap="md" align="center">
             <Text variant="label" tone="gold" align="center">
               Enquiry
             </Text>

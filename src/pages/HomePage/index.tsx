@@ -11,18 +11,16 @@ export default function HomePage() {
 
   return (
     <>
-      <Section spacing="lg" maxWidth="default">
-        <Hero
-          eyebrow="Basement Pickups"
-          headline="Tone that's built different"
-          lead="Handwound boutique pickups, voiced on the bench. Built for players who care where the magic comes from."
-          primaryCta={{ label: 'Shop Pickups', href: '/shop' }}
-          secondaryCta={{ label: 'Read the journal', href: '/articles' }}
-          imageSrc="/assets/images/spirit-photos/bp-spirit-1.png"
-          imageAlt="A handwound humbucker resting under warm workshop light"
-          imagePosition="left"
-        />
-      </Section>
+      <Hero
+        eyebrow="Basement Pickups"
+        headline="Tone that's built different"
+        lead="Handwound boutique pickups, voiced on the bench. Built for players who care where the magic comes from."
+        primaryCta={{ label: 'Shop Pickups', href: '/shop' }}
+        secondaryCta={{ label: 'Read the journal', href: '/articles' }}
+        imageSrc="/assets/images/spirit-photos/bp-spirit-1.png"
+        imageAlt="A handwound humbucker resting under warm workshop light"
+        imagePosition="left"
+      />
       <Section spacing="lg" maxWidth="default">
         <ProductGrid
           eyebrow="Featured"

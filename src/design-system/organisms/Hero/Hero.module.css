@@ -1,7 +1,7 @@
 .root {
   display: block;
   inline-size: 100%;
-  padding-block: var(--space-8);
+  padding-block: var(--space-6);
   padding-inline: var(--space-5);
 }
 
@@ -58,7 +58,7 @@
 
 @media (width <= 768px) {
   .root {
-    padding-block: var(--space-7);
+    padding-block: var(--space-5);
   }
 
   .layout {

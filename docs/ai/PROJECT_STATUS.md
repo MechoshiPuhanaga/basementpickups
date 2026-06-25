@@ -325,7 +325,7 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 - ~~404 status for the splat route~~ — **done** (`getStatusForUrl` → real 404s)
 - Consider compiling `server/index.ts` to JS for production instead of running via tsx (small perf gain; current setup keeps `tsx` in `dependencies`)
 - **PWA SW**: bump `VERSION` in `public/sw.js` on any worker change; needs a real-browser install/offline test before launch
-- **Cloudflare: turn Email Obfuscation OFF** (Scrape Shield) — it rewrites the `/contact` email + injects a decode script that Trusted Types blocks → React #418 hydration error + broken email for users. Keep Rocket Loader / Mirage off too. See memory `project-cloudflare-ssr-conflicts`.
+- ~~**Cloudflare: turn Email Obfuscation OFF**~~ — **done 2026-06-25**: confirmed the `/contact` TrustedHTML / React #418 errors were Cloudflare Email Address Obfuscation injecting `email-decode.min.js`; turning it OFF cleared them. New dashboard location is **Security → Settings** (no longer "Scrape Shield"). Keep Rocket Loader / Mirage off too. See memory `project-cloudflare-ssr-conflicts`.
 
 ## Roadmap (next)
 
@@ -339,6 +339,32 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-25 — Email logo inline (cid) + UI spacing / mobile-menu polish
+
+Follow-up session after the Resend work (below), plus a batch of spacing/animation polish.
+
+**Email logo now inline (`server/contact.ts`).** abv.bg and Zoho block remote images by default, so the hosted logo URL never rendered in the branded emails (Gmail did — it loads remote images). Switched the logo to an **inline `cid:` attachment**: new `getLogoAttachment()` reads `BP_Gold_horizont.png` from `dist/client/assets/logo` then `public/assets/logo`, base64-encodes + caches it, and returns `{ filename, content, contentId: 'bp-logo' }`. Attached on **both** the workshop notification and the visitor auto-reply via a conditional spread (`exactOptionalPropertyTypes`-safe). `shell()` references `cid:bp-logo`, falling back to the hosted URL only if the file can't be read; the `<img>` `alt` is now a gold, letter-spaced "BASEMENT PICKUPS" wordmark so a branded header still shows if the image is stripped. **Still needs a real-send test on abv.bg + Zoho** to confirm inline rendering (residual risk; Gmail already fine).
+
+**Cloudflare Email Obfuscation resolved** — see the (now-ticked) open follow-up above. Turning it OFF cleared the `/contact` TrustedHTML / React #418 errors. Memory `project-cloudflare-ssr-conflicts` updated with the new dashboard location (Security → Settings).
+
+**Spacing / layout polish (pages only; DS untouched except Hero + tokens):**
+
+- **Home hero double-padding fixed** — removed the redundant `<Section spacing="lg">` wrapper around `<Hero>` (the Hero self-pads, so it was getting 8rem top/bottom). Also trimmed Hero `padding-block` to `space-6` desktop / `space-5` mobile.
+- **Top sections → `sm` (2rem)** on Shop, Articles, FAQ, Contact, About-intro, and Cart (both empty + populated states). Secondary/lower sections and NotFound (`xl`) left as-is. Product/Article _detail_ tops use their layouts and were not touched.
+- **Headline groups synced to `gap="md"`** across every page (previously a mix of `xs`/`md`) — more consistent, airier rhythm.
+- **Shop + Articles** headline→filters gap reduced `xl`→`lg` (3rem→2rem).
+
+**Mobile-menu animation reworked** — enter is slower/more elegant (`--motion-slow` + new `--motion-easing-emphasized` decelerate + a soft opacity fade); exit is snappy and clean (`--motion-base` + new `--motion-easing-exit` accelerate, transform-only, no opacity). Two new easing tokens added to `tokens.css`; `EXIT_FALLBACK_MS` 400→600 to stay above the enter animation.
+
+**Contact-form post-submit UX (`ContactPage` + `ContactForm` molecule):**
+
+- After a successful **cart** enquiry the read-only `EnquirySummary` now hides — a `sent` flag on `ContactPage` gates it (the cart is cleared on success, but the summary is nav-state-derived so it lingered). On a **failed** send nothing clears: summary, cart, and form input are all preserved for retry, with the existing 4xx message / 5xx mailto fallback.
+- The result message (success/error Callout) now **scrolls into view** on status change (smooth unless `prefers-reduced-motion`; SSR-safe effect). Deliberately **no focus move** — relies on the existing `aria-live` region, avoiding a double-announce and the questionable practice of focusing a non-interactive element. **Errors are now assertive** (`role="alert"` / `aria-live="assertive"`); success stays polite. See memory `feedback-form-feedback-a11y`.
+
+**Reported, not fixed (deferred):** on phone the header logo-bar can be a hair taller than the mobile-menu's mirrored top bar — the header stacks the Enquiry button (`.actions`) + burger (`.mobileNav`) in `.rightGroup` (~5rem, occasionally over the `min-block-size: 5rem`), nudging the logo a few px and causing a small shift on open/close; plus a scroll-lock scrollbar shift visible mainly in desktop/DevTools. Likely fix: hide the redundant phone Enquiry button (the burger menu already has an Enquiry entry) and/or `scrollbar-gutter: stable`.
+
+**Quality:** typecheck / lint / stylelint / prettier / prod build all green.
 
 ## 2026-06-25 — Resend-backed contact form (real email send + branded templates)
 

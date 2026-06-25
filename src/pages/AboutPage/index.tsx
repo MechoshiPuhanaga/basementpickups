@@ -11,7 +11,7 @@ import { brandValues } from '../../data/brandValues';
 export default function AboutPage() {
   return (
     <>
-      <Section spacing="lg" maxWidth="narrow">
+      <Section spacing="sm" maxWidth="narrow">
         <Stack direction="column" gap="lg" align="stretch">
           <Stack direction="column" gap="md" align="center">
             <Text variant="label" tone="gold" align="center">
@@ -61,7 +61,7 @@ export default function AboutPage() {
       </Section>
       <Section spacing="lg" maxWidth="default">
         <Stack direction="column" gap="xl" align="stretch">
-          <Stack direction="column" gap="xs" align="center">
+          <Stack direction="column" gap="md" align="center">
             <Text variant="label" tone="gold" align="center">
               What we stand for
             </Text>

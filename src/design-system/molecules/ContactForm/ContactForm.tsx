@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '../../atoms/Button';
 import { Callout } from '../../atoms/Callout';
@@ -88,6 +88,19 @@ export function ContactForm({
   const [status, setStatus] = useState<ContactFormStatus>('idle');
   const [serverError, setServerError] = useState<string>('');
   const [lastData, setLastData] = useState<ContactFormData | null>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  // Bring the result message into view on success/error — on a long form (or
+  // phone) it sits below the submit button, off-screen. Screen readers already
+  // get it via the live region; this is purely for sighted visibility. SSR-safe
+  // (effects are client-only) and motion-aware.
+  useEffect(() => {
+    if (status !== 'success' && status !== 'error') return;
+    const node = statusRef.current;
+    if (node === null) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    node.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  }, [status]);
 
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const subjectOptions =
@@ -205,7 +218,12 @@ export function ContactForm({
           </Button>
         </div>
 
-        <div className={styles['status']} role="status" aria-live="polite">
+        <div
+          ref={statusRef}
+          className={styles['status']}
+          role={status === 'error' ? 'alert' : 'status'}
+          aria-live={status === 'error' ? 'assertive' : 'polite'}
+        >
           {status === 'success' && <Callout tone="success">{successMessage}</Callout>}
           {status === 'error' &&
             (serverError !== '' ? (

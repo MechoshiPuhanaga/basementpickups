@@ -60,7 +60,8 @@
       "Bash(curl -s http://localhost:3000/products/white-pearl-bridge)",
       "Bash(curl -sf -o /dev/null -w \"robots.txt: HTTP %{http_code}\\\\n\" http://localhost:3000/robots.txt)",
       "Bash(perl -0pi -e \"s/error: 'We could not send your message\\\\. Please try again\\\\.'/error: \\\\\"We couldn't send your message just now. Please try again in a moment.\\\\\"/g\" server/contact.ts)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "WebFetch(domain:developers.cloudflare.com)"
     ]
   }
 }

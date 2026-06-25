@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation } from 'react-router';
 
 import { useCart, type CartItem } from '../../cart/CartContext';
@@ -103,6 +104,7 @@ export default function ContactPage() {
   const location = useLocation();
   const { clear } = useCart();
   const hydrated = useIsHydrated();
+  const [sent, setSent] = useState(false);
 
   // The browser restores history.state on reload, so React Router hands the
   // client navigation state the server never had. Read it only after hydration
@@ -119,12 +121,15 @@ export default function ContactPage() {
   async function handleSubmit(data: ContactFormData): Promise<void> {
     await postEnquiry(data, fromCart ? items : undefined);
     if (fromCart) clear();
+    // Hide the read-only enquiry summary once the enquiry has been sent — the
+    // cart is now cleared, so the (nav-state-derived) list would be stale.
+    setSent(true);
   }
 
   return (
-    <Section spacing="lg" maxWidth="default">
+    <Section spacing="sm" maxWidth="default">
       <Stack direction="column" gap="xl" align="stretch">
-        <Stack direction="column" gap="xs" align="center">
+        <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
             Get in touch
           </Text>
@@ -140,7 +145,7 @@ export default function ContactPage() {
         <div className={styles['layout']}>
           <div className={styles['formSide']}>
             <Stack direction="column" gap="lg" align="stretch">
-              {fromCart && items !== undefined && <EnquirySummary items={items} />}
+              {fromCart && items !== undefined && !sent && <EnquirySummary items={items} />}
               <ContactForm
                 key={hydrated ? 'hydrated' : 'ssr'}
                 onSubmit={handleSubmit}

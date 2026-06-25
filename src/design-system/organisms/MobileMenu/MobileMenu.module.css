@@ -46,7 +46,7 @@
   border: none;
   background-color: rgb(0 0 0 / 60%);
   cursor: pointer;
-  animation: fade var(--motion-base) var(--motion-easing);
+  animation: fade var(--motion-slow) var(--motion-easing);
 }
 
 .panel {
@@ -62,7 +62,7 @@
   background-color: var(--color-surface-base);
   border-inline-end: 1px solid var(--color-line-gold);
   overflow-y: auto;
-  animation: slide var(--motion-base) var(--motion-easing);
+  animation: slide var(--motion-slow) var(--motion-easing-emphasized);
 }
 
 .panel:focus {
@@ -82,10 +82,12 @@
 @keyframes slide {
   from {
     transform: translateX(-100%);
+    opacity: 0;
   }
 
   to {
     transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -93,11 +95,15 @@
    stays off-screen / transparent until React unmounts it on animationend. */
 .scrim[data-state='closing'] {
   animation-name: fade-out;
+  animation-duration: var(--motion-base);
+  animation-timing-function: var(--motion-easing-exit);
   animation-fill-mode: forwards;
 }
 
 .panel[data-state='closing'] {
   animation-name: slide-out;
+  animation-duration: var(--motion-base);
+  animation-timing-function: var(--motion-easing-exit);
   animation-fill-mode: forwards;
 }
 

@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Request, Response } from 'express';
 import { Resend } from 'resend';
 
@@ -34,6 +37,48 @@ const MAX = {
 } as const;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
+
+const LOGO_FILENAME = 'BP_Gold_horizont.png';
+// Content ID for the inline logo, referenced from the HTML as `cid:bp-logo`.
+const LOGO_CID = 'bp-logo';
+
+interface LogoAttachment {
+  readonly filename: string;
+  readonly content: string;
+  readonly contentId: string;
+}
+
+let cachedLogo: LogoAttachment | null | undefined;
+
+/**
+ * The logo as an inline (cid) attachment so it renders without the recipient
+ * enabling remote images — abv.bg, Zoho and Outlook all block remote images by
+ * default. Read from disk once and base64-cached. Tries the built location
+ * first, then the source `public/` dir. Returns null if the file can't be read,
+ * in which case the email falls back to the hosted image URL.
+ */
+function getLogoAttachment(): LogoAttachment | null {
+  if (cachedLogo !== undefined) return cachedLogo;
+  const candidates = [
+    path.resolve(ROOT, 'dist/client/assets/logo', LOGO_FILENAME),
+    path.resolve(ROOT, 'public/assets/logo', LOGO_FILENAME),
+  ];
+  for (const file of candidates) {
+    try {
+      const content = fs.readFileSync(file).toString('base64');
+      cachedLogo = { filename: LOGO_FILENAME, content, contentId: LOGO_CID };
+      return cachedLogo;
+    } catch {
+      // Try the next candidate path.
+    }
+  }
+  console.error('Email logo file not found; falling back to remote image URL.');
+  cachedLogo = null;
+  return cachedLogo;
+}
 
 /** A spec line for a pickup, e.g. { label: 'Bobbin', value: 'Cream' }. */
 export interface ContactItemOption {
@@ -171,7 +216,11 @@ function escapeHtml(value: string): string {
  * the logo renders locally).
  */
 function shell(title: string, inner: string, siteUrl: string, assetUrl: string): string {
-  const logoUrl = `${assetUrl}/assets/logo/BP_Gold_horizont.png`;
+  // Prefer the inline (cid) logo so it shows even when remote images are
+  // blocked; fall back to the hosted URL only if the file couldn't be read.
+  const logoSrc = getLogoAttachment()
+    ? `cid:${LOGO_CID}`
+    : `${assetUrl}/assets/logo/${LOGO_FILENAME}`;
   const displayUrl = siteUrl.replace(/^https?:\/\//, '');
   return `<!doctype html>
 <html lang="en">
@@ -182,7 +231,7 @@ function shell(title: string, inner: string, siteUrl: string, assetUrl: string):
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e6e0d4;border-radius:4px;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:${INK};">
             <tr>
               <td style="background:${INK};padding:28px 32px;text-align:center;">
-                <img src="${logoUrl}" alt="${BRAND}" width="220" style="display:inline-block;width:220px;max-width:68%;height:auto;border:0;" />
+                <img src="${logoSrc}" alt="BASEMENT PICKUPS" width="220" style="display:inline-block;width:220px;max-width:68%;height:auto;border:0;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1.3;letter-spacing:0.22em;text-transform:uppercase;color:${GOLD};text-decoration:none;" />
               </td>
             </tr>
             <tr>
@@ -422,6 +471,7 @@ export async function handleContact(req: Request, res: Response): Promise<void> 
   const from = `${BRAND} <${fromEmail}>`;
   const { data } = parsed;
   const site = siteOrigin();
+  const logo = getLogoAttachment();
 
   try {
     const notification = notificationEmail(data, site, site);
@@ -432,6 +482,7 @@ export async function handleContact(req: Request, res: Response): Promise<void> 
       subject: `[Contact] ${data.subject} — ${data.name}`,
       html: notification.html,
       text: notification.text,
+      ...(logo ? { attachments: [logo] } : {}),
     });
 
     if (result.error) {
@@ -452,6 +503,7 @@ export async function handleContact(req: Request, res: Response): Promise<void> 
       subject: `We received your message — ${BRAND}`,
       html: confirmation.html,
       text: confirmation.text,
+      ...(logo ? { attachments: [logo] } : {}),
     });
     if (confirmationResult.error) {
       console.error('Resend confirmation error:', confirmationResult.error);

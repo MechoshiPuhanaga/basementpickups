@@ -40,7 +40,7 @@ function iconForHref(href: string): NavIconName {
 type MenuState = 'closed' | 'open' | 'closing';
 
 /** Safety net: unmount the overlay even if `animationend` never fires. */
-const EXIT_FALLBACK_MS = 400;
+const EXIT_FALLBACK_MS = 600;
 
 function prefersReducedMotion(): boolean {
   return (
