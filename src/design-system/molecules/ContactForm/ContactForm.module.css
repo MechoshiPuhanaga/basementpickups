@@ -20,6 +20,38 @@
 
 .actions {
   display: flex;
+  align-items: center;
+  gap: var(--space-4);
   justify-content: flex-start;
   margin-block-start: var(--space-3);
+}
+
+/* Honeypot: hidden from sighted users, screen readers and tab order alike.
+   Bots that auto-fill every field reveal themselves by populating it. */
+.honeypot {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Live region wrapper; the Callout inside owns all feedback styling. Empty when
+   idle so it occupies no space. */
+.status:empty {
+  display: none;
+}
+
+.fallbackLink {
+  color: var(--color-accent-gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fallbackLink:hover {
+  color: var(--color-text-primary);
 }

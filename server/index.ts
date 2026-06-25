@@ -5,6 +5,7 @@ import path from 'node:path';
 import url from 'node:url';
 import { Writable } from 'node:stream';
 import type { ViteDevServer } from 'vite';
+import { handleContact } from './contact';
 import { splitTemplate } from './renderHtml';
 import type { SsrRenderResult } from '../src/entry-server';
 import { pickups } from '../src/data/pickups';
@@ -247,6 +248,12 @@ async function start(): Promise<void> {
       }),
     );
   }
+
+  // Contact form submission. Mounted before the SSR catch-all so it is not
+  // swallowed by the React renderer. JSON body, capped to a small size.
+  app.post('/api/contact', express.json({ limit: '64kb' }), (req, res) => {
+    void handleContact(req, res);
+  });
 
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain').send(buildRobotsTxt(getRequestOrigin(req)));

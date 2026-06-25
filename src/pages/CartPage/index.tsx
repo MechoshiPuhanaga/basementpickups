@@ -8,15 +8,8 @@ import { Price } from '../../design-system/atoms/Price';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
 import { Section } from '../../design-system/layouts/Section';
-import { useCart, type CartItem } from '../../cart/CartContext';
+import { useCart } from '../../cart/CartContext';
 import styles from './CartPage.module.css';
-
-function buildEnquiryMessage(items: readonly CartItem[], subtotal: number): string {
-  const lines = items
-    .map((item) => `- ${String(item.qty)} × ${item.name} (€${String(item.price)})`)
-    .join('\n');
-  return `I'd like to inquire about the following pickups:\n\n${lines}\n\nIndicative subtotal: €${String(subtotal)}`;
-}
 
 export default function CartPage() {
   const { items, subtotal, setQty, remove, clear } = useCart();
@@ -136,8 +129,12 @@ export default function CartPage() {
               onClick={() => {
                 void navigate('/contact', {
                   state: {
+                    fromCart: true,
                     subject: 'Order inquiry',
-                    message: buildEnquiryMessage(items, subtotal),
+                    // Structured line items: shown read-only on the contact page
+                    // and rendered as an itemised email template by the server.
+                    // The message field is left empty for custom requirements.
+                    items,
                   },
                 });
               }}

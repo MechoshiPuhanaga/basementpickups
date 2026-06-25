@@ -1,0 +1,63 @@
+.callout {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid color-mix(in srgb, currentcolor 42%, transparent);
+  background: color-mix(in srgb, currentcolor 8%, transparent);
+  font-family: var(--font-body);
+  font-size: var(--type-scale-step-down);
+  line-height: 1.5;
+}
+
+.callout[data-tone='success'] {
+  color: var(--color-feedback-success);
+}
+
+.callout[data-tone='error'] {
+  color: var(--color-feedback-error);
+}
+
+.callout[data-tone='info'] {
+  color: var(--color-accent-gold);
+}
+
+/* Restrained Art Deco corner brackets, drawn from the tone colour. */
+.callout::before,
+.callout::after {
+  content: '';
+  position: absolute;
+  inline-size: 10px;
+  block-size: 10px;
+  border-style: solid;
+  border-color: currentcolor;
+  opacity: 0.75;
+}
+
+.callout::before {
+  inset-block-start: 4px;
+  inset-inline-start: 4px;
+  border-width: 1px 0 0 1px;
+}
+
+.callout::after {
+  inset-block-end: 4px;
+  inset-inline-end: 4px;
+  border-width: 0 1px 1px 0;
+}
+
+/* Small Deco diamond bullet. */
+.mark {
+  flex: 0 0 auto;
+  inline-size: 7px;
+  block-size: 7px;
+  margin-block-start: 0.4em;
+  background: currentcolor;
+  transform: rotate(45deg);
+}
+
+.message {
+  flex: 1 1 auto;
+  color: var(--color-text-primary);
+}
