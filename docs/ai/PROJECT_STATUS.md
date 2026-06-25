@@ -340,6 +340,11 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 
 # Session Log
 
+## 2026-06-26 — Two production bug fixes (cart-enquiry refresh + FAQ answer contrast)
+
+- **Cart enquiry summary survived a refresh** (`ContactPage`). After a successful cart enquiry the `sent` flag hid the read-only `EnquirySummary`, but on **reload** the browser restores `history.state`, so React Router re-supplied the stale `fromCart`/`items` and the summary came back (`sent` had reset to `false`). Fix: on success, `navigate('.', { replace: true, state: null })` to wipe the navigation state from history before `setSent(true)`. A post-submit refresh now behaves like a direct `/contact` visit (all state-readers already treat `null` state as "no state"). Clearing the cart was already correct — it just doesn't drive this list.
+- **FAQ answers looked too dim** (`FaqPage`). Answers used `Text variant="body" tone="muted"` (`--color-text-muted` #9a8e74). Dropped the tone so they default to `--color-text-primary` (#f1e7d0), matching article/editorial body text.
+
 ## 2026-06-25 — Email logo inline (cid) + UI spacing / mobile-menu polish
 
 Follow-up session after the Resend work (below), plus a batch of spacing/animation polish.
@@ -359,7 +364,7 @@ Follow-up session after the Resend work (below), plus a batch of spacing/animati
 
 **Contact-form post-submit UX (`ContactPage` + `ContactForm` molecule):**
 
-- After a successful **cart** enquiry the read-only `EnquirySummary` now hides — a `sent` flag on `ContactPage` gates it (the cart is cleared on success, but the summary is nav-state-derived so it lingered). On a **failed** send nothing clears: summary, cart, and form input are all preserved for retry, with the existing 4xx message / 5xx mailto fallback.
+- After a successful **cart** enquiry the read-only `EnquirySummary` now hides — a `sent` flag on `ContactPage` gates it (the cart is cleared on success, but the summary is nav-state-derived so it lingered). On a **failed** send nothing clears: summary, cart, and form input are all preserved for retry, with the existing 4xx message / 5xx mailto fallback. _(Update 2026-06-26: the `sent` flag alone didn't survive a refresh — history.state restored the summary; now also cleared via `navigate(replace, state: null)`. See the 2026-06-26 log entry.)_
 - The result message (success/error Callout) now **scrolls into view** on status change (smooth unless `prefers-reduced-motion`; SSR-safe effect). Deliberately **no focus move** — relies on the existing `aria-live` region, avoiding a double-announce and the questionable practice of focusing a non-interactive element. **Errors are now assertive** (`role="alert"` / `aria-live="assertive"`); success stays polite. See memory `feedback-form-feedback-a11y`.
 
 **Reported, not fixed (deferred):** on phone the header logo-bar can be a hair taller than the mobile-menu's mirrored top bar — the header stacks the Enquiry button (`.actions`) + burger (`.mobileNav`) in `.rightGroup` (~5rem, occasionally over the `min-block-size: 5rem`), nudging the logo a few px and causing a small shift on open/close; plus a scroll-lock scrollbar shift visible mainly in desktop/DevTools. Likely fix: hide the redundant phone Enquiry button (the burger menu already has an Enquiry entry) and/or `scrollbar-gutter: stable`.

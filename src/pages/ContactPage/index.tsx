@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { useCart, type CartItem } from '../../cart/CartContext';
 import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
@@ -102,6 +102,7 @@ async function postEnquiry(
 
 export default function ContactPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { clear } = useCart();
   const hydrated = useIsHydrated();
   const [sent, setSent] = useState(false);
@@ -121,6 +122,10 @@ export default function ContactPage() {
   async function handleSubmit(data: ContactFormData): Promise<void> {
     await postEnquiry(data, fromCart ? items : undefined);
     if (fromCart) clear();
+    // Clear the navigation state in history so a refresh can't restore the now
+    // stale cart items (the browser persists history.state across reloads).
+    // Without this, the read-only enquiry summary reappears on refresh.
+    void navigate('.', { replace: true, state: null });
     // Hide the read-only enquiry summary once the enquiry has been sent — the
     // cart is now cleared, so the (nav-state-derived) list would be stale.
     setSent(true);

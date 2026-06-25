@@ -33,9 +33,7 @@ export default function FaqPage() {
                   {item.question}
                 </Heading>
               </Stack>
-              <Text variant="body" tone="muted">
-                {item.answer}
-              </Text>
+              <Text variant="body">{item.answer}</Text>
             </Stack>
           ))}
         </Stack>
