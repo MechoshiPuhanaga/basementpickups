@@ -9,6 +9,7 @@ import { Swatch } from '../../design-system/atoms/Swatch';
 import { Text } from '../../design-system/atoms/Text';
 import { ProductLayout } from '../../design-system/layouts/ProductLayout';
 import { Section } from '../../design-system/layouts/Section';
+import { Disclosure } from '../../design-system/molecules/Disclosure';
 import { ProductGallery } from '../../design-system/molecules/ProductGallery';
 import { useCart } from '../../cart/CartContext';
 import { bobbinColorLabel } from '../../data/bobbinColors';
@@ -182,12 +183,18 @@ interface VariantSelectorProps {
 function VariantSelector({ parent, active }: VariantSelectorProps) {
   if (parent.variants === undefined || parent.variants.length === 0) return null;
   const options: readonly Pickup[] = [parent, ...parent.variants];
+  const isBase = active.slug === parent.slug;
 
   return (
     <Stack direction="column" gap="sm" align="stretch">
       <Heading level={2} variant="section">
         Variants
       </Heading>
+      {isBase && (
+        <Text variant="meta" tone="muted">
+          Choose a position (neck or bridge) to add it to your enquiry.
+        </Text>
+      )}
       <div className={styles['variantRow']}>
         {options.map((option) => {
           const isActive = option.slug === active.slug;
@@ -195,6 +202,7 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
             <Button
               key={option.slug}
               linkTo={`/products/${option.slug}`}
+              linkState={{ preserveScroll: true }}
               variant={isActive ? 'primary' : 'ghost'}
               size="sm"
             >
@@ -252,21 +260,20 @@ export default function ProductPage() {
               <Heading level={1} variant="display" align="start">
                 {pickup.name}
               </Heading>
-              <Price amount={pickup.price} size="lg" tone="primary" />
+              <Stack direction="row" gap="sm" align="center" wrap>
+                <Price amount={pickup.price} size="lg" tone="primary" />
+                <Stack direction="row" gap="xs" wrap>
+                  {pickup.positions.map((position) => (
+                    <Badge key={position} variant="outline" tone="gold" size="sm">
+                      {position}
+                    </Badge>
+                  ))}
+                </Stack>
+              </Stack>
             </Stack>
             <Text variant="body">{pickup.description}</Text>
-            <Stack direction="row" gap="xs" wrap>
-              {pickup.positions.map((position) => (
-                <Badge key={position} variant="outline" tone="gold" size="sm">
-                  {position}
-                </Badge>
-              ))}
-            </Stack>
             <VariantSelector parent={parent} active={pickup} />
-            <Stack direction="column" gap="sm" align="stretch">
-              <Heading level={2} variant="section">
-                Specifications
-              </Heading>
+            <Disclosure title="Specifications" desktop="heading" headingLevel={2}>
               <div className={styles['specs']}>
                 <SpecRow label="Type" value={TYPE_LABEL[pickup.type]} />
                 <SpecRow label="Magnet" value={formatMagnet(pickup, parent)} />
@@ -291,12 +298,8 @@ export default function ProductPage() {
                 )}
                 <SwatchRow label="Bobbin colours" colors={pickup.hardware.bobbinColors} />
               </div>
-            </Stack>
-            {isBaseWithVariants ? (
-              <Text variant="meta" tone="muted">
-                Choose a position (neck or bridge) above to add it to your enquiry.
-              </Text>
-            ) : (
+            </Disclosure>
+            {!isBaseWithVariants && (
               <Button
                 variant="solid"
                 size="lg"

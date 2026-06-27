@@ -16,7 +16,9 @@ All six pages + the enquiry cart, the full design system, the real product catal
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
 - Real **article photos** (still placeholder SVGs — they fall back to the default OG image in link previews until replaced).
 
-**In progress (uncommitted, 2026-06-23):** responsive / mobile-nav pass + Art Deco separator. New `MobileMenu` organism (burger → full-screen dialog overlay) wired via `MobileNav` + a `NavIcon` atom; a `FilterDisclosure` molecule that collapses the shop filters behind a toggle ≤768px; responsive restacking across `ProductBrowser` / `ArticleBrowser` / `ProductGrid` / `Grid` / `ProductCard`; tighter `Section` top padding on mobile; and a new `DecoSeparator` `crest` variant now used as the header/footer/mobile-menu rule. See the 2026-06-23 session-log entry. Advances roadmap items 1 (responsive) and 2 (Art Deco). **Not yet committed; manual real-device verification still pending.**
+**Responsive pass: done** (developer-confirmed 2026-06-27). `MobileMenu` organism (burger → full-screen dialog overlay) via `MobileNav` + `NavIcon`; collapsible shop/article filters; responsive restacking across `ProductBrowser` / `ArticleBrowser` / `ProductGrid` / `Grid` / `ProductCard`; tighter `Section` top padding on mobile; `DecoSeparator` `crest` rule. Roadmap items 1 (responsive) **done** and 2 (Art Deco expansion) **dropped as not actual**.
+
+**Uncommitted (2026-06-27):** generic `Disclosure` accordion + variant-switch scroll fix — see the 2026-06-27 session-log entry.
 
 Prior milestones (2026-05-23): infrastructure complete, then design-system complete.
 
@@ -329,8 +331,8 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 
 ## Roadmap (next)
 
-1. **Responsive design pass** — _in progress (2026-06-23, uncommitted)_: mobile nav overlay, collapsible filters, browser/grid restacking, and tighter mobile section padding landed. **Still to do:** real-device verification of breakpoints, touch-target sizes, and 320px/200% reflow. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) — restack/wrap at breakpoints rather than compress.
-2. **Art Deco SVG ornamentation** — _in progress (2026-06-23)_: new `DecoSeparator` `crest` variant now rules the header/footer/mobile menu. **Still to do:** expand the **in-house** `DecoCorner` / `DecoFrame` / `DecoSeparator` / `DecoOrnament` atoms across the site (section corners, panel/hero frames, editorial separators, CTA/footer ornaments). Derive from `design/references/` + `SVG_SYSTEM.md`, drawing from the new `svg-art` palette. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`).
+1. ~~**Responsive design pass**~~ — **done** (developer-confirmed 2026-06-27). Mobile nav overlay, collapsible filters, browser/grid restacking, and tighter mobile section padding all landed; breakpoints/touch-targets/reflow accepted. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) for any future layout work.
+2. ~~**Art Deco SVG ornamentation**~~ — **dropped (not actual, 2026-06-27)**: the developer decided the current ornamentation (in-house `Deco*` atoms + `DecoSeparator` `crest`) is enough; no site-wide expansion planned. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`) if this is ever revived.
 3. **Prefetch all resources on load (non-blocking) for offline** — after first paint and while the connection is idle, warm the cache with the rest of the site's assets (route chunks, product/spirit images + their AVIF/WebP derivatives, fonts) so a subsequent offline visit has everything. Must be **non-blocking**: kick off after `load`, ideally gated on `requestIdleCallback` and `navigator.connection` (skip on save-data / slow links). Coordinate with the existing hand-rolled service worker (`public/sw.js`, approach A) — bump its `VERSION` and decide between SW-side precache vs. client-driven `fetch`/`<link rel=prefetch>`. Respect the CSP and don't regress LCP/TBT.
 4. **Bobbin colour selection in the enquiry** — _data + display done (2026-06-24): `pickup.hardware.bobbinColors` holds **name tokens** (not hex); `bobbinColorLabel` (`src/data/bobbinColors.ts`) is the single token→label source; the `Swatch` atom shows them as Art Deco chips (hex lives only in its CSS). See session log._ **Still to do:** a DS **colour-picker widget** (built on `Swatch`) to choose a bobbin colour **before** adding to the enquiry; store the chosen colour on the enquiry-cart line; show the swatch next to each pickup in the enquiry and let the user **switch** it there. The prefilled contact mailto must list **human-readable colour names** (via `bobbinColorLabel`), never hex. Stays within the no-payments enquiry model (memory `project-enquiry-cart`). Touches the cart line shape, ProductPage (selector), and CartPage (per-line swatch + edit). The chosen configuration is stored on the enquiry-cart line and is **editable in the enquiry per configured pickup**. Stays within the no-payments enquiry-cart model (memory `project-enquiry-cart`): the selection just enriches the prefilled contact mailto. Touches `DATA_MODEL.md` (pickup colour options), the cart line shape, ProductCard/ProductBrowser (selector), and the CartPage (per-line edit). **Server already ready (2026-06-25):** the `/api/contact` itemised email template accepts per-item `options` (`ContactItemOption[]`) and renders them — once the cart line carries the chosen colour, include it as an `option` on each item in the `POST /api/contact` payload (and in the mailto fallback's `mailtoItemsText`).
 5. ~~**Q&A / FAQ page**~~ — **done 2026-06-24**: `/faq` page (`src/pages/FaqPage`) renders `FAQ_ITEMS` (`src/data/faq.ts`) with the in-house Art Deco `FaqIcon` atom, composed from DS primitives (no page CSS). Wired into routing, `primaryNav` (label "Q&A", with a new `faq` `NavIcon` glyph for the mobile menu), SSR SEO (`getSeoForUrl` + `STATIC_PATHS`), sitemap, `llms.txt`, and **`FAQPage` JSON-LD** + breadcrumb in `getJsonLdForUrl.ts` (expandable rich-result eligible). Copy stays editorial, < 50 words each; **the list is extensible — more entries may be added** by appending to `FAQ_ITEMS`.
@@ -339,6 +341,61 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-06-27 — Product-page UX polish + muted-text contrast lift
+
+Follow-ups to the Disclosure/scroll work below; same uncommitted batch. All gates green.
+
+**Product detail layout (ProductPage).** Users mistook the non-interactive position badges (below
+the description) for the variant picker. Fixes:
+
+- Position badges moved up **beside the price** (read as metadata, not a control).
+- The "Choose a position (neck or bridge)…" hint moved **above** the Variants buttons (inside
+  `VariantSelector`, shown only on the base view of a set). Base sets no longer render a bottom
+  Add button — the hint up top explains the choice.
+
+**Muted-text contrast.** Subheadlines use `Text variant="lead" tone="muted"` →
+`--color-text-muted`. Old `#9a8e74` measured 6.0:1 on the page bg (AA pass, but users read it as
+dim). Lifted the token to **`#a89c7e` (7.2:1, AAA)** — one-place change, brightens all muted copy
+site-wide while staying within the elegant Art Deco palette (primary cream stays ~16:1, hierarchy
+intact). One non-text consumer (a Badge fill) also lightens marginally; verified fine.
+
+## 2026-06-27 — Generic Disclosure accordion + product-variant scroll fix
+
+Two changes; all gates green (typecheck / lint / stylelint / prettier). Uncommitted.
+
+**Generic `Disclosure` molecule (shared accordion).** Extracted the filter accordion's engine into a
+reusable DS molecule `src/design-system/molecules/Disclosure/`. Two large-screen modes via a
+`desktop` prop:
+
+- `dissolve` (default): wrapper uses `display: contents`, panel flows inline, toggle hidden — the
+  filter-bar behaviour, unchanged.
+- `heading`: `title` renders as a section `Heading` above an always-open panel.
+
+Both collapse behind the same gold-chevron toggle at ≤768px (same animation/a11y as before).
+Optional `icon` + `summary` (chips) props; `headingLevel`, `defaultOpen`.
+
+- **`FilterDisclosure` is now a thin preset** over `Disclosure` (`desktop="dissolve"`, lotus icon,
+  "Filters" label, `filters → summary`). Same public API/props, identical output → **zero filter
+  regression**; `ProductBrowser`/`ArticleBrowser` untouched. Deleted the now-dead
+  `FilterDisclosure.module.css` (styles live in `Disclosure.module.css`; class `.lotus` → generic
+  `.icon`).
+- **ProductPage specs** now use `<Disclosure title="Specifications" desktop="heading"
+headingLevel={2}>`. Desktop unchanged; on phones the specs collapse so the Add-to-enquiry button
+  is reachable without a long scroll. The `.specs` grid stays as page layout glue.
+
+Considered (and rejected) adding an add-to-enquiry control to shop `ProductCard`s: 3 of 6 pickups
+are base-with-variants (must choose neck/bridge), so a quick-add is ambiguous — left as-is.
+
+**Product-variant switch no longer jumps to top.** `App.tsx` ran `scrollTo(0,0)` + `focus('#main')`
+on every pathname change, so Base/Bridge/Neck links jumped the page up. Added an opt-in
+`preserveScroll` navigation-state flag (React Router's `state` — the intended channel, not a hack):
+
+- `Button` atom gained a `linkState` prop forwarded to its `<Link state>`.
+- `VariantSelector` passes `linkState={{ preserveScroll: true }}`.
+- `App.tsx` reads `location.state`; when `preserveScroll` is set it skips **both** the scroll reset
+  and the focus-to-`#main` move (focus stays on the control just used). All other navigation still
+  scrolls to top as before.
 
 ## 2026-06-26 — Two production bug fixes (cart-enquiry refresh + FAQ answer contrast)
 

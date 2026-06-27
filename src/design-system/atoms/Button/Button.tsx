@@ -15,6 +15,8 @@ export interface ButtonProps extends Omit<
   className?: string | undefined;
   children?: ReactNode;
   linkTo?: string | undefined;
+  /** Navigation state forwarded to the underlying router Link (only when linkTo is set). */
+  linkState?: unknown;
 }
 
 export function Button({
@@ -23,6 +25,7 @@ export function Button({
   className,
   children,
   linkTo,
+  linkState,
   type = 'button',
   ...rest
 }: ButtonProps) {
@@ -30,7 +33,13 @@ export function Button({
 
   if (linkTo !== undefined) {
     return (
-      <Link to={linkTo} className={classes} data-variant={variant} data-size={size}>
+      <Link
+        to={linkTo}
+        state={linkState}
+        className={classes}
+        data-variant={variant}
+        data-size={size}
+      >
         <span className={styles['label']}>{children}</span>
       </Link>
     );
