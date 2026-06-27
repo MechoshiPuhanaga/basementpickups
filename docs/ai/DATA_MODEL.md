@@ -125,9 +125,20 @@ export type PickupSpecs = {
 
 export type PickupPolepiece = 'chrome' | 'black' | 'nickel' | 'gold';
 
+export type BobbinStyle = 'slug' | 'screw' | 'blade';
+
+export type PickupBobbin = {
+  id: string; // neutral, stable key unique within the pickup: 'coil-1' | 'coil-2' | 'coil'
+  style: BobbinStyle; // pole-piece style → label + swatch
+  palette: string[]; // colours available for THIS bobbin (name tokens)
+  defaultColor: string; // must be one of palette
+  label?: string; // optional override; else derived from style (+ index when styles repeat)
+};
+
 export type PickupHardware = {
   spacingMm?: number; // string spacing, e.g. 50, 52, 49.2
   bobbinColors: string[]; // name tokens, e.g. 'white' | 'cream' | 'light-blue' (never hex)
+  bobbins?: PickupBobbin[]; // configurable coils + per-bobbin palette/default (optional during rollout)
   polepieces: PickupPolepiece;
   cover?: { material: string; optional: boolean }; // absent = no cover offered
   sevenString?: { colors: string[] }; // absent = 7-string not offered
@@ -181,6 +192,21 @@ in the DS `Swatch` atom's CSS module (`data-color="<token>"` → fill), because 
 strict prod CSP forbids inline `style`. Three places list the token set — keep
 them in sync: `bobbinColors.ts`, `STANDARD_BOBBIN_COLORS` in `pickups.ts`, and
 `Swatch.module.css`.
+
+**Per-bobbin customization (2026-06-27).** `hardware.bobbins` lists the physical
+coils a customer can colour. The **palette is per bobbin** (availability depends on
+spacing / 7-string / future bobbin styles) — `bobbinColors` is kept as the display
+union, derived via `availableBobbinColors(hardware)` (`src/data/bobbins.ts`). All
+seven models are humbuckers → two coils (slug + screw, except Twin Bliss = two
+screw coils). Helpers in `bobbins.ts`: `deriveBobbinLabels`, `availableBobbinColors`,
+`bobbinOptions` (coil → colour pairs for the enquiry/email), `cartLineKey`, and the
+`BobbinSelection` type. The DS `BobbinConfigurator` molecule (swatch + label +
+colour select; read-only for single-colour coils) drives both the product-page
+**Configure** section and each cart line. The chosen colours ride on the cart line
+as `config` (a `BobbinSelection`); the cart line **id** is `cartLineKey(slug, config)`
+so different colours are separate lines and identical ones aggregate. On enquiry the
+colours are sent as per-item `options` (`{label, value}`) — the existing
+`server/contact.ts` email template renders them unchanged.
 
 ````
 

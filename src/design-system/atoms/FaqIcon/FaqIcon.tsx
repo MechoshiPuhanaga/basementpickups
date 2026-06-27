@@ -10,7 +10,9 @@ export type FaqIconName =
   | 'packaging'
   | 'wiring'
   | 'signature'
-  | 'coil-wiring';
+  | 'coil-wiring'
+  | 'bobbin-colour'
+  | 'more-options';
 
 export interface FaqIconProps {
   name: FaqIconName;
@@ -158,6 +160,25 @@ export function FaqIcon({ name, size = 28, className }: FaqIconProps) {
           <circle cx="16.5" cy="10" r="1" fill="currentColor" stroke="none" />
           <circle cx="16.5" cy="14" r="1" fill="currentColor" stroke="none" />
           <path d="M7.5 18 L7.5 21 L16.5 21 L16.5 18" vectorEffect="non-scaling-stroke" />
+        </>
+      )}
+
+      {/* Bobbin colour — two coils, one filled / one open diamond (two-tone). */}
+      {name === 'bobbin-colour' && (
+        <>
+          <path d="M4 5 L11 5 L11 19 L4 19 Z" vectorEffect="non-scaling-stroke" />
+          <path d="M13 5 L20 5 L20 19 L13 19 Z" vectorEffect="non-scaling-stroke" />
+          <path d="M7.5 9 L9.5 12 L7.5 15 L5.5 12 Z" fill="currentColor" stroke="none" />
+          <path d="M16.5 9 L18.5 12 L16.5 15 L14.5 12 Z" vectorEffect="non-scaling-stroke" />
+        </>
+      )}
+
+      {/* More options / write-in — a deco diamond framing a plus. */}
+      {name === 'more-options' && (
+        <>
+          <path d="M12 3 L21 12 L12 21 L3 12 Z" vectorEffect="non-scaling-stroke" />
+          <path d="M12 8 L12 16" vectorEffect="non-scaling-stroke" />
+          <path d="M8 12 L16 12" vectorEffect="non-scaling-stroke" />
         </>
       )}
     </svg>

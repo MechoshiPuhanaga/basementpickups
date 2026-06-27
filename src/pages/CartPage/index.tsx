@@ -8,11 +8,33 @@ import { Price } from '../../design-system/atoms/Price';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
 import { Section } from '../../design-system/layouts/Section';
-import { useCart } from '../../cart/CartContext';
+import { BobbinConfigurator } from '../../design-system/molecules/BobbinConfigurator';
+import { useCart, type CartItem } from '../../cart/CartContext';
+import { getPickupBySlug } from '../../data/pickups';
 import styles from './CartPage.module.css';
 
+/** Per-line bobbin colours, editable in the enquiry; changes merge matching lines. */
+function CartLineConfig({
+  item,
+  onChange,
+}: {
+  item: CartItem;
+  onChange: (bobbinId: string, color: string) => void;
+}) {
+  const bobbins = getPickupBySlug(item.slug)?.hardware.bobbins;
+  if (bobbins === undefined || bobbins.length === 0) return null;
+  return (
+    <BobbinConfigurator
+      className={styles['config']}
+      bobbins={bobbins}
+      value={item.config ?? {}}
+      onChange={onChange}
+    />
+  );
+}
+
 export default function CartPage() {
-  const { items, subtotal, setQty, remove, clear } = useCart();
+  const { items, subtotal, setQty, remove, updateConfig, clear } = useCart();
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -58,50 +80,58 @@ export default function CartPage() {
 
           <ul className={styles['list']} role="list">
             {items.map((item) => (
-              <li key={item.slug} className={styles['row']}>
-                <div className={styles['name']}>
-                  <Heading level={2} variant="section">
-                    {item.name}
-                  </Heading>
-                  <Text variant="meta" tone="muted">
-                    €{String(item.price)} each
-                  </Text>
+              <li key={item.id} className={styles['row']}>
+                <div className={styles['rowMain']}>
+                  <div className={styles['name']}>
+                    <Heading level={2} variant="section">
+                      {item.name}
+                    </Heading>
+                    <Text variant="meta" tone="muted">
+                      €{String(item.price)} each
+                    </Text>
+                  </div>
+                  <div className={styles['qty']}>
+                    <IconButton
+                      label={`Decrease ${item.name} quantity`}
+                      variant="outlined"
+                      onClick={() => {
+                        setQty(item.id, item.qty - 1);
+                      }}
+                    >
+                      −
+                    </IconButton>
+                    <span className={styles['qtyValue']}>{item.qty}</span>
+                    <IconButton
+                      label={`Increase ${item.name} quantity`}
+                      variant="outlined"
+                      onClick={() => {
+                        setQty(item.id, item.qty + 1);
+                      }}
+                    >
+                      +
+                    </IconButton>
+                  </div>
+                  <div className={styles['lineTotal']}>
+                    <Price amount={item.price * item.qty} size="md" />
+                  </div>
+                  <div className={styles['removeCell']}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        remove(item.id);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
-                <div className={styles['qty']}>
-                  <IconButton
-                    label={`Decrease ${item.name} quantity`}
-                    variant="outlined"
-                    onClick={() => {
-                      setQty(item.slug, item.qty - 1);
-                    }}
-                  >
-                    −
-                  </IconButton>
-                  <span className={styles['qtyValue']}>{item.qty}</span>
-                  <IconButton
-                    label={`Increase ${item.name} quantity`}
-                    variant="outlined"
-                    onClick={() => {
-                      setQty(item.slug, item.qty + 1);
-                    }}
-                  >
-                    +
-                  </IconButton>
-                </div>
-                <div className={styles['lineTotal']}>
-                  <Price amount={item.price * item.qty} size="md" />
-                </div>
-                <div className={styles['removeCell']}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      remove(item.slug);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
+                <CartLineConfig
+                  item={item}
+                  onChange={(bobbinId, color) => {
+                    updateConfig(item.id, bobbinId, color);
+                  }}
+                />
               </li>
             ))}
           </ul>
@@ -127,15 +157,11 @@ export default function CartPage() {
               variant="primary"
               size="lg"
               onClick={() => {
+                // Pass only the flag — the contact page reads the live cart, so
+                // later colour edits (and Back navigation) stay in sync. A stale
+                // items snapshot in history state was the cause of an old-colour bug.
                 void navigate('/contact', {
-                  state: {
-                    fromCart: true,
-                    subject: 'Order inquiry',
-                    // Structured line items: shown read-only on the contact page
-                    // and rendered as an itemised email template by the server.
-                    // The message field is left empty for custom requirements.
-                    items,
-                  },
+                  state: { fromCart: true, subject: 'Order inquiry' },
                 });
               }}
             >

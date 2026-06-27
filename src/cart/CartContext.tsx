@@ -8,27 +8,51 @@ import {
   type ReactNode,
 } from 'react';
 
+import { cartLineKey, type BobbinSelection } from '../data/bobbins';
+
 export interface CartItem {
+  /**
+   * Stable line identity = slug + chosen bobbin colours (see `cartLineKey`).
+   * Two adds with the same id aggregate (qty grows); different colours of the
+   * same model are separate lines. Always recomputed from slug+config, never
+   * trusted from storage.
+   */
+  readonly id: string;
   readonly slug: string;
   readonly name: string;
   readonly price: number;
   readonly qty: number;
+  /** Chosen colour per bobbin; absent for non-configurable pickups. */
+  readonly config?: BobbinSelection;
 }
 
 export interface CartContextValue {
   readonly items: readonly CartItem[];
   readonly count: number;
   readonly subtotal: number;
-  add: (item: Omit<CartItem, 'qty'>) => void;
-  remove: (slug: string) => void;
-  setQty: (slug: string, qty: number) => void;
+  add: (item: Omit<CartItem, 'qty' | 'id'>) => void;
+  remove: (id: string) => void;
+  setQty: (id: string, qty: number) => void;
+  /** Change one bobbin's colour on a line; merges into a matching line if the new colours collide. */
+  updateConfig: (id: string, bobbinId: string, color: string) => void;
   clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = 'bp-enquiry-cart-v1';
 
-function isCartItem(value: unknown): value is CartItem {
+/** A bobbin selection from untrusted storage: keep only string→string entries. */
+function readConfig(value: unknown): BobbinSelection | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, val] of Object.entries(value)) {
+    if (typeof val === 'string') out[key] = val;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+/** Validate the base shape (config is optional and validated separately). */
+function isStoredItem(value: unknown): value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null) return false;
   const item = value as Record<string, unknown>;
   return (
@@ -46,7 +70,18 @@ function readStorage(): CartItem[] {
     if (raw === null) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isCartItem);
+    return parsed.filter(isStoredItem).map((item) => {
+      const config = readConfig(item['config']);
+      const slug = item['slug'] as string;
+      return {
+        id: cartLineKey(slug, config),
+        slug,
+        name: item['name'] as string,
+        price: item['price'] as number,
+        qty: item['qty'] as number,
+        ...(config ? { config } : {}),
+      };
+    });
   } catch {
     return [];
   }
@@ -76,26 +111,47 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, hydrated]);
 
-  const add = useCallback((item: Omit<CartItem, 'qty'>) => {
+  const add = useCallback((item: Omit<CartItem, 'qty' | 'id'>) => {
+    const id = cartLineKey(item.slug, item.config);
     setItems((prev) => {
-      const existing = prev.find((i) => i.slug === item.slug);
+      const existing = prev.find((i) => i.id === id);
       if (existing) {
-        return prev.map((i) => (i.slug === item.slug ? { ...i, qty: i.qty + 1 } : i));
+        return prev.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i));
       }
-      return [...prev, { ...item, qty: 1 }];
+      return [...prev, { ...item, id, qty: 1 }];
     });
   }, []);
 
-  const remove = useCallback((slug: string) => {
-    setItems((prev) => prev.filter((i) => i.slug !== slug));
+  const remove = useCallback((id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
-  const setQty = useCallback((slug: string, qty: number) => {
+  const setQty = useCallback((id: string, qty: number) => {
     setItems((prev) =>
       qty <= 0
-        ? prev.filter((i) => i.slug !== slug)
-        : prev.map((i) => (i.slug === slug ? { ...i, qty } : i)),
+        ? prev.filter((i) => i.id !== id)
+        : prev.map((i) => (i.id === id ? { ...i, qty } : i)),
     );
+  }, []);
+
+  const updateConfig = useCallback((id: string, bobbinId: string, color: string) => {
+    setItems((prev) => {
+      const target = prev.find((i) => i.id === id);
+      if (target === undefined) return prev;
+      const nextConfig: BobbinSelection = { ...(target.config ?? {}), [bobbinId]: color };
+      const nextId = cartLineKey(target.slug, nextConfig);
+      if (nextId === id) {
+        return prev.map((i) => (i.id === id ? { ...i, config: nextConfig } : i));
+      }
+      const collision = prev.find((i) => i.id === nextId);
+      if (collision !== undefined) {
+        // The edited line now matches another — merge quantities, drop the edited one.
+        return prev
+          .filter((i) => i.id !== id)
+          .map((i) => (i.id === nextId ? { ...i, qty: i.qty + target.qty } : i));
+      }
+      return prev.map((i) => (i.id === id ? { ...i, id: nextId, config: nextConfig } : i));
+    });
   }, []);
 
   const clear = useCallback(() => {
@@ -105,8 +161,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     const count = items.reduce((sum, i) => sum + i.qty, 0);
     const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-    return { items, count, subtotal, add, remove, setQty, clear };
-  }, [items, add, remove, setQty, clear]);
+    return { items, count, subtotal, add, remove, setQty, updateConfig, clear };
+  }, [items, add, remove, setQty, updateConfig, clear]);
 
   return <CartContext value={value}>{children}</CartContext>;
 }

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useCart, type CartItem } from '../../cart/CartContext';
+import { bobbinOptions } from '../../data/bobbins';
+import { getPickupBySlug } from '../../data/pickups';
 import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
@@ -33,31 +35,22 @@ function readFlag(state: unknown, key: string): boolean {
   );
 }
 
-function isCartItem(value: unknown): value is CartItem {
-  if (typeof value !== 'object' || value === null) return false;
-  const item = value as Record<string, unknown>;
-  return (
-    typeof item['slug'] === 'string' &&
-    typeof item['name'] === 'string' &&
-    typeof item['price'] === 'number' &&
-    typeof item['qty'] === 'number'
-  );
-}
-
-/** Read the cart line items carried in navigation state, if any. */
-function readItems(state: unknown): readonly CartItem[] | undefined {
-  if (typeof state !== 'object' || state === null || !('items' in state)) return undefined;
-  const value = (state as Record<string, unknown>)['items'];
-  if (!Array.isArray(value)) return undefined;
-  const items = value.filter(isCartItem);
-  return items.length > 0 ? items : undefined;
+/** Resolved bobbin colours for a cart line, e.g. `[{ label: 'Slug coil', value: 'Black' }]`. */
+function itemOptions(item: CartItem): { label: string; value: string }[] {
+  const bobbins = getPickupBySlug(item.slug)?.hardware.bobbins;
+  return bobbins === undefined ? [] : bobbinOptions(bobbins, item.config);
 }
 
 /** Plain-text item list appended to the mailto fallback when sending fails. */
 function formatItemsText(items: readonly CartItem[]): string {
-  const lines = items.map(
-    (item) => `- ${String(item.qty)} × ${item.name} — €${String(item.price * item.qty)}`,
-  );
+  const lines = items.map((item) => {
+    const options = itemOptions(item);
+    const colours =
+      options.length > 0
+        ? ` (${options.map((option) => `${option.label}: ${option.value}`).join(', ')})`
+        : '';
+    return `- ${String(item.qty)} × ${item.name}${colours} — €${String(item.price * item.qty)}`;
+  });
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
   return [
     'Selected pickups:',
@@ -80,10 +73,16 @@ async function postEnquiry(
   data: ContactFormData,
   items: readonly CartItem[] | undefined,
 ): Promise<void> {
+  // Attach each line's chosen bobbin colours as per-item options so the server
+  // renders them in the itemised email.
+  const payloadItems = items?.map((item) => {
+    const options = itemOptions(item);
+    return options.length > 0 ? { ...item, options } : item;
+  });
   const response = await fetch('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data, items }),
+    body: JSON.stringify({ ...data, items: payloadItems }),
   });
 
   if (!response.ok) {
@@ -103,7 +102,7 @@ async function postEnquiry(
 export default function ContactPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { clear } = useCart();
+  const { items: cartItems, clear } = useCart();
   const hydrated = useIsHydrated();
   const [sent, setSent] = useState(false);
 
@@ -114,13 +113,16 @@ export default function ContactPage() {
   const state: unknown = hydrated ? location.state : null;
   const defaultSubject = readState(state, 'subject');
   const fromCart = readFlag(state, 'fromCart');
-  const items = readItems(state);
+  // Read the LIVE cart (not a navigation-state snapshot) so editing a bobbin
+  // colour in the cart is reflected here — including after a browser Back, which
+  // would otherwise restore the stale items captured when "Send enquiry" was hit.
+  const items = fromCart && cartItems.length > 0 ? cartItems : undefined;
 
   // The form clears itself on success. Only empty the cart when this enquiry
   // actually came from the cart — a standalone enquiry must leave the cart
   // untouched, even if it happens to have items.
   async function handleSubmit(data: ContactFormData): Promise<void> {
-    await postEnquiry(data, fromCart ? items : undefined);
+    await postEnquiry(data, items);
     if (fromCart) clear();
     // Clear the navigation state in history so a refresh can't restore the now
     // stale cart items (the browser persists history.state across reloads).
@@ -150,7 +152,16 @@ export default function ContactPage() {
         <div className={styles['layout']}>
           <div className={styles['formSide']}>
             <Stack direction="column" gap="lg" align="stretch">
-              {fromCart && items !== undefined && !sent && <EnquirySummary items={items} />}
+              {fromCart && items !== undefined && !sent && (
+                <EnquirySummary
+                  items={items.map((item) => ({
+                    name: item.name,
+                    qty: item.qty,
+                    price: item.price,
+                    options: itemOptions(item),
+                  }))}
+                />
+              )}
               <ContactForm
                 key={hydrated ? 'hydrated' : 'ssr'}
                 onSubmit={handleSubmit}

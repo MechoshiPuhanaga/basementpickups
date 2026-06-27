@@ -36,6 +36,20 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     icon: 'batch-variation',
   },
   {
+    id: 'bobbin-colours',
+    question: 'Can I choose the bobbin colours?',
+    answer:
+      'Yes. Each model ships in a default colour, so choosing is optional. If you wish, set each coil — slug and screw — independently before adding it to an enquiry. Availability varies; a particular shade may need a substitute or a short lead time, which we’ll confirm by email.',
+    icon: 'bobbin-colour',
+  },
+  {
+    id: 'unlisted-requirements',
+    question: 'What if the option I want isn’t available to configure?',
+    answer:
+      'Simply describe it in your enquiry message — we read every one personally and will do our best to accommodate it. We’re steadily expanding the configurable options, too, so more choices can be made directly over time.',
+    icon: 'more-options',
+  },
+  {
     id: 'measurement-conditions',
     question: 'Under what conditions are measurements taken?',
     answer:

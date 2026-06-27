@@ -13,16 +13,22 @@
 }
 
 .row {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  align-items: center;
-  gap: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   padding-block: var(--space-5);
   border-block-start: 1px solid var(--color-line);
 }
 
 .row:last-child {
   border-block-end: 1px solid var(--color-line);
+}
+
+.rowMain {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--space-5);
 }
 
 .name {
@@ -54,6 +60,10 @@
   justify-self: end;
 }
 
+.config {
+  max-inline-size: 22rem;
+}
+
 .summary {
   display: flex;
   align-items: baseline;
@@ -70,7 +80,7 @@
 }
 
 @media (width <= 640px) {
-  .row {
+  .rowMain {
     grid-template-columns: 1fr auto;
     grid-template-areas:
       'name total'
@@ -92,6 +102,10 @@
 
   .removeCell {
     grid-area: remove;
+  }
+
+  .config {
+    max-inline-size: none;
   }
 
   .actions {

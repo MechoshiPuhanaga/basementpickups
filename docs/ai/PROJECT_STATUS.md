@@ -334,13 +334,83 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 1. ~~**Responsive design pass**~~ — **done** (developer-confirmed 2026-06-27). Mobile nav overlay, collapsible filters, browser/grid restacking, and tighter mobile section padding all landed; breakpoints/touch-targets/reflow accepted. Follow the no-shrink-flex rule (memory `feedback-responsive-no-shrink`) for any future layout work.
 2. ~~**Art Deco SVG ornamentation**~~ — **dropped (not actual, 2026-06-27)**: the developer decided the current ornamentation (in-house `Deco*` atoms + `DecoSeparator` `crest`) is enough; no site-wide expansion planned. **In-house only — do NOT reintroduce the rejected Magnific vectors** (memory `feedback-magnific-vectors-rejected`) if this is ever revived.
 3. **Prefetch all resources on load (non-blocking) for offline** — after first paint and while the connection is idle, warm the cache with the rest of the site's assets (route chunks, product/spirit images + their AVIF/WebP derivatives, fonts) so a subsequent offline visit has everything. Must be **non-blocking**: kick off after `load`, ideally gated on `requestIdleCallback` and `navigator.connection` (skip on save-data / slow links). Coordinate with the existing hand-rolled service worker (`public/sw.js`, approach A) — bump its `VERSION` and decide between SW-side precache vs. client-driven `fetch`/`<link rel=prefetch>`. Respect the CSP and don't regress LCP/TBT.
-4. **Bobbin colour selection in the enquiry** — _data + display done (2026-06-24): `pickup.hardware.bobbinColors` holds **name tokens** (not hex); `bobbinColorLabel` (`src/data/bobbinColors.ts`) is the single token→label source; the `Swatch` atom shows them as Art Deco chips (hex lives only in its CSS). See session log._ **Still to do:** a DS **colour-picker widget** (built on `Swatch`) to choose a bobbin colour **before** adding to the enquiry; store the chosen colour on the enquiry-cart line; show the swatch next to each pickup in the enquiry and let the user **switch** it there. The prefilled contact mailto must list **human-readable colour names** (via `bobbinColorLabel`), never hex. Stays within the no-payments enquiry model (memory `project-enquiry-cart`). Touches the cart line shape, ProductPage (selector), and CartPage (per-line swatch + edit). The chosen configuration is stored on the enquiry-cart line and is **editable in the enquiry per configured pickup**. Stays within the no-payments enquiry-cart model (memory `project-enquiry-cart`): the selection just enriches the prefilled contact mailto. Touches `DATA_MODEL.md` (pickup colour options), the cart line shape, ProductCard/ProductBrowser (selector), and the CartPage (per-line edit). **Server already ready (2026-06-25):** the `/api/contact` itemised email template accepts per-item `options` (`ContactItemOption[]`) and renders them — once the cart line carries the chosen colour, include it as an `option` on each item in the `POST /api/contact` payload (and in the mailto fallback's `mailtoItemsText`).
+4. ~~**Bobbin colour selection in the enquiry**~~ — **done 2026-06-27** (per-coil). The palette is
+   **per bobbin** (`hardware.bobbins`: style + palette + default). DS `BobbinConfigurator` molecule
+   (built on `Swatch`) drives a product-page **Configure** accordion and an editable configurator on
+   each cart line. The chosen colours ride on the cart line as `config`; line id = `cartLineKey`, so
+   different colours are separate lines and identical ones aggregate (incl. live merge when edited in
+   the cart). Colours are sent as per-item `options` to `/api/contact` (rendered by the existing
+   email template — no server change) and into the mailto fallback + `EnquirySummary`, all using
+   human-readable names. Stayed within the no-payments enquiry model (memory `project-enquiry-cart`).
+   **Remaining:** real-browser send-test of the full add→cart→email chain (logic verified). See the
+   2026-06-27 session-log entry.
 5. ~~**Q&A / FAQ page**~~ — **done 2026-06-24**: `/faq` page (`src/pages/FaqPage`) renders `FAQ_ITEMS` (`src/data/faq.ts`) with the in-house Art Deco `FaqIcon` atom, composed from DS primitives (no page CSS). Wired into routing, `primaryNav` (label "Q&A", with a new `faq` `NavIcon` glyph for the mobile menu), SSR SEO (`getSeoForUrl` + `STATIC_PATHS`), sitemap, `llms.txt`, and **`FAQPage` JSON-LD** + breadcrumb in `getJsonLdForUrl.ts` (expandable rich-result eligible). Copy stays editorial, < 50 words each; **the list is extensible — more entries may be added** by appending to `FAQ_ITEMS`.
 6. **Shop facets — spacing, then position** _(deferred; revisit when the catalog grows or singles/middle land)_. Both are pure `ProductBrowser` additions — the data model already carries `hardware.spacingMm` and `positions`. **String spacing is the higher-value facet** (a fitment/compatibility decision, and it actually narrows the list: current values 49.2 / 50 / 52 mm) — do it first. **Position** (neck / bridge, plus `middle` once single-coils exist) is lower value while every product has a bridge option (a "bridge" filter would match everything). Build notes for both: a pickup must match if **any** of its values — including variants — falls in the bucket (e.g. White Pearl appears under both 50 and 52 mm; Twin Bliss's `[50, 52]` matches both). Consider friendly labels for spacing (e.g. note 52 mm = F-spaced). Skip while the catalog is ~7 items and fits on one screen; the brand stays deliberately restrained. _Why deferred: low narrowing payoff on a tiny catalog + set/variant matching semantics to maintain._
+7. **Pole-piece colour per bobbin (configurable)** — extend the enquiry configurator so the buyer can
+   also choose the **pole-piece finish per coil** (the existing `PickupPolepiece`: chrome / black /
+   nickel / gold). Today `hardware.polepieces` is a single value per pickup; this means moving/adding
+   a per-bobbin pole-piece option (likely a `polepiece`/`polepieceOptions` on `PickupBobbin`, mirroring
+   the colour `palette`/`defaultColor` shape). Reuse the `BobbinConfigurator` pattern (a second control
+   per coil row), carry the choice on the cart line `config`, and surface it as another per-item
+   `option` in the enquiry/email (server already renders arbitrary `{label, value}` options — no server
+   change). Stays within the no-payments enquiry model.
+8. **String-spacing selection where a model offers more than one** — when `hardware.spacingMm` is an
+   array (e.g. **Twin Bliss `[50, 52]`**), let the buyer pick the spacing before adding to the enquiry.
+   A single control on the product-page **Configure** section (and editable on the cart line), stored on
+   the cart line and sent as a per-item `option` (e.g. "String spacing: 52 mm"). Single-value models show
+   it read-only or omit the control. Distinct from roadmap item 6 (a shop **filter**); this is a
+   **per-line choice**. Pairs naturally with item 7 under one "Configure" section.
 
 ---
 
 # Session Log
+
+## 2026-06-27 — Bobbin-colour customization (roadmap item 4)
+
+Per-coil bobbin colour selection, end to end. All gates green (typecheck / lint / stylelint /
+prettier / build). Uncommitted. **Roadmap item 4 → done.**
+
+**Data model (`pickups.ts`).** Added `BobbinStyle` (`slug`/`screw`/`blade`) and `PickupBobbin`
+(`id`, `style`, per-bobbin `palette`, `defaultColor`, optional `label`); `hardware.bobbins?` is
+optional (backward-compatible). All 7 humbuckers given two coils via a `humbuckerCoils()` factory +
+per-family constants. Defaults (developer-supplied): White Pearl both white; Macho Heaven / Chow
+Chow slug black + screw cream (palette gained **white**); Rockroach both light-blue; Karakonjul both
+black; Little Karakonjul both green; Twin Bliss **two screw coils**, both orange. `bobbinColors`
+kept as the display union via `availableBobbinColors`. Raw `data/pickups-data.txt` synced (white
+added; per-coil defaults documented up top).
+
+**Helpers (`src/data/bobbins.ts`, new).** `deriveBobbinLabels` (indexes repeated styles →
+"Screw coil 1/2"), `availableBobbinColors`, `bobbinOptions` (coil→colour pairs), `cartLineKey`,
+`BobbinSelection`. Verified `bobbinOptions` returns chosen colours (not defaults) with a runtime check.
+
+**DS (`BobbinConfigurator` molecule, new).** Swatch (reused the existing Art Deco chip — no new atom)
+
+- coil label + colour `Select`; read-only row when a coil has one colour. Controlled; reused on the
+  product page and each cart line.
+
+**Cart (`CartContext`).** Lines now carry `config` + a composite `id = cartLineKey(slug, config)`;
+`add` aggregates same-config lines, new `updateConfig` edits a colour and **auto-merges** if it
+collides with another line. Storage stays v1 (config optional, id recomputed on load → no reset, no
+regression). `CartPage` ops switched slug→id and each line renders the configurator (editable in the
+enquiry).
+
+**Product page.** New **Configure** accordion (a second `Disclosure desktop="heading"`) under
+Specifications — desktop static, mobile collapsible. A keyed `AddToEnquiry` child owns the selection
+(reseeds per pickup); only shown for addable views; only renders when a coil is choosable.
+
+**Email / enquiry.** `ContactPage` derives per-line `options` (`{label, value}`) and sends them in
+the `/api/contact` payload + the mailto fallback; `EnquirySummary` shows the colours. **No server
+change** — `server/contact.ts` already rendered per-item `options`. Verified by rendering the real
+`notificationEmail` output (HTML + text) for a configured enquiry — colours display per coil.
+
+**Back-button fix.** `ContactPage` now reads the **live cart** (via `useCart`) instead of a
+navigation-state `items` snapshot; CartPage passes only `{ fromCart, subject }`. A colour edited in
+the cart (and Back navigation to `/contact`) now reflects correctly — the stale history snapshot was
+showing the pre-edit colour.
+
+**FAQ.** Two new `FAQ_ITEMS` entries with new in-house Art Deco `FaqIcon` glyphs: `bobbin-colours`
+("Can I choose the bobbin colours?", icon `bobbin-colour`) and `unlisted-requirements` ("What if the
+option I want isn't available to configure?", icon `more-options`).
 
 ## 2026-06-27 — Product-page UX polish + muted-text contrast lift
 

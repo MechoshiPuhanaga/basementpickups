@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(nvm *)",
       "Bash(pnpm run *)",
       "Bash(pnpm exec *)",
       "Bash(/home/mechoshi/.nvm/versions/node/v24.16.0/bin/pnpm *)",

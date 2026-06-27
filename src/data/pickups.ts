@@ -44,6 +44,32 @@ export interface PickupSevenString {
 }
 
 /**
+ * Pole-piece style of a single bobbin (coil). A humbucker has two bobbins in any
+ * combination (slug/screw, screw/screw, slug/blade, blade/blade, …); a single
+ * coil or P-90 has one. Drives the bobbin's label and swatch.
+ */
+export type BobbinStyle = 'slug' | 'screw' | 'blade';
+
+/**
+ * One physical bobbin a customer can colour. The palette is **per bobbin** (the
+ * available finishes depend on spacing / 7-string / future bobbin styles), so it
+ * lives here rather than once per pickup. `id` is a neutral, stable key unique
+ * within the pickup (`coil-1` / `coil-2`, or `coil` for a single bobbin) used for
+ * cart configuration and de-duplication — never shown. `label` is optional
+ * display text; when absent it is derived from `style` (with an index when two
+ * bobbins share a style).
+ */
+export interface PickupBobbin {
+  readonly id: string;
+  readonly style: BobbinStyle;
+  /** Colours available for THIS bobbin, as name tokens (see `bobbinColors.ts`). */
+  readonly palette: readonly string[];
+  /** Default colour when added without customization; must be one of `palette`. */
+  readonly defaultColor: string;
+  readonly label?: string;
+}
+
+/**
  * Physical build / configuration of a pickup. Bobbin colors are tokens the DS
  * `Swatch` atom can render (`white`/`cream`/`black` or a hex string from the
  * boutique palette). Spacing is the string spacing in millimetres.
@@ -52,6 +78,12 @@ export interface PickupHardware {
   /** String spacing in mm. An array means it's offered in more than one. */
   readonly spacingMm?: number | readonly number[];
   readonly bobbinColors: readonly string[];
+  /**
+   * Configurable bobbins (coils) with their per-bobbin palette + default colour.
+   * Optional during rollout: when absent, the pickup is not yet configurable and
+   * behaves exactly as before (display falls back to `bobbinColors`).
+   */
+  readonly bobbins?: readonly PickupBobbin[];
   readonly polepieces: PickupPolepiece;
   readonly cover?: PickupCover;
   readonly sevenString?: PickupSevenString;
@@ -95,6 +127,32 @@ const STANDARD_BOBBIN_COLORS: readonly string[] = [
   'orange',
 ];
 
+/** PAF-set palette (49.2 mm bobbins): cream / white / black only. */
+const PAF_BOBBIN_COLORS: readonly string[] = ['cream', 'white', 'black'];
+
+/** A classic two-coil humbucker (slug + screw) sharing one palette, with per-coil defaults. */
+function humbuckerCoils(
+  palette: readonly string[],
+  slugColor: string,
+  screwColor: string,
+): readonly PickupBobbin[] {
+  return [
+    { id: 'coil-1', style: 'slug', palette, defaultColor: slugColor },
+    { id: 'coil-2', style: 'screw', palette, defaultColor: screwColor },
+  ];
+}
+
+const WHITE_PEARL_BOBBINS = humbuckerCoils(['white'], 'white', 'white');
+const PAF_BOBBINS = humbuckerCoils(PAF_BOBBIN_COLORS, 'black', 'cream');
+const ROCKROACH_BOBBINS = humbuckerCoils(STANDARD_BOBBIN_COLORS, 'light-blue', 'light-blue');
+const KARAKONJUL_BOBBINS = humbuckerCoils(['black'], 'black', 'black');
+const LITTLE_KARAKONJUL_BOBBINS = humbuckerCoils(STANDARD_BOBBIN_COLORS, 'green', 'green');
+// Twin Bliss is wound on two screw coils (no slug row).
+const TWIN_BLISS_BOBBINS: readonly PickupBobbin[] = [
+  { id: 'coil-1', style: 'screw', palette: STANDARD_BOBBIN_COLORS, defaultColor: 'orange' },
+  { id: 'coil-2', style: 'screw', palette: STANDARD_BOBBIN_COLORS, defaultColor: 'orange' },
+];
+
 export const pickups: readonly Pickup[] = [
   {
     id: 'white-pearl',
@@ -106,7 +164,7 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-4',
     price: 125,
     positions: ['neck', 'bridge'],
-    hardware: { polepieces: 'chrome', bobbinColors: ['white'] },
+    hardware: { polepieces: 'chrome', bobbinColors: ['white'], bobbins: WHITE_PEARL_BOBBINS },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',
     specs: { dcr: '5.9k–6.8k', inductance: '2.8H–3.5H' },
@@ -122,7 +180,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-3',
         price: 125,
         positions: ['neck'],
-        hardware: { spacingMm: 50, polepieces: 'chrome', bobbinColors: ['white'] },
+        hardware: {
+          spacingMm: 50,
+          polepieces: 'chrome',
+          bobbinColors: ['white'],
+          bobbins: WHITE_PEARL_BOBBINS,
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -143,7 +206,12 @@ export const pickups: readonly Pickup[] = [
         magnet: 'alnico-4',
         price: 125,
         positions: ['bridge'],
-        hardware: { spacingMm: 52, polepieces: 'chrome', bobbinColors: ['white'] },
+        hardware: {
+          spacingMm: 52,
+          polepieces: 'chrome',
+          bobbinColors: ['white'],
+          bobbins: WHITE_PEARL_BOBBINS,
+        },
         conductors: ['vintage-braided', '4-conductor'],
         potting: 'optional',
         specs: {
@@ -169,7 +237,8 @@ export const pickups: readonly Pickup[] = [
     hardware: {
       spacingMm: 49.2,
       polepieces: 'chrome',
-      bobbinColors: ['cream', 'black'],
+      bobbinColors: ['cream', 'white', 'black'],
+      bobbins: PAF_BOBBINS,
       cover: { material: 'nickel', optional: true },
     },
     conductors: ['vintage-braided', '4-conductor'],
@@ -190,7 +259,8 @@ export const pickups: readonly Pickup[] = [
         hardware: {
           spacingMm: 49.2,
           polepieces: 'chrome',
-          bobbinColors: ['cream', 'black'],
+          bobbinColors: ['cream', 'white', 'black'],
+          bobbins: PAF_BOBBINS,
           cover: { material: 'nickel', optional: true },
         },
         conductors: ['vintage-braided', '4-conductor'],
@@ -216,7 +286,8 @@ export const pickups: readonly Pickup[] = [
         hardware: {
           spacingMm: 49.2,
           polepieces: 'chrome',
-          bobbinColors: ['cream', 'black'],
+          bobbinColors: ['cream', 'white', 'black'],
+          bobbins: PAF_BOBBINS,
           cover: { material: 'nickel', optional: true },
         },
         conductors: ['vintage-braided', '4-conductor'],
@@ -244,7 +315,8 @@ export const pickups: readonly Pickup[] = [
     hardware: {
       spacingMm: 49.2,
       polepieces: 'chrome',
-      bobbinColors: ['cream', 'black'],
+      bobbinColors: ['cream', 'white', 'black'],
+      bobbins: PAF_BOBBINS,
       cover: { material: 'nickel', optional: true },
     },
     conductors: ['vintage-braided', '4-conductor'],
@@ -265,7 +337,8 @@ export const pickups: readonly Pickup[] = [
         hardware: {
           spacingMm: 49.2,
           polepieces: 'chrome',
-          bobbinColors: ['cream', 'black'],
+          bobbinColors: ['cream', 'white', 'black'],
+          bobbins: PAF_BOBBINS,
           cover: { material: 'nickel', optional: true },
         },
         conductors: ['vintage-braided', '4-conductor'],
@@ -291,7 +364,8 @@ export const pickups: readonly Pickup[] = [
         hardware: {
           spacingMm: 49.2,
           polepieces: 'chrome',
-          bobbinColors: ['cream', 'black'],
+          bobbinColors: ['cream', 'white', 'black'],
+          bobbins: PAF_BOBBINS,
           cover: { material: 'nickel', optional: true },
         },
         conductors: ['vintage-braided', '4-conductor'],
@@ -320,6 +394,7 @@ export const pickups: readonly Pickup[] = [
       spacingMm: 52,
       polepieces: 'black',
       bobbinColors: STANDARD_BOBBIN_COLORS,
+      bobbins: ROCKROACH_BOBBINS,
       sevenString: { colors: ['black'] },
     },
     conductors: ['4-conductor'],
@@ -346,6 +421,7 @@ export const pickups: readonly Pickup[] = [
       spacingMm: 52,
       polepieces: 'black',
       bobbinColors: ['black'],
+      bobbins: KARAKONJUL_BOBBINS,
       sevenString: { colors: ['black'] },
     },
     conductors: ['4-conductor'],
@@ -372,6 +448,7 @@ export const pickups: readonly Pickup[] = [
       spacingMm: 52,
       polepieces: 'black',
       bobbinColors: STANDARD_BOBBIN_COLORS,
+      bobbins: LITTLE_KARAKONJUL_BOBBINS,
       sevenString: { colors: ['black'] },
     },
     conductors: ['4-conductor'],
@@ -398,6 +475,7 @@ export const pickups: readonly Pickup[] = [
       spacingMm: [50, 52],
       polepieces: 'black',
       bobbinColors: STANDARD_BOBBIN_COLORS,
+      bobbins: TWIN_BLISS_BOBBINS,
     },
     conductors: ['vintage-braided', '4-conductor'],
     potting: 'optional',

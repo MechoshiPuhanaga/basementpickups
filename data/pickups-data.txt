@@ -1,3 +1,18 @@
+BOBBIN CONFIGURATION (customer-selectable per coil)
+
+Customers choose each coil's colour before adding to an enquiry. Defaults below; the
+chosen colours travel with the enquiry and appear in the workshop email.
+Full palette = black, white, cream, coral, red, blue, light blue, pink, green, orange.
+
+• White Pearl — slug + screw — palette: white — default: both white
+• Macho Heaven — slug + screw — palette: cream, white, black — default: slug black, screw cream
+• Chow Chow — slug + screw — palette: cream, white, black — default: slug black, screw cream
+• Rockroach — slug + screw — palette: full — default: both light blue
+• Karakonjul — slug + screw — palette: black — default: both black
+• Little Karakonjul — slug + screw — palette: full — default: both green
+• Twin Bliss — two screw coils — palette: full — default: both orange
+
+
 WHITE PEARL — STRAT-STYLE HUMBUCKER SET
 
 Neck Pickup
@@ -51,7 +66,7 @@ The bridge pickup delivers classic PAF dynamics with slightly increased aggressi
 
 Configuration:
 • String spacing: 49.2 mm (neck and bridge)
-• Bobbin colors: cream, black
+• Bobbin colors: cream, white, black
 • Pole pieces: chrome
 • Cover: nickel (optional)
 
@@ -80,7 +95,7 @@ The bridge pickup expands on the classic Alnico 2 character with additional midr
 
 Configuration:
 • String spacing: 49.2 mm (neck and bridge)
-• Bobbin colors: cream, black
+• Bobbin colors: cream, white, black
 • Pole pieces: chrome
 • Cover: nickel (optional)
 

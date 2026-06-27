@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router';
 
 import { Badge } from '../../design-system/atoms/Badge';
@@ -9,10 +10,12 @@ import { Swatch } from '../../design-system/atoms/Swatch';
 import { Text } from '../../design-system/atoms/Text';
 import { ProductLayout } from '../../design-system/layouts/ProductLayout';
 import { Section } from '../../design-system/layouts/Section';
+import { BobbinConfigurator } from '../../design-system/molecules/BobbinConfigurator';
 import { Disclosure } from '../../design-system/molecules/Disclosure';
 import { ProductGallery } from '../../design-system/molecules/ProductGallery';
 import { useCart } from '../../cart/CartContext';
 import { bobbinColorLabel } from '../../data/bobbinColors';
+import { availableBobbinColors, cartLineKey, type BobbinSelection } from '../../data/bobbins';
 import {
   getPickupAndParent,
   type Pickup,
@@ -215,9 +218,61 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
   );
 }
 
+/**
+ * Bobbin configuration + the Add-to-enquiry button for an addable pickup. Owns
+ * the colour selection (seeded from each bobbin's default); rendered with a
+ * `key={slug}` so switching variants reseeds to the new pickup's defaults. The
+ * "Configure" section only appears when at least one bobbin offers a choice; the
+ * chosen colours travel onto the cart line either way (so emails list them).
+ */
+function AddToEnquiry({ pickup }: { pickup: Pickup }) {
+  const cart = useCart();
+  const bobbins = pickup.hardware.bobbins;
+  const [selection, setSelection] = useState<BobbinSelection>(() =>
+    bobbins === undefined
+      ? {}
+      : Object.fromEntries(bobbins.map((bobbin) => [bobbin.id, bobbin.defaultColor])),
+  );
+  // Only offer the Configure section when at least one bobbin has a real choice.
+  const choosableBobbins = (bobbins ?? []).some((bobbin) => bobbin.palette.length > 1)
+    ? bobbins
+    : undefined;
+  const lineId = cartLineKey(pickup.slug, bobbins !== undefined ? selection : undefined);
+  const inEnquiry = cart.items.find((item) => item.id === lineId)?.qty ?? 0;
+
+  return (
+    <>
+      {choosableBobbins !== undefined && (
+        <Disclosure title="Configure" desktop="heading" headingLevel={2}>
+          <BobbinConfigurator
+            bobbins={choosableBobbins}
+            value={selection}
+            onChange={(bobbinId, color) => {
+              setSelection((prev) => ({ ...prev, [bobbinId]: color }));
+            }}
+          />
+        </Disclosure>
+      )}
+      <Button
+        variant="solid"
+        size="lg"
+        onClick={() => {
+          cart.add({
+            slug: pickup.slug,
+            name: pickup.name,
+            price: pickup.price,
+            ...(bobbins !== undefined ? { config: selection } : {}),
+          });
+        }}
+      >
+        {inEnquiry > 0 ? `Added to enquiry (${String(inEnquiry)})` : 'Add to enquiry'}
+      </Button>
+    </>
+  );
+}
+
 export default function ProductPage() {
   const { slug = '' } = useParams<{ slug: string }>();
-  const cart = useCart();
   const found = getPickupAndParent(slug);
 
   if (found === undefined) {
@@ -242,7 +297,6 @@ export default function ProductPage() {
   const images = buildGalleryImages(pickup);
   const sevenStringLabel = formatSevenString(pickup.hardware.sevenString);
   const spacingRow = formatSpacingRow(pickup, parent);
-  const inEnquiry = cart.items.find((i) => i.slug === pickup.slug)?.qty ?? 0;
   // The base view of a set (neck + bridge variants) is ambiguous — the buyer
   // must choose a position before it can go into the enquiry.
   const isBaseWithVariants = pickup.slug === parent.slug && (parent.variants?.length ?? 0) > 0;
@@ -296,24 +350,10 @@ export default function ProductPage() {
                 {sevenStringLabel !== undefined && (
                   <SpecRow label="7-string" value={sevenStringLabel} />
                 )}
-                <SwatchRow label="Bobbin colours" colors={pickup.hardware.bobbinColors} />
+                <SwatchRow label="Bobbin colours" colors={availableBobbinColors(pickup.hardware)} />
               </div>
             </Disclosure>
-            {!isBaseWithVariants && (
-              <Button
-                variant="solid"
-                size="lg"
-                onClick={() => {
-                  cart.add({
-                    slug: pickup.slug,
-                    name: pickup.name,
-                    price: pickup.price,
-                  });
-                }}
-              >
-                {inEnquiry > 0 ? `Added to enquiry (${String(inEnquiry)})` : 'Add to enquiry'}
-              </Button>
-            )}
+            {!isBaseWithVariants && <AddToEnquiry pickup={pickup} key={pickup.slug} />}
           </Stack>
         }
       />

@@ -22,10 +22,22 @@
   border-block-end: 1px solid var(--color-line);
 }
 
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 .name {
   font-family: var(--font-body);
   font-size: var(--type-scale-body);
   color: var(--color-text-primary);
+}
+
+.options {
+  font-family: var(--font-body);
+  font-size: var(--type-scale-step-down);
+  color: var(--color-text-muted);
 }
 
 .qty {

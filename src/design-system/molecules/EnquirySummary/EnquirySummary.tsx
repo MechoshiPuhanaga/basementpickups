@@ -7,6 +7,8 @@ export interface EnquirySummaryItem {
   readonly name: string;
   readonly qty: number;
   readonly price: number;
+  /** Resolved configuration shown under the name, e.g. coil colours. */
+  readonly options?: readonly { readonly label: string; readonly value: string }[] | undefined;
 }
 
 export interface EnquirySummaryProps {
@@ -41,8 +43,15 @@ export function EnquirySummary({
       <ul className={styles['list']}>
         {items.map((item, index) => (
           <li key={`${item.name}-${String(index)}`} className={styles['item']}>
-            <span className={styles['name']}>
-              <span className={styles['qty']}>{item.qty}×</span> {item.name}
+            <span className={styles['details']}>
+              <span className={styles['name']}>
+                <span className={styles['qty']}>{item.qty}×</span> {item.name}
+              </span>
+              {item.options !== undefined && item.options.length > 0 && (
+                <span className={styles['options']}>
+                  {item.options.map((option) => `${option.label}: ${option.value}`).join(' · ')}
+                </span>
+              )}
             </span>
             <Price amount={item.price * item.qty} tone="primary" size="sm" />
           </li>
