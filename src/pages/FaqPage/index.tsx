@@ -26,7 +26,7 @@ export default function FaqPage() {
 
         <Stack direction="column" gap="xl" align="stretch">
           {FAQ_ITEMS.map((item) => (
-            <Stack key={item.id} direction="column" gap="sm" align="start">
+            <Stack key={item.id} id={item.id} direction="column" gap="sm" align="start">
               <Stack direction="row" gap="sm" align="center">
                 <FaqIcon name={item.icon} size={32} />
                 <Heading level={2} variant="section">

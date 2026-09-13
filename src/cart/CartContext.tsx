@@ -8,22 +8,28 @@ import {
   type ReactNode,
 } from 'react';
 
-import { cartLineKey, type BobbinSelection } from '../data/bobbins';
+import {
+  cartLineKey,
+  readStoredConfig,
+  resolveConfig,
+  type PickupConfig,
+} from '../data/pickupConfig';
+import { getPickupBySlug } from '../data/pickups';
 
 export interface CartItem {
   /**
-   * Stable line identity = slug + chosen bobbin colours (see `cartLineKey`).
-   * Two adds with the same id aggregate (qty grows); different colours of the
-   * same model are separate lines. Always recomputed from slug+config, never
-   * trusted from storage.
+   * Stable line identity = slug + chosen build (see `cartLineKey`). Two adds
+   * with the same id aggregate (qty grows); different builds of the same model
+   * are separate lines. Always recomputed from slug+config, never trusted from
+   * storage.
    */
   readonly id: string;
   readonly slug: string;
   readonly name: string;
   readonly price: number;
   readonly qty: number;
-  /** Chosen colour per bobbin; absent for non-configurable pickups. */
-  readonly config?: BobbinSelection;
+  /** Chosen build (colours, wire, pole pieces, cover, spacing); absent for non-configurable pickups. */
+  readonly config?: PickupConfig;
 }
 
 export interface CartContextValue {
@@ -33,23 +39,13 @@ export interface CartContextValue {
   add: (item: Omit<CartItem, 'qty' | 'id'>) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
-  /** Change one bobbin's colour on a line; merges into a matching line if the new colours collide. */
-  updateConfig: (id: string, bobbinId: string, color: string) => void;
+  /** Replace a line's build; merges into a matching line if the new build collides. */
+  updateConfig: (id: string, config: PickupConfig) => void;
   clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = 'bp-enquiry-cart-v1';
-
-/** A bobbin selection from untrusted storage: keep only string→string entries. */
-function readConfig(value: unknown): BobbinSelection | undefined {
-  if (typeof value !== 'object' || value === null) return undefined;
-  const out: Record<string, string> = {};
-  for (const [key, val] of Object.entries(value)) {
-    if (typeof val === 'string') out[key] = val;
-  }
-  return Object.keys(out).length > 0 ? out : undefined;
-}
 
 /** Validate the base shape (config is optional and validated separately). */
 function isStoredItem(value: unknown): value is Record<string, unknown> {
@@ -71,8 +67,13 @@ function readStorage(): CartItem[] {
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isStoredItem).map((item) => {
-      const config = readConfig(item['config']);
       const slug = item['slug'] as string;
+      // Resolve against the catalog so older lines (pre wire/cover options) and
+      // any removed option settle on the current defaults — the same complete
+      // build the product page would have added.
+      const stored = readStoredConfig(item['config']);
+      const pickup = getPickupBySlug(slug);
+      const config = pickup === undefined ? stored : resolveConfig(pickup, stored);
       return {
         id: cartLineKey(slug, config),
         slug,
@@ -134,11 +135,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const updateConfig = useCallback((id: string, bobbinId: string, color: string) => {
+  const updateConfig = useCallback((id: string, nextConfig: PickupConfig) => {
     setItems((prev) => {
       const target = prev.find((i) => i.id === id);
       if (target === undefined) return prev;
-      const nextConfig: BobbinSelection = { ...(target.config ?? {}), [bobbinId]: color };
       const nextId = cartLineKey(target.slug, nextConfig);
       if (nextId === id) {
         return prev.map((i) => (i.id === id ? { ...i, config: nextConfig } : i));

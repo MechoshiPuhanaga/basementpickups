@@ -98,4 +98,11 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
       'Our four-conductor humbuckers follow a consistent code. North coil (slug): start red, finish white. South coil (screws): start black, finish green. For standard series wiring, join white to green; red is hot, black and the bare shield are ground. Splitting leaves the slug coil active.',
     icon: 'coil-wiring',
   },
+  {
+    id: 'option-availability',
+    question: 'Are all configuration options always available?',
+    answer:
+      'Not always. Bobbin colours, covers, pole-piece finishes and wire are sourced in small quantities, so a particular combination may occasionally be unavailable. Should anything in your build need a substitute or a longer lead time, we will write to you by email and agree the details before winding.',
+    icon: 'option-availability',
+  },
 ];

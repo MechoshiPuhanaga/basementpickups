@@ -1,6 +1,13 @@
 import { getPickupAndParent } from '../data/pickups';
 import type { Pickup } from '../data/pickups';
 import { bobbinColorLabel } from '../data/bobbinColors';
+import {
+  choiceLabel,
+  conductorLabel,
+  formatCoverOffer,
+  formatSpacing,
+  polepieceLabel,
+} from '../data/pickupLabels';
 import { getArticleBySlug } from '../data/articles';
 import { FAQ_ITEMS } from '../data/faq';
 
@@ -22,13 +29,6 @@ const MAGNET_LABEL: Record<string, string> = {
   neodymium: 'Neodymium',
 };
 
-const POLEPIECE_LABEL: Record<string, string> = {
-  chrome: 'Chrome',
-  black: 'Black',
-  nickel: 'Nickel',
-  gold: 'Gold',
-};
-
 /** Expose the build/hardware spec as schema.org PropertyValue entries. */
 function productProperties(pickup: Pickup): JsonLd[] {
   const h = pickup.hardware;
@@ -41,7 +41,12 @@ function productProperties(pickup: Pickup): JsonLd[] {
     {
       '@type': 'PropertyValue',
       name: 'Pole pieces',
-      value: POLEPIECE_LABEL[h.polepieces] ?? h.polepieces,
+      value: choiceLabel(h.polepieces, polepieceLabel),
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'Lead wire',
+      value: choiceLabel(pickup.conductors, conductorLabel),
     },
   ];
   if (h.spacingMm !== undefined) {
@@ -58,14 +63,14 @@ function productProperties(pickup: Pickup): JsonLd[] {
         : {
             '@type': 'PropertyValue',
             name: 'String spacing',
-            value: `${spacing.join(' or ')} mm`,
+            value: formatSpacing(spacing),
           },
     );
   }
   props.push({
     '@type': 'PropertyValue',
     name: 'Cover',
-    value: h.cover ? `${h.cover.material}${h.cover.optional ? ' (optional)' : ''}` : 'None',
+    value: formatCoverOffer(h.cover),
   });
   if (h.sevenString) {
     props.push({

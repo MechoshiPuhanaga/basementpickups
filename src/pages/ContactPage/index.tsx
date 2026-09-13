@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useCart, type CartItem } from '../../cart/CartContext';
-import { bobbinOptions } from '../../data/bobbins';
+import { configOptions } from '../../data/pickupConfig';
 import { getPickupBySlug } from '../../data/pickups';
 import { DecoSeparator } from '../../design-system/atoms/DecoSeparator';
 import { Heading } from '../../design-system/atoms/Heading';
@@ -35,10 +35,14 @@ function readFlag(state: unknown, key: string): boolean {
   );
 }
 
-/** Resolved bobbin colours for a cart line, e.g. `[{ label: 'Slug coil', value: 'Black' }]`. */
+/**
+ * Resolved build for a cart line, e.g. `[{ label: 'Slug coil', value: 'Black' },
+ * { label: 'Wire', value: '4-conductor (coil split)' }, …]`. Read from the same
+ * `resolveConfig` the product page and cart use, so the email matches the UI.
+ */
 function itemOptions(item: CartItem): { label: string; value: string }[] {
-  const bobbins = getPickupBySlug(item.slug)?.hardware.bobbins;
-  return bobbins === undefined ? [] : bobbinOptions(bobbins, item.config);
+  const pickup = getPickupBySlug(item.slug);
+  return pickup === undefined ? [] : configOptions(pickup, item.config);
 }
 
 /** Plain-text item list appended to the mailto fallback when sending fails. */
@@ -73,7 +77,7 @@ async function postEnquiry(
   data: ContactFormData,
   items: readonly CartItem[] | undefined,
 ): Promise<void> {
-  // Attach each line's chosen bobbin colours as per-item options so the server
+  // Attach each line's chosen build as per-item options so the server
   // renders them in the itemised email.
   const payloadItems = items?.map((item) => {
     const options = itemOptions(item);

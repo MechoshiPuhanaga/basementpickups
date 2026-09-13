@@ -7,7 +7,19 @@ export type PickupPosition = 'neck' | 'middle' | 'bridge';
 
 export type PickupConductor = 'vintage-braided' | '2-conductor' | '4-conductor';
 
-export type PickupPotting = 'potted' | 'unpotted' | 'optional';
+export type PickupPotting = 'potted' | 'unpotted';
+
+/**
+ * A customer-selectable build option: the finishes/variants offered for a
+ * pickup and the one it ships with when nothing is chosen. `defaultOption` must
+ * be one of `options`. A single-entry `options` means the value is fixed (shown
+ * read-only, never asked). Keeps rules in the data, so a future single coil or
+ * P-90 just lists its own options — nothing in the UI hardcodes humbucker rules.
+ */
+export interface Choice<T> {
+  readonly options: readonly T[];
+  readonly defaultOption: T;
+}
 
 export interface PickupSpecs {
   readonly inductance?: string;
@@ -22,14 +34,10 @@ export interface PickupImages {
 }
 
 /** Pole-piece finish offered for a pickup. */
-export type PickupPolepiece = 'chrome' | 'black' | 'nickel' | 'gold';
+export type PickupPolepiece = 'nickel' | 'black' | 'gold';
 
-/** A metal cover option. Present on a pickup means a cover is offered. */
-export interface PickupCover {
-  readonly material: string;
-  /** True when the cover is an option rather than fitted by default. */
-  readonly optional: boolean;
-}
+/** Metal cover finish; `none` = uncovered (open bobbins). */
+export type PickupCoverFinish = 'none' | 'nickel' | 'black' | 'gold';
 
 /** A 7-string variant option. Present means the pickup is offered in 7-string. */
 export interface PickupSevenString {
@@ -64,13 +72,13 @@ export interface PickupBobbin {
 }
 
 /**
- * Physical build / configuration of a pickup. Bobbin colors are tokens the DS
- * `Swatch` atom can render (`white`/`cream`/`black` or a hex string from the
- * boutique palette). Spacing is the string spacing in millimetres.
+ * Physical build / configuration of a pickup. Bobbin colors are name tokens the
+ * DS `Swatch` / `BobbinIcon` atoms can render. Spacing is the string spacing in
+ * millimetres; pole pieces are a customer choice (see `Choice`).
  */
 export interface PickupHardware {
-  /** String spacing in mm. An array means it's offered in more than one. */
-  readonly spacingMm?: number | readonly number[];
+  /** String spacing in mm. A `Choice` means the customer picks one. */
+  readonly spacingMm?: number | Choice<number>;
   readonly bobbinColors: readonly string[];
   /**
    * Configurable bobbins (coils) with their per-bobbin palette + default colour.
@@ -78,8 +86,10 @@ export interface PickupHardware {
    * behaves exactly as before (display falls back to `bobbinColors`).
    */
   readonly bobbins?: readonly PickupBobbin[];
-  readonly polepieces: PickupPolepiece;
-  readonly cover?: PickupCover;
+  /** Pole-piece finish: one finish for all coils of the pickup. */
+  readonly polepieces: Choice<PickupPolepiece>;
+  /** Cover choice (usually defaulting to `none`). Absent = no cover offered at all. */
+  readonly cover?: Choice<PickupCoverFinish>;
   readonly sevenString?: PickupSevenString;
 }
 
@@ -93,8 +103,10 @@ export interface Pickup {
   readonly price: number;
   readonly positions: readonly PickupPosition[];
   readonly hardware: PickupHardware;
-  readonly conductors: readonly PickupConductor[];
-  readonly potting: PickupPotting;
+  /** Lead wire: vintage braided (2-conductor) or 4-conductor (coil split). */
+  readonly conductors: Choice<PickupConductor>;
+  /** Wax potting: a customer choice, or fixed when only one option is listed. */
+  readonly potting: Choice<PickupPotting>;
   readonly specs: PickupSpecs;
   readonly images: PickupImages;
   readonly variants?: readonly Pickup[];
@@ -123,6 +135,39 @@ const STANDARD_BOBBIN_COLORS: readonly string[] = [
 
 /** PAF-set palette (49.2 mm bobbins): cream / white / black only. */
 const PAF_BOBBIN_COLORS: readonly string[] = ['cream', 'white', 'black'];
+
+/** 49.2 mm (PAF) pole pieces come in nickel only. */
+const PAF_POLEPIECES: Choice<PickupPolepiece> = { options: ['nickel'], defaultOption: 'nickel' };
+
+/** 50 / 52 mm pole pieces: nickel, black or gold, with a per-model default. */
+function polepieceChoice(defaultOption: PickupPolepiece): Choice<PickupPolepiece> {
+  return { options: ['nickel', 'black', 'gold'], defaultOption };
+}
+
+/** Every humbucker is offered with either lead wire; the default is per model. */
+function wireChoice(defaultOption: PickupConductor): Choice<PickupConductor> {
+  return { options: ['vintage-braided', '4-conductor'], defaultOption };
+}
+
+/** Optional metal cover, shipped uncovered unless chosen. */
+const COVER_OPTIONAL: Choice<PickupCoverFinish> = {
+  options: ['none', 'nickel', 'black', 'gold'],
+  defaultOption: 'none',
+};
+
+/** Potting offered either way, shipped unpotted unless chosen. */
+const POTTING_OPTIONAL: Choice<PickupPotting> = {
+  options: ['unpotted', 'potted'],
+  defaultOption: 'unpotted',
+};
+
+/** Always wax potted (high-output models). */
+const POTTING_FIXED: Choice<PickupPotting> = { options: ['potted'], defaultOption: 'potted' };
+
+const WIRE_BRAIDED = wireChoice('vintage-braided');
+const WIRE_FOUR = wireChoice('4-conductor');
+const POLEPIECES_NICKEL = polepieceChoice('nickel');
+const POLEPIECES_BLACK = polepieceChoice('black');
 
 /** A classic two-coil humbucker (slug + screw) sharing one palette, with per-coil defaults. */
 function humbuckerCoils(
@@ -158,9 +203,14 @@ export const pickups: readonly Pickup[] = [
     magnet: 'alnico-4',
     price: 125,
     positions: ['neck', 'bridge'],
-    hardware: { polepieces: 'chrome', bobbinColors: ['white'], bobbins: WHITE_PEARL_BOBBINS },
-    conductors: ['vintage-braided', '4-conductor'],
-    potting: 'optional',
+    hardware: {
+      polepieces: POLEPIECES_NICKEL,
+      cover: COVER_OPTIONAL,
+      bobbinColors: ['white'],
+      bobbins: WHITE_PEARL_BOBBINS,
+    },
+    conductors: WIRE_FOUR,
+    potting: POTTING_OPTIONAL,
     specs: { dcr: '5.9k–6.8k', inductance: '2.8H–3.5H' },
     images: { main: PHOTO('white-pearl') },
     variants: [
@@ -176,12 +226,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['neck'],
         hardware: {
           spacingMm: 50,
-          polepieces: 'chrome',
+          polepieces: POLEPIECES_NICKEL,
+          cover: COVER_OPTIONAL,
           bobbinColors: ['white'],
           bobbins: WHITE_PEARL_BOBBINS,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_FOUR,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '5.9k',
           inductance: '2.8H',
@@ -202,12 +253,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['bridge'],
         hardware: {
           spacingMm: 52,
-          polepieces: 'chrome',
+          polepieces: POLEPIECES_NICKEL,
+          cover: COVER_OPTIONAL,
           bobbinColors: ['white'],
           bobbins: WHITE_PEARL_BOBBINS,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_FOUR,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '6.8k',
           inductance: '3.5H',
@@ -230,13 +282,13 @@ export const pickups: readonly Pickup[] = [
     positions: ['neck', 'bridge'],
     hardware: {
       spacingMm: 49.2,
-      polepieces: 'chrome',
+      polepieces: PAF_POLEPIECES,
       bobbinColors: ['cream', 'white', 'black'],
       bobbins: PAF_BOBBINS,
-      cover: { material: 'nickel', optional: true },
+      cover: COVER_OPTIONAL,
     },
-    conductors: ['vintage-braided', '4-conductor'],
-    potting: 'optional',
+    conductors: WIRE_BRAIDED,
+    potting: POTTING_OPTIONAL,
     specs: { dcr: '7.4k–8.1k', inductance: '4.3H–5.1H' },
     images: { main: PHOTO('macho-heaven') },
     variants: [
@@ -252,13 +304,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['neck'],
         hardware: {
           spacingMm: 49.2,
-          polepieces: 'chrome',
+          polepieces: PAF_POLEPIECES,
           bobbinColors: ['cream', 'white', 'black'],
           bobbins: PAF_BOBBINS,
-          cover: { material: 'nickel', optional: true },
+          cover: COVER_OPTIONAL,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_BRAIDED,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '7.4k',
           inductance: '4.3H',
@@ -279,13 +331,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['bridge'],
         hardware: {
           spacingMm: 49.2,
-          polepieces: 'chrome',
+          polepieces: PAF_POLEPIECES,
           bobbinColors: ['cream', 'white', 'black'],
           bobbins: PAF_BOBBINS,
-          cover: { material: 'nickel', optional: true },
+          cover: COVER_OPTIONAL,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_BRAIDED,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '8.1k',
           inductance: '5.1H',
@@ -308,13 +360,13 @@ export const pickups: readonly Pickup[] = [
     positions: ['neck', 'bridge'],
     hardware: {
       spacingMm: 49.2,
-      polepieces: 'chrome',
+      polepieces: PAF_POLEPIECES,
       bobbinColors: ['cream', 'white', 'black'],
       bobbins: PAF_BOBBINS,
-      cover: { material: 'nickel', optional: true },
+      cover: COVER_OPTIONAL,
     },
-    conductors: ['vintage-braided', '4-conductor'],
-    potting: 'optional',
+    conductors: WIRE_BRAIDED,
+    potting: POTTING_OPTIONAL,
     specs: { dcr: '7.6k–8.3k', inductance: '4.4H–5.3H' },
     images: { main: PHOTO('chow-chow') },
     variants: [
@@ -330,13 +382,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['neck'],
         hardware: {
           spacingMm: 49.2,
-          polepieces: 'chrome',
+          polepieces: PAF_POLEPIECES,
           bobbinColors: ['cream', 'white', 'black'],
           bobbins: PAF_BOBBINS,
-          cover: { material: 'nickel', optional: true },
+          cover: COVER_OPTIONAL,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_BRAIDED,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '7.6k',
           inductance: '4.4H',
@@ -357,13 +409,13 @@ export const pickups: readonly Pickup[] = [
         positions: ['bridge'],
         hardware: {
           spacingMm: 49.2,
-          polepieces: 'chrome',
+          polepieces: PAF_POLEPIECES,
           bobbinColors: ['cream', 'white', 'black'],
           bobbins: PAF_BOBBINS,
-          cover: { material: 'nickel', optional: true },
+          cover: COVER_OPTIONAL,
         },
-        conductors: ['vintage-braided', '4-conductor'],
-        potting: 'optional',
+        conductors: WIRE_BRAIDED,
+        potting: POTTING_OPTIONAL,
         specs: {
           dcr: '8.3k',
           inductance: '5.3H',
@@ -386,13 +438,14 @@ export const pickups: readonly Pickup[] = [
     positions: ['bridge'],
     hardware: {
       spacingMm: 52,
-      polepieces: 'black',
+      polepieces: POLEPIECES_BLACK,
+      cover: COVER_OPTIONAL,
       bobbinColors: STANDARD_BOBBIN_COLORS,
       bobbins: ROCKROACH_BOBBINS,
       sevenString: { colors: ['black'] },
     },
-    conductors: ['4-conductor'],
-    potting: 'potted',
+    conductors: WIRE_FOUR,
+    potting: POTTING_FIXED,
     specs: {
       dcr: '12.2k',
       inductance: '5.9H',
@@ -413,13 +466,14 @@ export const pickups: readonly Pickup[] = [
     positions: ['bridge'],
     hardware: {
       spacingMm: 52,
-      polepieces: 'black',
+      polepieces: POLEPIECES_BLACK,
+      cover: COVER_OPTIONAL,
       bobbinColors: ['black'],
       bobbins: KARAKONJUL_BOBBINS,
       sevenString: { colors: ['black'] },
     },
-    conductors: ['4-conductor'],
-    potting: 'potted',
+    conductors: WIRE_FOUR,
+    potting: POTTING_FIXED,
     specs: {
       dcr: '17.9k',
       inductance: '8.8H',
@@ -440,13 +494,14 @@ export const pickups: readonly Pickup[] = [
     positions: ['bridge'],
     hardware: {
       spacingMm: 52,
-      polepieces: 'black',
+      polepieces: POLEPIECES_BLACK,
+      cover: COVER_OPTIONAL,
       bobbinColors: STANDARD_BOBBIN_COLORS,
       bobbins: LITTLE_KARAKONJUL_BOBBINS,
       sevenString: { colors: ['black'] },
     },
-    conductors: ['4-conductor'],
-    potting: 'potted',
+    conductors: WIRE_FOUR,
+    potting: POTTING_FIXED,
     specs: {
       dcr: '5.6k',
       inductance: '3.2H',
@@ -466,13 +521,13 @@ export const pickups: readonly Pickup[] = [
     price: 140,
     positions: ['neck', 'bridge'],
     hardware: {
-      spacingMm: [50, 52],
-      polepieces: 'black',
+      spacingMm: { options: [50, 52], defaultOption: 50 },
+      polepieces: POLEPIECES_NICKEL,
       bobbinColors: STANDARD_BOBBIN_COLORS,
       bobbins: TWIN_BLISS_BOBBINS,
     },
-    conductors: ['vintage-braided', '4-conductor'],
-    potting: 'optional',
+    conductors: WIRE_FOUR,
+    potting: POTTING_OPTIONAL,
     specs: {
       dcr: '7.4k',
       inductance: '4.0H',

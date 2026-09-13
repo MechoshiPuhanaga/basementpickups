@@ -10,18 +10,31 @@ import { Swatch } from '../../design-system/atoms/Swatch';
 import { Text } from '../../design-system/atoms/Text';
 import { ProductLayout } from '../../design-system/layouts/ProductLayout';
 import { Section } from '../../design-system/layouts/Section';
-import { BobbinConfigurator } from '../../design-system/molecules/BobbinConfigurator';
+import { PickupConfigurator } from '../../design-system/molecules/PickupConfigurator';
 import { Disclosure } from '../../design-system/molecules/Disclosure';
 import { ProductGallery } from '../../design-system/molecules/ProductGallery';
 import { useCart } from '../../cart/CartContext';
 import { bobbinColorLabel } from '../../data/bobbinColors';
-import { availableBobbinColors, cartLineKey, type BobbinSelection } from '../../data/bobbins';
+import { availableBobbinColors } from '../../data/bobbins';
+import {
+  cartLineKey,
+  defaultConfig,
+  hasConfigChoices,
+  type PickupConfig,
+} from '../../data/pickupConfig';
+import {
+  choiceLabel,
+  conductorLabel,
+  formatCoverOffer,
+  formatSpacing,
+  polepieceLabel,
+  pottingLabel,
+} from '../../data/pickupLabels';
 import {
   getPickupAndParent,
+  type Choice,
   type Pickup,
-  type PickupCover,
   type PickupMagnet,
-  type PickupPolepiece,
   type PickupPosition,
   type PickupSevenString,
   type PickupType,
@@ -45,24 +58,6 @@ const MAGNET_LABEL: Record<PickupMagnet, string> = {
 };
 
 const POSITION_ORDER: readonly PickupPosition[] = ['neck', 'middle', 'bridge'];
-
-const POLEPIECE_LABEL: Record<PickupPolepiece, string> = {
-  chrome: 'Chrome',
-  black: 'Black',
-  nickel: 'Nickel',
-  gold: 'Gold',
-};
-
-function formatSpacing(mm: number | readonly number[]): string {
-  const values: readonly number[] = typeof mm === 'number' ? [mm] : mm;
-  return `${values.map((n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))).join(' or ')} mm`;
-}
-
-function formatCover(cover: PickupCover | undefined): string {
-  if (cover === undefined) return 'None';
-  const material = cover.material.charAt(0).toUpperCase() + cover.material.slice(1);
-  return cover.optional ? `${material} (optional)` : material;
-}
 
 function formatSevenString(sevenString: PickupSevenString | undefined): string | undefined {
   if (sevenString === undefined) return undefined;
@@ -120,7 +115,7 @@ function formatSpacingRow(active: Pickup, parent: Pickup): string | undefined {
         position: variant.positions.length === 1 ? variant.positions[0] : undefined,
       }))
       .filter(
-        (entry): entry is { spacing: number | readonly number[]; position: PickupPosition } =>
+        (entry): entry is { spacing: number | Choice<number>; position: PickupPosition } =>
           entry.position !== undefined && entry.spacing !== undefined,
       );
 
@@ -219,37 +214,27 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
 }
 
 /**
- * Bobbin configuration + the Add-to-enquiry button for an addable pickup. Owns
- * the colour selection (seeded from each bobbin's default); rendered with a
+ * Build configuration + the Add-to-enquiry button for an addable pickup. Owns
+ * the selection (seeded from the pickup's defaults); rendered with a
  * `key={slug}` so switching variants reseeds to the new pickup's defaults. The
- * "Configure" section only appears when at least one bobbin offers a choice; the
- * chosen colours travel onto the cart line either way (so emails list them).
+ * "Configure" section only appears when there is a real choice to make; the
+ * complete build travels onto the cart line either way (so emails list it).
  */
 function AddToEnquiry({ pickup }: { pickup: Pickup }) {
   const cart = useCart();
-  const bobbins = pickup.hardware.bobbins;
-  const [selection, setSelection] = useState<BobbinSelection>(() =>
-    bobbins === undefined
-      ? {}
-      : Object.fromEntries(bobbins.map((bobbin) => [bobbin.id, bobbin.defaultColor])),
-  );
-  // Only offer the Configure section when at least one bobbin has a real choice.
-  const choosableBobbins = (bobbins ?? []).some((bobbin) => bobbin.palette.length > 1)
-    ? bobbins
-    : undefined;
-  const lineId = cartLineKey(pickup.slug, bobbins !== undefined ? selection : undefined);
+  const [selection, setSelection] = useState<PickupConfig>(() => defaultConfig(pickup));
+  const lineId = cartLineKey(pickup.slug, selection);
   const inEnquiry = cart.items.find((item) => item.id === lineId)?.qty ?? 0;
 
   return (
     <>
-      {choosableBobbins !== undefined && (
+      {hasConfigChoices(pickup) && (
         <Disclosure title="Configure" desktop="heading" headingLevel={2}>
-          <BobbinConfigurator
-            bobbins={choosableBobbins}
+          <PickupConfigurator
+            pickup={pickup}
             value={selection}
-            onChange={(bobbinId, color) => {
-              setSelection((prev) => ({ ...prev, [bobbinId]: color }));
-            }}
+            onChange={setSelection}
+            helpTo="/faq#option-availability"
           />
         </Disclosure>
       )}
@@ -261,7 +246,7 @@ function AddToEnquiry({ pickup }: { pickup: Pickup }) {
             slug: pickup.slug,
             name: pickup.name,
             price: pickup.price,
-            ...(bobbins !== undefined ? { config: selection } : {}),
+            config: selection,
           });
         }}
       >
@@ -332,8 +317,7 @@ export default function ProductPage() {
                 <SpecRow label="Type" value={TYPE_LABEL[pickup.type]} />
                 <SpecRow label="Magnet" value={formatMagnet(pickup, parent)} />
                 <SpecRow label="Positions" value={pickup.positions.join(', ')} />
-                <SpecRow label="Conductors" value={pickup.conductors.join(', ')} />
-                <SpecRow label="Potting" value={pickup.potting} />
+                <SpecRow label="Lead wire" value={choiceLabel(pickup.conductors, conductorLabel)} />
                 {pickup.specs.dcr !== undefined && <SpecRow label="DCR" value={pickup.specs.dcr} />}
                 {pickup.specs.inductance !== undefined && (
                   <SpecRow label="Inductance" value={pickup.specs.inductance} />
@@ -344,9 +328,13 @@ export default function ProductPage() {
                 {pickup.specs.loadedResonantPeak !== undefined && (
                   <SpecRow label="Loaded resonant peak" value={pickup.specs.loadedResonantPeak} />
                 )}
+                <SpecRow label="Potting" value={choiceLabel(pickup.potting, pottingLabel)} />
                 {spacingRow !== undefined && <SpecRow label="String spacing" value={spacingRow} />}
-                <SpecRow label="Pole pieces" value={POLEPIECE_LABEL[pickup.hardware.polepieces]} />
-                <SpecRow label="Cover" value={formatCover(pickup.hardware.cover)} />
+                <SpecRow
+                  label="Pole pieces"
+                  value={choiceLabel(pickup.hardware.polepieces, polepieceLabel)}
+                />
+                <SpecRow label="Cover" value={formatCoverOffer(pickup.hardware.cover)} />
                 {sevenStringLabel !== undefined && (
                   <SpecRow label="7-string" value={sevenStringLabel} />
                 )}

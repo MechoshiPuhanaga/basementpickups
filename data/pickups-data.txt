@@ -13,6 +13,20 @@ Full palette = black, white, cream, coral, red, blue, light blue, pink, green, o
 • Twin Bliss — two screw coils — palette: full — default: both orange
 
 
+BUILD OPTIONS (customer-selectable; 2026-09-13)
+
+Every option is data on the pickup (a Choice: offered options + default), never a UI rule.
+• Wire: all humbuckers offer vintage braided (2-conductor) and 4-conductor (coil split).
+  Default: 4-conductor — White Pearl, Rockroach, Karakonjul, Little Karakonjul, Twin Bliss.
+  Default: vintage braided — Macho Heaven, Chow Chow.
+• Pole pieces (one finish for both coils): 49.2 mm (Macho Heaven, Chow Chow) = nickel only.
+  50 / 52 mm = nickel, black or gold. Default nickel — White Pearl, Twin Bliss;
+  default black — Rockroach, Karakonjul, Little Karakonjul. (Old "chrome" is now "nickel".)
+• Cover: no cover (default) / nickel / black / gold, on every model except Twin Bliss.
+• Potting: unpotted (default) / potted — White Pearl, Macho Heaven, Chow Chow, Twin Bliss.
+  Always potted — Rockroach, Karakonjul, Little Karakonjul.
+• String spacing: Twin Bliss chooses 50 mm (default) or 52 mm; all others fixed.
+
 WHITE PEARL — STRAT-STYLE HUMBUCKER SET
 
 Neck Pickup

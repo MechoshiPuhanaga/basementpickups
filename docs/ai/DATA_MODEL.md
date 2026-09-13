@@ -108,7 +108,7 @@ export type PickupPosition = 'neck' | 'middle' | 'bridge';
 
 export type PickupConductor = 'vintage-braided' | '2-conductor' | '4-conductor';
 
-export type PickupPotting = 'potted' | 'unpotted' | 'optional';
+export type PickupPotting = 'potted' | 'unpotted';
 
 export type PickupSpecs = {
   inductance?: string;
@@ -117,7 +117,12 @@ export type PickupSpecs = {
   loadedResonantPeak?: string; // e.g. "3.9 kHz"
 };
 
-export type PickupPolepiece = 'chrome' | 'black' | 'nickel' | 'gold';
+export type PickupPolepiece = 'nickel' | 'black' | 'gold';
+
+export type PickupCoverFinish = 'none' | 'nickel' | 'black' | 'gold';
+
+/** A customer-selectable build option. One entry in `options` = fixed (read-only). */
+export type Choice<T> = { options: readonly T[]; defaultOption: T };
 
 export type BobbinStyle = 'slug' | 'screw' | 'blade';
 
@@ -130,11 +135,11 @@ export type PickupBobbin = {
 };
 
 export type PickupHardware = {
-  spacingMm?: number; // string spacing, e.g. 50, 52, 49.2
+  spacingMm?: number | Choice<number>; // fixed (52, 49.2) or a choice (Twin Bliss: 50 or 52)
   bobbinColors: string[]; // name tokens, e.g. 'white' | 'cream' | 'light-blue' (never hex)
   bobbins?: PickupBobbin[]; // configurable coils + per-bobbin palette/default (optional during rollout)
-  polepieces: PickupPolepiece;
-  cover?: { material: string; optional: boolean }; // absent = no cover offered
+  polepieces: Choice<PickupPolepiece>; // one finish for all coils
+  cover?: Choice<PickupCoverFinish>; // usually defaults to 'none'; absent = no cover offered
   sevenString?: { colors: string[] }; // absent = 7-string not offered
 };
 
@@ -157,9 +162,9 @@ export type Pickup = {
 
   hardware: PickupHardware;
 
-  conductors: PickupConductor[];
+  conductors: Choice<PickupConductor>; // lead wire
 
-  potting: PickupPotting;
+  potting: Choice<PickupPotting>;
 
   specs: PickupSpecs;
 
@@ -182,25 +187,55 @@ also surfaced in the Product JSON-LD as `material` (magnet) +
 lives in `src/data/bobbinColors.ts` (`bobbinColorLabel`) — the single source so
 product specs, JSON-LD, and (later) the enquiry message all read the same names.
 The hex values are only an **approximation** for the visual chip and live solely
-in the DS `Swatch` atom's CSS module (`data-color="<token>"` → fill), because the
-strict prod CSP forbids inline `style`. Three places list the token set — keep
-them in sync: `bobbinColors.ts`, `STANDARD_BOBBIN_COLORS` in `pickups.ts`, and
-`Swatch.module.css`.
+in `src/design-system/tokens/bobbin-colors.css` (`--bobbin-color-<token>`), read by
+the DS `Swatch` and `PickupPreview` atoms via `data-color="<token>"`, because the
+strict prod CSP forbids inline `style`. Four places list the token set — keep them
+in sync: `bobbinColors.ts`, `STANDARD_BOBBIN_COLORS` in `pickups.ts`,
+`bobbin-colors.css`, and the `data-color` rules in the two atoms' CSS modules.
 
 **Per-bobbin customization (2026-06-27).** `hardware.bobbins` lists the physical
 coils a customer can colour. The **palette is per bobbin** (availability depends on
 spacing / 7-string / future bobbin styles) — `bobbinColors` is kept as the display
 union, derived via `availableBobbinColors(hardware)` (`src/data/bobbins.ts`). All
 seven models are humbuckers → two coils (slug + screw, except Twin Bliss = two
-screw coils). Helpers in `bobbins.ts`: `deriveBobbinLabels`, `availableBobbinColors`,
-`bobbinOptions` (coil → colour pairs for the enquiry/email), `cartLineKey`, and the
-`BobbinSelection` type. The DS `BobbinConfigurator` molecule (swatch + label +
-colour select; read-only for single-colour coils) drives both the product-page
-**Configure** section and each cart line. The chosen colours ride on the cart line
-as `config` (a `BobbinSelection`); the cart line **id** is `cartLineKey(slug, config)`
-so different colours are separate lines and identical ones aggregate. On enquiry the
-colours are sent as per-item `options` (`{label, value}`) — the existing
-`server/contact.ts` email template renders them unchanged.
+screw coils). Helpers in `bobbins.ts`: `deriveBobbinLabels`, `availableBobbinColors`.
+
+**Build options as `Choice<T>` (2026-09-13).** Everything a customer can pick is
+data on the pickup, never a rule in the UI: `conductors` (wire), `potting`,
+`hardware.polepieces`, `hardware.cover`, and `hardware.spacingMm` (a `Choice`
+only where more than one spacing is offered). A `Choice` lists the offered
+`options` and the `defaultOption`; a single-option choice is a fixed value and
+renders read-only. Shared constants in `pickups.ts` (`PAF_POLEPIECES`,
+`polepieceChoice(default)`, `wireChoice(default)`, `COVER_OPTIONAL`,
+`POTTING_OPTIONAL` / `POTTING_FIXED`) keep the per-pickup entries short. A future
+P-90 / single coil simply lists its own options.
+
+Labels for every option token live in `src/data/pickupLabels.ts`
+(`conductorLabel`, `polepieceLabel`, `coverLabel`, `pottingLabel`, `spacingLabel`,
+`choiceLabel`, `formatCoverOffer`, `formatSpacing`) — the single source for the
+product specs, JSON-LD, the configurator, and the enquiry email.
+
+**The customer's build = `PickupConfig`** (`src/data/pickupConfig.ts`):
+`{ bobbins?: {[bobbinId]: colour}, conductors?, polepieces?, cover?, potting?,
+spacingMm? }`. Everything that reads one goes through `resolveConfig(pickup, config)`,
+which validates each value against the offered options and fills defaults, so a
+partial or stale config always yields a complete, valid build. Helpers:
+`defaultConfig`, `hasConfigChoices` (whether to show Configure at all),
+`cartLineKey(slug, config)` (sorted, deterministic line identity — identical builds
+aggregate, any differing option is a separate line), `configOptions(pickup, config)`
+(human-readable `{label, value}` list for the enquiry summary + email — includes
+fixed values so the workshop sees the complete build), and `readStoredConfig`
+(migrates the pre-2026-09 flat `{[bobbinId]: colour}` localStorage shape).
+
+The DS `PickupConfigurator` molecule (`pickup` + `value` + `onChange(next)`) drives
+both the product-page **Configure** section and each cart line, so both edit a
+build the same way. It shows the `PickupPreview` atom — the whole pickup from
+above (coils stacked as on the real thing, coloured by the chosen tokens, poles
+tinted by the chosen finish) — beside compact coil colour selects, then wire /
+pole pieces / cover / potting / spacing rows. Defaults are marked "(default)" in
+every select; a note links to `/faq#option-availability`. Bobbin colour hex values
+live in `src/design-system/tokens/bobbin-colors.css` (shared by `Swatch` and
+`PickupPreview`).
 
 ````
 

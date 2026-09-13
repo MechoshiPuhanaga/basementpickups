@@ -1,0 +1,27 @@
+/* Bobbin + hardware colour tokens.
+
+   Product data speaks in NAME TOKENS (see src/data/bobbinColors.ts); the hex
+   values here are only an approximation used by the DS `Swatch` chip and the
+   `BobbinIcon` preview. Keep the token set in sync with bobbinColors.ts and
+   STANDARD_BOBBIN_COLORS in src/data/pickups.ts. Inline styles are forbidden by
+   the strict prod CSP, so the atoms map `data-*` attributes to these variables. */
+:root {
+  --bobbin-color-white: #f4f1ea;
+  --bobbin-color-cream: #efe4c4;
+  --bobbin-color-black: #171513;
+  --bobbin-color-coral: #f65d71;
+  --bobbin-color-red: #bf474a;
+  --bobbin-color-blue: #0e138a;
+  --bobbin-color-light-blue: #569ece;
+  --bobbin-color-pink: #dc5ea3;
+  --bobbin-color-green: #4db456;
+  --bobbin-color-orange: #f6a449;
+
+  /* Pole-piece finishes (fills for the BobbinIcon poles). */
+  --polepiece-nickel: #c7c3b8;
+  --polepiece-nickel-shade: #7d7a72;
+  --polepiece-black: #262320;
+  --polepiece-black-shade: #0c0b0a;
+  --polepiece-gold: #d9b45a;
+  --polepiece-gold-shade: #8a6b24;
+}

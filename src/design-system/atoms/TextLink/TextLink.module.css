@@ -1,0 +1,15 @@
+.link {
+  color: var(--color-accent-gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--motion-base) var(--motion-easing);
+}
+
+.link:hover {
+  color: var(--color-text-primary);
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}

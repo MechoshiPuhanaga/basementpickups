@@ -10,6 +10,7 @@ import { renderSeoTags, renderJsonLd } from '../server/seo';
 import './design-system/tokens/fonts.css';
 import './design-system/tokens/reset.css';
 import './design-system/tokens/tokens.css';
+import './design-system/tokens/bobbin-colors.css';
 import './design-system/tokens/global.css';
 
 export class SsrRedirectError extends Error {

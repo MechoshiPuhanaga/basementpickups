@@ -30,44 +30,43 @@
 }
 
 /* Boutique bobbin palette. data-color is a NAME TOKEN (see
-   src/data/bobbinColors.ts); the hex here is only an approximate fill for the
-   chip. Keep tokens in sync with bobbinColors.ts + STANDARD_BOBBIN_COLORS. */
+   src/data/bobbinColors.ts); fills come from tokens/bobbin-colors.css. */
 .swatch[data-color='white']::before {
-  background-color: #f4f1ea;
+  background-color: var(--bobbin-color-white);
 }
 
 .swatch[data-color='cream']::before {
-  background-color: #efe4c4;
+  background-color: var(--bobbin-color-cream);
 }
 
 .swatch[data-color='black']::before {
-  background-color: #171513;
+  background-color: var(--bobbin-color-black);
 }
 
 .swatch[data-color='coral']::before {
-  background-color: #f65d71;
+  background-color: var(--bobbin-color-coral);
 }
 
 .swatch[data-color='red']::before {
-  background-color: #bf474a;
+  background-color: var(--bobbin-color-red);
 }
 
 .swatch[data-color='blue']::before {
-  background-color: #0e138a;
+  background-color: var(--bobbin-color-blue);
 }
 
 .swatch[data-color='light-blue']::before {
-  background-color: #569ece;
+  background-color: var(--bobbin-color-light-blue);
 }
 
 .swatch[data-color='pink']::before {
-  background-color: #dc5ea3;
+  background-color: var(--bobbin-color-pink);
 }
 
 .swatch[data-color='green']::before {
-  background-color: #4db456;
+  background-color: var(--bobbin-color-green);
 }
 
 .swatch[data-color='orange']::before {
-  background-color: #f6a449;
+  background-color: var(--bobbin-color-orange);
 }

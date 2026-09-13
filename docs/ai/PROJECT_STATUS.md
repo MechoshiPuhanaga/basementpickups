@@ -22,6 +22,16 @@ All six pages + the enquiry cart, the full design system, the real product catal
 
 Prior milestones (2026-05-23): infrastructure complete, then design-system complete.
 
+**Uncommitted (2026-09-13): full build configurator.** Wire, pole pieces, cover, potting and
+(Twin Bliss) string spacing are now customer choices modelled as `Choice<T>` data on each
+pickup (see DATA_MODEL.md "Build options"); the customer's build is a `PickupConfig`
+(`src/data/pickupConfig.ts`) shared by the product page, cart lines and the enquiry email.
+New DS: `PickupPreview` atom (whole pickup from above, coloured by the chosen tokens),
+`TextLink` atom, `PickupConfigurator` molecule (replaces `BobbinConfigurator`),
+`tokens/bobbin-colors.css`. New FAQ `option-availability` (+ icon) linked from the
+configurator; FAQ items now carry ids and the App scrolls to `#hash` targets. Old
+"chrome" pole pieces renamed nickel. Cart storage migrates the old flat colour config.
+
 ---
 
 # Completed Work

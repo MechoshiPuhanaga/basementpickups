@@ -12,7 +12,8 @@ export type FaqIconName =
   | 'signature'
   | 'coil-wiring'
   | 'bobbin-colour'
-  | 'more-options';
+  | 'more-options'
+  | 'option-availability';
 
 export interface FaqIconProps {
   name: FaqIconName;
@@ -179,6 +180,17 @@ export function FaqIcon({ name, size = 28, className }: FaqIconProps) {
           <path d="M12 3 L21 12 L12 21 L3 12 Z" vectorEffect="non-scaling-stroke" />
           <path d="M12 8 L12 16" vectorEffect="non-scaling-stroke" />
           <path d="M8 12 L16 12" vectorEffect="non-scaling-stroke" />
+        </>
+      )}
+
+      {/* Option availability — an envelope (we confirm substitutions by email) with a lozenge seal. */}
+      {name === 'option-availability' && (
+        <>
+          <path d="M3.5 6.5 L20.5 6.5 L20.5 18.5 L3.5 18.5 Z" vectorEffect="non-scaling-stroke" />
+          <path d="M3.5 6.5 L12 13.5 L20.5 6.5" vectorEffect="non-scaling-stroke" />
+          <path d="M3.5 18.5 L9.5 12.5" vectorEffect="non-scaling-stroke" />
+          <path d="M20.5 18.5 L14.5 12.5" vectorEffect="non-scaling-stroke" />
+          <path d="M12 1.5 L13.5 3.5 L12 5.5 L10.5 3.5 Z" fill="currentColor" stroke="none" />
         </>
       )}
     </svg>

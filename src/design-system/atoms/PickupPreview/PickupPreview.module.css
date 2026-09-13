@@ -1,0 +1,92 @@
+/* Top-down pickup preview. Coil colour and pole finish are resolved from
+   data-* attributes to the tokens in tokens/bobbin-colors.css — never inline. */
+.preview {
+  display: block;
+  flex: 0 0 auto;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+/* The baseplate the coils sit on: a dark plate with the brand's gold edge. */
+.plate {
+  fill: var(--color-surface-sunken);
+  stroke: var(--color-accent-gold);
+  stroke-width: 0.8;
+}
+
+.body {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-line-strong);
+  stroke-width: 0.5;
+}
+
+.pole {
+  fill: var(--polepiece-nickel);
+  stroke: var(--polepiece-nickel-shade);
+  stroke-width: 0.6;
+}
+
+.slot {
+  stroke: var(--polepiece-nickel-shade);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.preview[data-polepieces='black'] .pole {
+  fill: var(--polepiece-black);
+  stroke: var(--polepiece-black-shade);
+}
+
+.preview[data-polepieces='black'] .slot {
+  stroke: var(--polepiece-nickel-shade);
+}
+
+.preview[data-polepieces='gold'] .pole {
+  fill: var(--polepiece-gold);
+  stroke: var(--polepiece-gold-shade);
+}
+
+.preview[data-polepieces='gold'] .slot {
+  stroke: var(--polepiece-gold-shade);
+}
+
+.coil[data-color='white'] .body {
+  fill: var(--bobbin-color-white);
+}
+
+.coil[data-color='cream'] .body {
+  fill: var(--bobbin-color-cream);
+}
+
+.coil[data-color='black'] .body {
+  fill: var(--bobbin-color-black);
+}
+
+.coil[data-color='coral'] .body {
+  fill: var(--bobbin-color-coral);
+}
+
+.coil[data-color='red'] .body {
+  fill: var(--bobbin-color-red);
+}
+
+.coil[data-color='blue'] .body {
+  fill: var(--bobbin-color-blue);
+}
+
+.coil[data-color='light-blue'] .body {
+  fill: var(--bobbin-color-light-blue);
+}
+
+.coil[data-color='pink'] .body {
+  fill: var(--bobbin-color-pink);
+}
+
+.coil[data-color='green'] .body {
+  fill: var(--bobbin-color-green);
+}
+
+.coil[data-color='orange'] .body {
+  fill: var(--bobbin-color-orange);
+}

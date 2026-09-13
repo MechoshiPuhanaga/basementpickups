@@ -1,0 +1,64 @@
+.configurator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  inline-size: 100%;
+}
+
+/* The whole pickup, as it will look, beside its coil colour pickers. */
+.coils {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.preview {
+  flex: 0 0 auto;
+  inline-size: 11rem;
+}
+
+.coilFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+/* Colour names are short — keep the colour pickers compact so the preview leads. */
+.coilFields .select {
+  max-inline-size: 12.5rem;
+}
+
+/* Wire / pole pieces / cover / spacing, two per line on wider screens. */
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* Wire names are long ("4-conductor (coil split)") — give that row the full width. */
+.wide {
+  grid-column: 1 / -1;
+}
+
+.note {
+  margin-block-start: var(--space-1);
+}
+
+@media (width <= 480px) {
+  .options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .preview {
+    inline-size: 8.5rem;
+  }
+}

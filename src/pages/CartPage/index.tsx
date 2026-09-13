@@ -8,27 +8,29 @@ import { Price } from '../../design-system/atoms/Price';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
 import { Section } from '../../design-system/layouts/Section';
-import { BobbinConfigurator } from '../../design-system/molecules/BobbinConfigurator';
+import { PickupConfigurator } from '../../design-system/molecules/PickupConfigurator';
 import { useCart, type CartItem } from '../../cart/CartContext';
+import type { PickupConfig } from '../../data/pickupConfig';
 import { getPickupBySlug } from '../../data/pickups';
 import styles from './CartPage.module.css';
 
-/** Per-line bobbin colours, editable in the enquiry; changes merge matching lines. */
+/** Per-line build (colours, wire, pole pieces, cover), editable in the enquiry; changes merge matching lines. */
 function CartLineConfig({
   item,
   onChange,
 }: {
   item: CartItem;
-  onChange: (bobbinId: string, color: string) => void;
+  onChange: (config: PickupConfig) => void;
 }) {
-  const bobbins = getPickupBySlug(item.slug)?.hardware.bobbins;
-  if (bobbins === undefined || bobbins.length === 0) return null;
+  const pickup = getPickupBySlug(item.slug);
+  if (pickup === undefined) return null;
   return (
-    <BobbinConfigurator
+    <PickupConfigurator
       className={styles['config']}
-      bobbins={bobbins}
+      pickup={pickup}
       value={item.config ?? {}}
       onChange={onChange}
+      helpTo="/faq#option-availability"
     />
   );
 }
@@ -128,8 +130,8 @@ export default function CartPage() {
                 </div>
                 <CartLineConfig
                   item={item}
-                  onChange={(bobbinId, color) => {
-                    updateConfig(item.id, bobbinId, color);
+                  onChange={(config) => {
+                    updateConfig(item.id, config);
                   }}
                 />
               </li>

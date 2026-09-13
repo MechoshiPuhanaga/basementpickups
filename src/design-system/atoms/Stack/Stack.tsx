@@ -14,6 +14,8 @@ export interface StackProps {
   align?: StackAlign | undefined;
   justify?: StackJustify | undefined;
   wrap?: boolean | undefined;
+  /** Optional DOM id (e.g. an in-page anchor target). */
+  id?: string | undefined;
   className?: string | undefined;
   children?: ReactNode;
 }
@@ -25,6 +27,7 @@ export function Stack({
   align,
   justify,
   wrap,
+  id,
   className,
   children,
 }: StackProps) {
@@ -32,6 +35,7 @@ export function Stack({
 
   return (
     <Tag
+      id={id}
       className={classes}
       data-direction={direction}
       data-gap={gap}
