@@ -12,12 +12,12 @@ From the repo root:
 
 ```sh
 # 1. Use the pinned Node version
-nvm use                    # picks 24.16.0 from .nvmrc
-# (first time only: nvm install 24.16.0)
+nvm use                    # picks 24.20.0 from .nvmrc
+# (first time only: nvm install 24.20.0)
 
 # 2. Activate the pinned pnpm
 corepack enable
-corepack prepare pnpm@11.2.2 --activate
+corepack prepare pnpm@12.3.4 --activate
 
 # 3. Install dependencies
 pnpm install
@@ -46,15 +46,15 @@ Then open **http://localhost:3000**.
 
 ## Notes
 
-- If `nvm use` says the version isn't installed, run `nvm install 24.16.0` once.
-- If `pnpm --version` shows 9.x instead of 11.2.2, your global pnpm is shadowing corepack's shim. Either rely on the corepack-managed binary in `~/.nvm/versions/node/v<version>/bin/pnpm` or uninstall the global one (`rm -rf ~/.local/share/pnpm/pnpm`).
+- If `nvm use` says the version isn't installed, run `nvm install 24.20.0` once.
+- If `pnpm --version` shows 9.x instead of 12.3.4, your global pnpm is shadowing corepack's shim. Either rely on the corepack-managed binary in `~/.nvm/versions/node/v<version>/bin/pnpm` or uninstall the global one (`rm -rf ~/.local/share/pnpm/pnpm`).
 - The server reads `process.env.PORT || 3000`, so `PORT=4000 pnpm dev` works if 3000 is taken.
 
 ---
 
 ## Tech stack
 
-- **Runtime**: Node 24.16.0 LTS, pnpm 11.2.2
+- **Runtime**: Node 24.20.0 LTS, pnpm 12.3.4
 - **Framework**: React 19 + react-router 7 (library mode) with custom streaming SSR
 - **Bundler**: Vite 8 + `@vitejs/plugin-react`
 - **Server**: Express 5 (Vite middleware in dev, static + SSR in prod)
@@ -91,4 +91,4 @@ design/references/     Approved visual references
 
 ## Deployment
 
-The app is built to deploy to Heroku via Docker. The provided `Dockerfile` uses `node:24.16.0-alpine`, installs with `pnpm install --frozen-lockfile`, runs `pnpm run build`, and starts with `pnpm start`. The server listens on `process.env.PORT || 3000`.
+The app is built to deploy to Heroku via Docker. The provided `Dockerfile` uses `node:24.20.0-alpine`, installs with `pnpm install --frozen-lockfile`, runs `pnpm run build`, and starts with `pnpm start`. The server listens on `process.env.PORT || 3000`.

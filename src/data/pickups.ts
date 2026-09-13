@@ -1,13 +1,7 @@
 export type PickupType = 'humbucker' | 'single' | 'p90';
 
 export type PickupMagnet =
-  | 'alnico-2'
-  | 'alnico-3'
-  | 'alnico-4'
-  | 'alnico-5'
-  | 'alnico-8'
-  | 'ceramic'
-  | 'neodymium';
+  'alnico-2' | 'alnico-3' | 'alnico-4' | 'alnico-5' | 'alnico-8' | 'ceramic' | 'neodymium';
 
 export type PickupPosition = 'neck' | 'middle' | 'bridge';
 

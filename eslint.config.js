@@ -4,6 +4,7 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
+import { fixupPluginRules } from '@eslint/compat';
 
 export default tseslint.config(
   {
@@ -27,7 +28,9 @@ export default tseslint.config(
       },
     },
     plugins: {
-      react: reactPlugin,
+      // eslint-plugin-react 7.37 still uses ESLint 9 APIs (context.getFilename); the
+      // compat wrapper bridges it to ESLint 10. Drop once the plugin supports ESLint 10.
+      react: fixupPluginRules(reactPlugin),
       'react-hooks': reactHooksPlugin,
     },
     settings: {

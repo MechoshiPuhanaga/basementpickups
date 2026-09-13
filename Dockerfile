@@ -1,8 +1,8 @@
-FROM node:24.16.0-alpine
+FROM node:24.20.0-alpine
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@11.2.2 --activate
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 

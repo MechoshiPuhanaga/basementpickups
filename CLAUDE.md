@@ -228,8 +228,8 @@ Use pnpm at project level.
 
 Runtime versions are fixed:
 
-- Node: 24.16.0
-- pnpm: 11.2.2
+- Node: 24.20.0
+- pnpm: 12.3.4
 
 Rules:
 
@@ -250,7 +250,7 @@ Claude should make the application compatible with this deployment model, but sh
 Production assumptions:
 
 - app runs inside Docker
-- base runtime uses Node `24.16.0-alpine`
+- base runtime uses Node `24.20.0-alpine`
 - package manager is pnpm
 - dependencies are installed from `pnpm-lock.yaml`
 - server must listen on `process.env.PORT`
