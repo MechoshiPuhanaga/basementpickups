@@ -108,9 +108,13 @@ interface ParsedRequest {
   readonly isBot: boolean;
 }
 
+/** Which form control a validation message concerns, so the client can mark and focus it. */
+type ContactField = 'name' | 'email' | 'subject' | 'message';
+
 interface InvalidRequest {
   readonly ok: false;
   readonly error: string;
+  readonly field: ContactField;
 }
 
 function readField(body: unknown, key: string): string {
@@ -168,19 +172,28 @@ function parseRequest(body: unknown): ParsedRequest | InvalidRequest {
   const isBot = readField(body, 'company') !== '';
 
   if (name === '' || name.length > MAX.name) {
-    return { ok: false, error: 'Please let us know your name.' };
+    return { ok: false, error: 'Please let us know your name.', field: 'name' };
   }
   if (email === '' || email.length > MAX.email || !EMAIL_PATTERN.test(email)) {
     return {
       ok: false,
       error: "That email address doesn't look right — please double-check it.",
+      field: 'email',
     };
   }
   if (subject.length > MAX.subject) {
-    return { ok: false, error: 'That subject line is a little long — please shorten it.' };
+    return {
+      ok: false,
+      error: 'That subject line is a little long — please shorten it.',
+      field: 'subject',
+    };
   }
   if (message.length > MAX.message) {
-    return { ok: false, error: 'That message is a little long — please trim it.' };
+    return {
+      ok: false,
+      error: 'That message is a little long — please trim it.',
+      field: 'message',
+    };
   }
 
   const items = parseItems((body as Record<string, unknown> | null)?.['items']);
@@ -189,7 +202,11 @@ function parseRequest(body: unknown): ParsedRequest | InvalidRequest {
   // and the message is for any extra custom requirements). For a plain enquiry
   // with no items, a message is required.
   if (items === undefined && message === '') {
-    return { ok: false, error: 'Please add a short message so we know how we can help.' };
+    return {
+      ok: false,
+      error: 'Please add a short message so we know how we can help.',
+      field: 'message',
+    };
   }
 
   const data: ContactPayload = items
@@ -441,7 +458,7 @@ function getClient(apiKey: string): Resend {
 export async function handleContact(req: Request, res: Response): Promise<void> {
   const parsed = parseRequest(req.body);
   if (!parsed.ok) {
-    res.status(400).json({ ok: false, error: parsed.error });
+    res.status(400).json({ ok: false, error: parsed.error, field: parsed.field });
     return;
   }
 

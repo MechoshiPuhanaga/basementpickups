@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router';
 
 import { DecoOrnament } from '../../atoms/DecoOrnament';
@@ -42,6 +43,10 @@ type MenuState = 'closed' | 'open' | 'closing';
 /** Safety net: unmount the overlay even if `animationend` never fires. */
 const EXIT_FALLBACK_MS = 600;
 
+/** Everything keyboard focus can land on inside the dialog (the panel itself is tabindex=-1). */
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 function prefersReducedMotion(): boolean {
   return (
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -61,6 +66,7 @@ export function MobileMenu({
   const rendered = state !== 'closed';
   const { pathname } = useLocation();
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const scrimRef = useRef<HTMLButtonElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   // Begin the exit: animate out unless reduced-motion is on, in which case no
@@ -95,13 +101,38 @@ export function MobileMenu({
     };
   }, [state, finishClose]);
 
-  // Lock body scroll, move focus into the dialog, and restore on close.
+  // While the overlay is on screen (open or animating out): lock body scroll.
+  // Once it is gone, return focus to the trigger — unless something else
+  // claimed focus meanwhile (a route change focuses the new page's main
+  // landmark; the overlay is inert while closing, so focus can't be in it).
   useEffect(() => {
-    if (!open) return;
+    if (!rendered) return;
     const { body } = document;
     const previousOverflow = body.style.overflow;
     const trigger = triggerRef.current;
     body.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousOverflow;
+      const active = document.activeElement;
+      if (active === null || active === body) trigger?.focus();
+    };
+  }, [rendered]);
+
+  // While open: make everything behind the overlay inert (unreachable by
+  // focus, screen-reader exploration and pointer alike), move focus into the
+  // dialog, close on Escape, and wrap Tab. The overlay is portalled to <body>,
+  // so its siblings are exactly "the rest of the page". Inert is lifted as soon
+  // as closing starts so a navigation triggered from the menu can focus the new
+  // page (link clicks close the menu in the same update as the route change).
+  useEffect(() => {
+    if (!open) return;
+    const overlay: readonly (Element | null)[] = [scrimRef.current, dialogRef.current];
+    const background = Array.from(document.body.children).filter(
+      (node): node is HTMLElement =>
+        node instanceof HTMLElement && !overlay.includes(node) && !node.inert,
+    );
+    for (const node of background) node.inert = true;
     dialogRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -111,17 +142,19 @@ export function MobileMenu({
         return;
       }
       if (event.key !== 'Tab') return;
-      const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
-      );
-      if (focusables === undefined || focusables.length === 0) return;
+      const dialog = dialogRef.current;
+      if (dialog === null) return;
+      const focusables = Array.from(
+        dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((node) => node.getClientRects().length > 0);
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       if (first === undefined || last === undefined) return;
-      if (event.shiftKey && document.activeElement === first) {
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || active === dialog)) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && active === last) {
         event.preventDefault();
         first.focus();
       }
@@ -129,9 +162,8 @@ export function MobileMenu({
 
     document.addEventListener('keydown', onKeyDown);
     return () => {
-      body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', onKeyDown);
-      trigger?.focus();
+      for (const node of background) node.inert = false;
     };
   }, [open, close]);
 
@@ -157,119 +189,131 @@ export function MobileMenu({
         </span>
       </button>
 
-      {rendered && (
-        <>
-          <button
-            type="button"
-            className={styles['scrim']}
-            data-state={state}
-            aria-label="Close menu"
-            onClick={close}
-            inert={state === 'closing'}
-          />
-          <div
-            ref={dialogRef}
-            className={styles['panel']}
-            data-state={state}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            tabIndex={-1}
-            inert={state === 'closing'}
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) finishClose();
-            }}
-          >
-            <div className={styles['overlayTop']}>
-              <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
-                <img
-                  src="/assets/logo/BP_Gold_horizont.svg"
-                  alt=""
-                  width={273}
-                  height={100}
-                  className={styles['logo']}
-                />
-              </Link>
-              <button
-                type="button"
-                className={styles['close']}
-                aria-label="Close menu"
-                onClick={close}
-              >
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="square"
-                  aria-hidden="true"
-                  focusable="false"
+      {rendered &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <>
+            {/* Pointer-only dismiss target: the header close button covers keyboard and AT. */}
+            <button
+              ref={scrimRef}
+              type="button"
+              className={styles['scrim']}
+              data-state={state}
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={close}
+              inert={state === 'closing'}
+            />
+            <div
+              ref={dialogRef}
+              className={styles['panel']}
+              data-state={state}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site menu"
+              tabIndex={-1}
+              inert={state === 'closing'}
+              onAnimationEnd={(event) => {
+                if (event.target === event.currentTarget) finishClose();
+              }}
+            >
+              <div className={styles['overlayTop']}>
+                <Link
+                  to="/"
+                  className={styles['brand']}
+                  aria-label="Basement Pickups — home"
+                  onClick={close}
                 >
-                  <path d="M5 5 L19 19" vectorEffect="non-scaling-stroke" />
-                  <path d="M19 5 L5 19" vectorEffect="non-scaling-stroke" />
-                </svg>
-              </button>
-            </div>
+                  <img
+                    src="/assets/logo/BP_Gold_horizont.svg"
+                    alt=""
+                    width={273}
+                    height={100}
+                    className={styles['logo']}
+                  />
+                </Link>
+                <button
+                  type="button"
+                  className={styles['close']}
+                  aria-label="Close menu"
+                  onClick={close}
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="square"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M5 5 L19 19" vectorEffect="non-scaling-stroke" />
+                    <path d="M19 5 L5 19" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                </button>
+              </div>
 
-            <DecoSeparator variant="crest" className={styles['topDivider']} />
+              <DecoSeparator variant="crest" className={styles['topDivider']} />
 
-            <nav aria-label="Primary" className={styles['nav']}>
-              <ul className={styles['list']} role="list">
-                {links.map((link) => (
-                  <li key={link.href} className={styles['item']}>
-                    <NavLink
-                      to={link.href}
-                      end={link.href === '/'}
-                      className={({ isActive }) =>
-                        [styles['link'], isActive ? styles['linkActive'] : undefined]
-                          .filter(Boolean)
-                          .join(' ')
-                      }
-                    >
-                      <NavIcon
-                        name={iconForHref(link.href)}
-                        size={22}
-                        className={styles['linkIcon']}
-                      />
-                      <span className={styles['linkLabel']}>{link.label}</span>
-                      <DecoOrnament
-                        variant="diamond"
-                        filled
-                        size={8}
-                        className={styles['linkDiamond']}
-                      />
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+              <nav aria-label="Primary" className={styles['nav']}>
+                <ul className={styles['list']} role="list">
+                  {links.map((link) => (
+                    <li key={link.href} className={styles['item']}>
+                      <NavLink
+                        to={link.href}
+                        end={link.href === '/'}
+                        onClick={close}
+                        className={({ isActive }) =>
+                          [styles['link'], isActive ? styles['linkActive'] : undefined]
+                            .filter(Boolean)
+                            .join(' ')
+                        }
+                      >
+                        <NavIcon
+                          name={iconForHref(link.href)}
+                          size={22}
+                          className={styles['linkIcon']}
+                        />
+                        <span className={styles['linkLabel']}>{link.label}</span>
+                        <DecoOrnament
+                          variant="diamond"
+                          filled
+                          size={8}
+                          className={styles['linkDiamond']}
+                        />
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
 
-            <DecoSeparator variant="medallion" className={styles['divider']} />
+              <DecoSeparator variant="medallion" className={styles['divider']} />
 
-            <Link to={enquiryHref} className={styles['enquiry']}>
-              <span className={styles['enquiryGlyph']}>
-                <NavIcon name="cart" size={52} />
-                {enquiryCount > 0 && (
-                  <span className={styles['badge']} aria-hidden="true">
-                    {enquiryCount}
-                  </span>
-                )}
-              </span>
-              <span className={styles['enquiryText']}>
-                <span className={styles['enquiryLabel']}>
-                  {enquiryLabel}
+              <Link to={enquiryHref} className={styles['enquiry']} onClick={close}>
+                <span className={styles['enquiryGlyph']}>
+                  <NavIcon name="cart" size={52} />
                   {enquiryCount > 0 && (
-                    <span className={styles['srOnly']}>{`, ${String(enquiryCount)} items`}</span>
+                    <span className={styles['badge']} aria-hidden="true">
+                      {enquiryCount}
+                    </span>
                   )}
                 </span>
-                <span className={styles['enquiryHint']}>View your enquiry list</span>
-              </span>
-            </Link>
-          </div>
-        </>
-      )}
+                <span className={styles['enquiryText']}>
+                  <span className={styles['enquiryLabel']}>
+                    {enquiryLabel}
+                    {enquiryCount > 0 && (
+                      <span className={styles['srOnly']}>{`, ${String(enquiryCount)} items`}</span>
+                    )}
+                  </span>
+                  <span className={styles['enquiryHint']}>View your enquiry list</span>
+                </span>
+              </Link>
+            </div>
+          </>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -9,6 +9,11 @@
  *   pnpm run audit:lighthouse                 # audits the production site
  *   pnpm run audit:lighthouse http://localhost:3000   # audits a local build
  *
+ * For a local *production* build start the server with
+ * `PUBLIC_ORIGIN=http://localhost:<port>` so canonical/OG URLs match the audited
+ * origin (in production they are pinned to https://basementpickups.com, and
+ * Lighthouse's canonical audit fails when it points at another domain).
+ *
  * Requirements: Chrome/Chromium installed. Lighthouse is pulled via `npx` on
  * demand — intentionally NOT a dependency (it's a heavy tree, used only here).
  *
@@ -29,7 +34,12 @@ async function sitemapUrls() {
   const res = await fetch(`${BASE}/sitemap.xml`);
   if (!res.ok) throw new Error(`sitemap fetch failed: ${res.status}`);
   const xml = await res.text();
-  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  // The sitemap advertises the public origin (pinned to the production domain
+  // when NODE_ENV=production), so re-root every path onto the base being
+  // audited — otherwise a local prod build would send us to the live site.
+  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    (m) => new URL(new URL(m[1]).pathname, BASE).href,
+  );
 }
 
 function runLighthouse(url, outPath) {

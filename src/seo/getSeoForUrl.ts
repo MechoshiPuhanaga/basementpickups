@@ -1,5 +1,5 @@
 import type { SeoMeta } from './seoTypes';
-import { getPickupBySlug } from '../data/pickups';
+import { getPickupAndParent } from '../data/pickups';
 import { getArticleBySlug } from '../data/articles';
 
 const SITE_NAME = 'Basement Pickups';
@@ -22,7 +22,7 @@ function withSiteName(title: string): string {
  * Map a source image path to its generated Open Graph JPEG (`<name>-og.jpg`).
  * Non-raster sources (article placeholder SVGs) fall back to the site default.
  */
-function toOgImage(imagePath: string): string {
+export function toOgImage(imagePath: string): string {
   if (/\.(png|jpe?g)$/i.test(imagePath)) {
     return imagePath.replace(/\.(png|jpe?g)$/i, '-og.jpg');
   }
@@ -37,6 +37,8 @@ interface SeoInput {
   readonly ogImage?: string;
   readonly ogImageAlt?: string;
   readonly robots?: string;
+  /** Omit the canonical link (pages that shouldn't be indexed under any URL, e.g. 404). */
+  readonly noCanonical?: boolean;
   readonly article?: SeoMeta['article'];
 }
 
@@ -46,7 +48,7 @@ function build(origin: string, input: SeoInput): SeoMeta {
   return {
     title: input.title,
     description: input.description,
-    canonicalUrl: url,
+    ...(input.noCanonical ? {} : { canonicalUrl: url }),
     ogTitle: input.title,
     ogDescription: input.description,
     ogType: input.ogType,
@@ -118,7 +120,7 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
 
   if (normalized === '/faq') {
     return build(origin, {
-      title: withSiteName('Q&A'),
+      title: withSiteName('Q&A — Lead Times, Specs and Handwork'),
       description:
         'How Basement Pickups are made and measured, and what to expect when you order — lead times, the marks of handwork, batch variation, and measurement conditions.',
       path: '/faq',
@@ -129,7 +131,8 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
   if (normalized === '/contact') {
     return build(origin, {
       title: withSiteName('Contact'),
-      description: 'Get in touch with the Basement Pickups workshop.',
+      description:
+        'Get in touch with the Basement Pickups workshop about a set you have in mind, custom builds, pickup customisation, repairs or lead times.',
       path: '/contact',
       ogType: 'website',
     });
@@ -137,13 +140,17 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
 
   const productMatch = /^\/products\/([^/]+)$/.exec(normalized);
   if (productMatch) {
-    const slug = productMatch[1] ?? '';
-    const pickup = getPickupBySlug(slug);
-    if (pickup) {
+    const found = getPickupAndParent(productMatch[1] ?? '');
+    if (found) {
+      const { pickup, parent } = found;
+      // Neck/bridge variants share the parent's photo, price and spec shape, so
+      // the set page is the one URL search engines should rank; variant pages
+      // keep their own title/description but canonicalise to the parent (and
+      // are left out of the sitemap).
       return build(origin, {
         title: withSiteName(pickup.name),
-        description: pickup.description,
-        path: `/products/${pickup.slug}`,
+        description: pickup.seoDescription,
+        path: `/products/${parent.slug}`,
         ogType: 'product',
         ogImage: pickup.images.main,
         ogImageAlt: `${pickup.name} — Basement Pickups`,
@@ -182,7 +189,9 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
     description: 'The page you are looking for does not exist.',
     path: normalized,
     ogType: 'website',
-    robots: 'noindex, nofollow',
+    // Not indexable, but the recovery links (home, shop) are worth following.
+    robots: 'noindex, follow',
+    noCanonical: true,
   });
 }
 
@@ -198,7 +207,7 @@ export function getStatusForUrl(pathname: string): number {
 
   const productMatch = /^\/products\/([^/]+)$/.exec(normalized);
   if (productMatch) {
-    return getPickupBySlug(productMatch[1] ?? '') !== undefined ? 200 : 404;
+    return getPickupAndParent(productMatch[1] ?? '') !== undefined ? 200 : 404;
   }
 
   const articleMatch = /^\/articles\/([^/]+)$/.exec(normalized);

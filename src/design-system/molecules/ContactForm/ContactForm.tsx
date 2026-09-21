@@ -25,6 +25,35 @@ function buildMailto(email: string, data: ContactFormData, itemsText?: string): 
 
 export type ContactFormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
+export type ContactFormField = 'name' | 'email' | 'subject' | 'message';
+
+const FIELD_IDS: Record<ContactFormField, string> = {
+  name: 'contact-name',
+  email: 'contact-email',
+  subject: 'contact-subject',
+  message: 'contact-message',
+};
+
+/**
+ * Thrown (or rejected) by `onSubmit` to surface a validation problem. With a
+ * `field`, the message is shown under that control, which is marked invalid
+ * and focused; without one it is shown in the form-level status region.
+ */
+export class ContactFormError extends Error {
+  readonly field: ContactFormField | undefined;
+
+  constructor(message: string, field?: ContactFormField) {
+    super(message);
+    this.name = 'ContactFormError';
+    this.field = field;
+  }
+}
+
+interface FieldError {
+  readonly field: ContactFormField;
+  readonly message: string;
+}
+
 export interface ContactFormData {
   readonly name: string;
   readonly email: string;
@@ -87,20 +116,28 @@ export function ContactForm({
 }: ContactFormProps) {
   const [status, setStatus] = useState<ContactFormStatus>('idle');
   const [serverError, setServerError] = useState<string>('');
+  const [fieldError, setFieldError] = useState<FieldError | null>(null);
   const [lastData, setLastData] = useState<ContactFormData | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
   // Bring the result message into view on success/error — on a long form (or
   // phone) it sits below the submit button, off-screen. Screen readers already
   // get it via the live region; this is purely for sighted visibility. SSR-safe
-  // (effects are client-only) and motion-aware.
+  // (effects are client-only) and motion-aware. A field-level error instead
+  // moves focus to the control, which scrolls it into view natively.
   useEffect(() => {
     if (status !== 'success' && status !== 'error') return;
+    if (fieldError !== null) {
+      const control = formRef.current?.elements.namedItem(fieldError.field);
+      if (control instanceof HTMLElement) control.focus();
+      return;
+    }
     const node = statusRef.current;
     if (node === null) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     node.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-  }, [status]);
+  }, [status, fieldError]);
 
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const subjectOptions =
@@ -124,23 +161,52 @@ export function ContactForm({
 
     setStatus('submitting');
     setServerError('');
+    setFieldError(null);
     try {
       await onSubmit(data);
       setStatus('success');
       form.reset();
     } catch (error) {
-      setServerError(error instanceof Error ? error.message : '');
+      if (error instanceof ContactFormError && error.field !== undefined) {
+        setFieldError({ field: error.field, message: error.message });
+      } else {
+        setServerError(error instanceof Error ? error.message : '');
+      }
       setLastData(data);
       setStatus('error');
     }
   }
 
+  /** Invalid state + described-by wiring for one control, when it holds the error. */
+  function invalidProps(field: ContactFormField) {
+    if (fieldError?.field !== field) return {};
+    return { invalid: true, 'aria-describedby': `${FIELD_IDS[field]}-error` };
+  }
+
+  function renderFieldError(field: ContactFormField) {
+    if (fieldError?.field !== field) return null;
+    return (
+      <p id={`${FIELD_IDS[field]}-error`} className={styles['error']}>
+        {fieldError.message}
+      </p>
+    );
+  }
+
   return (
     <form
+      ref={formRef}
       className={classes}
       onSubmit={(event) => {
         event.preventDefault();
         void handleSubmit(event.currentTarget);
+      }}
+      onInput={(event) => {
+        // Editing the flagged control clears its error until the next submit.
+        if (fieldError === null) return;
+        const target = event.target;
+        if (target instanceof HTMLElement && target.id === FIELD_IDS[fieldError.field]) {
+          setFieldError(null);
+        }
       }}
       aria-label="Contact form"
     >
@@ -156,7 +222,9 @@ export function ContactForm({
             required
             autoComplete="name"
             disabled={isSubmitting}
+            {...invalidProps('name')}
           />
+          {renderFieldError('name')}
         </div>
         <div className={styles['field']}>
           <label htmlFor="contact-email" className={styles['label']}>
@@ -169,7 +237,9 @@ export function ContactForm({
             required
             autoComplete="email"
             disabled={isSubmitting}
+            {...invalidProps('email')}
           />
+          {renderFieldError('email')}
         </div>
         <div className={styles['field']}>
           <label htmlFor="contact-subject" className={styles['label']}>
@@ -180,6 +250,7 @@ export function ContactForm({
             name="subject"
             defaultValue={defaultSubject ?? ''}
             disabled={isSubmitting}
+            {...invalidProps('subject')}
           >
             <option value="" disabled>
               Choose a subject
@@ -190,6 +261,7 @@ export function ContactForm({
               </option>
             ))}
           </Select>
+          {renderFieldError('subject')}
         </div>
         <div className={styles['field']}>
           <label htmlFor="contact-message" className={styles['label']}>
@@ -203,7 +275,9 @@ export function ContactForm({
             defaultValue={defaultMessage}
             placeholder={messagePlaceholder}
             disabled={isSubmitting}
+            {...invalidProps('message')}
           />
+          {renderFieldError('message')}
         </div>
 
         {/* Honeypot — hidden from users and assistive tech; bots fill it. */}
@@ -226,6 +300,7 @@ export function ContactForm({
         >
           {status === 'success' && <Callout tone="success">{successMessage}</Callout>}
           {status === 'error' &&
+            fieldError === null &&
             (serverError !== '' ? (
               // A specific validation message from the server — the visitor can fix it.
               <Callout tone="error">{serverError}</Callout>

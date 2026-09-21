@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 import { Link } from 'react-router';
 
 import styles from './Button.module.css';
@@ -17,6 +17,8 @@ export interface ButtonProps extends Omit<
   linkTo?: string | undefined;
   /** Navigation state forwarded to the underlying router Link (only when linkTo is set). */
   linkState?: unknown;
+  /** Forwarded to the native button (ignored when linkTo is set), e.g. for focus management. */
+  ref?: Ref<HTMLButtonElement> | undefined;
 }
 
 export function Button({
@@ -27,6 +29,7 @@ export function Button({
   linkTo,
   linkState,
   type = 'button',
+  ref,
   ...rest
 }: ButtonProps) {
   const classes = [styles['button'], className].filter(Boolean).join(' ');
@@ -46,7 +49,14 @@ export function Button({
   }
 
   return (
-    <button {...rest} type={type} className={classes} data-variant={variant} data-size={size}>
+    <button
+      {...rest}
+      ref={ref}
+      type={type}
+      className={classes}
+      data-variant={variant}
+      data-size={size}
+    >
       <span className={styles['label']}>{children}</span>
     </button>
   );

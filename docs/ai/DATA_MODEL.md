@@ -152,6 +152,9 @@ export type Pickup = {
 
   description: string;
 
+  /** ≤155-char search snippet, written by hand (meta description / og:description). */
+  seoDescription: string;
+
   type: PickupType;
 
   magnet: PickupMagnet;
@@ -227,7 +230,8 @@ aggregate, any differing option is a separate line), `configOptions(pickup, conf
 fixed values so the workshop sees the complete build), and `readStoredConfig`
 (migrates the pre-2026-09 flat `{[bobbinId]: colour}` localStorage shape).
 
-The DS `PickupConfigurator` molecule (`pickup` + `value` + `onChange(next)`) drives
+The DS `PickupConfigurator` molecule (`pickup` + `value` + `onChange(next)` + a required
+visually-hidden `legend`, e.g. `"White Pearl · Neck build"` — it renders as a `<fieldset>`) drives
 both the product-page **Configure** section and each cart line, so both edit a
 build the same way. It shows the `PickupPreview` atom — the whole pickup from
 above (coils stacked as on the real thing, coloured by the chosen tokens, poles

@@ -234,6 +234,7 @@ function AddToEnquiry({ pickup }: { pickup: Pickup }) {
             pickup={pickup}
             value={selection}
             onChange={setSelection}
+            legend={`${pickup.name} build`}
             helpTo="/faq#option-availability"
           />
         </Disclosure>

@@ -26,6 +26,15 @@
   margin-block-start: var(--space-3);
 }
 
+/* Field-level validation message, referenced by the control's aria-describedby. */
+.error {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--type-scale-step-down);
+  line-height: 1.5;
+  color: var(--color-feedback-error);
+}
+
 /* Honeypot: hidden from sighted users, screen readers and tab order alike.
    Bots that auto-fill every field reveal themselves by populating it. */
 .honeypot {

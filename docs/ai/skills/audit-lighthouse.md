@@ -19,6 +19,12 @@ pnpm run audit:lighthouse http://localhost:3000   # audits a local prod build
   `noindex`, so it isn't in the sitemap).
 - Runs Lighthouse on each page and prints a **score table** + a **consolidated
   issue list** (each issue → how many pages it affects).
+- Auditing a **local prod build**: start it with
+  `PUBLIC_ORIGIN=http://localhost:3100 PORT=3100 NODE_ENV=production ./node_modules/.bin/tsx server/index.ts`.
+  In production the public origin is pinned to `https://basementpickups.com`, so without
+  the override every canonical/OG URL points at the live domain and Lighthouse's canonical
+  audit fails (the script itself re-roots sitemap URLs onto the audited base, so discovery
+  still works either way).
 - Requirements: **Chrome/Chromium installed**. Lighthouse is pulled via `npx`
   on demand — deliberately **not a dependency** (heavy tree, used only here).
 
@@ -47,6 +53,8 @@ best-practices (CSP/HSTS/console errors), SEO.
 # Reading the results — known non-issues
 
 - **`/cart` SEO low / "blocked from indexing"** — intentional (`noindex`).
+- **Neck/bridge variant pages aren't audited** — they canonicalise to the set page and
+  are deliberately left out of the sitemap (2026-09-21). Audit one by hand if needed.
 - **`render-blocking resources` / `unused JavaScript`** — expected: prod ships a
   render-blocking CSS `<link>` and one bundle (no route code-splitting, per the
   SSR architecture decision). Only chase with critical-CSS inlining / splitting
@@ -59,7 +67,9 @@ best-practices (CSP/HSTS/console errors), SEO.
 # Common real findings + fixes
 
 - **LCP image lazily loaded** → add `priority` to that `Image` (eager +
-  fetchpriority=high). Only the one above-the-fold LCP image per route.
+  fetchpriority=high). Only the one above-the-fold LCP image per route. For a page whose
+  first viewport is a card grid, use `priorityFirst` on `ProductGrid`/`ArticleGrid` (first
+  card only) instead of touching the card — and leave it off where a hero owns the LCP.
 - **Image without width/height** (`unsized-images`) → add `width`/`height`
   attributes. Photos via the `Image` atom already have them; watch for plain
   `<img>` (e.g. logos).

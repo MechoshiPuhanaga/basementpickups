@@ -10,6 +10,8 @@ import styles from './ArticleCard.module.css';
 
 export interface ArticleCardProps {
   article: Article;
+  /** This card's image is the page's LCP candidate: load it eagerly with high priority. */
+  priority?: boolean | undefined;
   className?: string | undefined;
 }
 
@@ -25,7 +27,7 @@ function formatPublishedAt(iso: string): string {
   return dateFormatter.format(date);
 }
 
-export function ArticleCard({ article, className }: ArticleCardProps) {
+export function ArticleCard({ article, priority = false, className }: ArticleCardProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const dateLabel = formatPublishedAt(article.metadata.publishedAt);
   const metaLabel = `${dateLabel} · ${formatReadingTime(article.body)}`;
@@ -37,7 +39,10 @@ export function ArticleCard({ article, className }: ArticleCardProps) {
           <Image
             src={article.mainImage.src}
             alt=""
+            width={article.mainImage.width}
+            height={article.mainImage.height}
             sizes="(max-width: 768px) 90vw, 33vw"
+            priority={priority}
             className={styles['image']}
           />
         </div>

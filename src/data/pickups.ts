@@ -98,6 +98,8 @@ export interface Pickup {
   readonly slug: string;
   readonly name: string;
   readonly description: string;
+  /** Search-result snippet (≤155 chars): the description distilled, not truncated. */
+  readonly seoDescription: string;
   readonly type: PickupType;
   readonly magnet: PickupMagnet;
   readonly price: number;
@@ -199,6 +201,8 @@ export const pickups: readonly Pickup[] = [
     name: 'White Pearl',
     description:
       'A Strat-style humbucker set built for clarity, openness, and articulation. Airy top end, controlled lows, and a balanced, musical voice that rewards picking dynamics and the volume knob.',
+    seoDescription:
+      'Hand-wound Alnico 4 humbucker set for Strat-style guitars: airy highs, tight lows and a balanced voice that rewards picking dynamics and the volume knob.',
     type: 'humbucker',
     magnet: 'alnico-4',
     price: 125,
@@ -220,6 +224,8 @@ export const pickups: readonly Pickup[] = [
         name: 'White Pearl · Neck',
         description:
           'Designed for players seeking maximum clarity, openness, and articulation from a humbucker-equipped Strat-style guitar. Its relatively low inductance and high resonant frequency create an airy top end with excellent note separation and dynamic response. Clean tones stay sparkling and detailed; overdriven sounds reveal complex harmonic content without becoming harsh. The bass response is intentionally controlled and tight, avoiding the boominess often associated with neck humbuckers.',
+        seoDescription:
+          'Neck humbucker for Strat-style guitars: low inductance for sparkling cleans, clear note separation and tight, controlled bass without the boom.',
         type: 'humbucker',
         magnet: 'alnico-3',
         price: 125,
@@ -247,6 +253,8 @@ export const pickups: readonly Pickup[] = [
         name: 'White Pearl · Bridge',
         description:
           'Complements the neck with additional authority, harmonic richness, and sustain while preserving the set’s overall clarity. Articulate lows, detailed mids, and smooth highs that cut through a mix without sounding aggressive. Rich overtones emerge naturally when driven, making it equally suitable for expressive lead work and rhythm playing.',
+        seoDescription:
+          'Bridge humbucker with authority and sustain: articulate lows, detailed mids and smooth highs that cut through a mix without turning harsh.',
         type: 'humbucker',
         magnet: 'alnico-4',
         price: 125,
@@ -276,6 +284,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Macho Heaven',
     description:
       'A vintage PAF set that captures the sweetness and expressiveness of a classic humbucker while eliminating the muddiness of traditional designs. Warm, open, and highly articulate, with a vocal midrange that flatters both clean and overdriven tones.',
+    seoDescription:
+      'Vintage PAF humbucker set, hand-wound with Alnico 4: warm, open and articulate with a vocal midrange, minus the mud of traditional designs.',
     type: 'humbucker',
     magnet: 'alnico-4',
     price: 140,
@@ -298,6 +308,8 @@ export const pickups: readonly Pickup[] = [
         name: 'Macho Heaven · Neck',
         description:
           'Captures the sweetness and expressiveness of a classic PAF while eliminating the muddiness often found in traditional neck humbuckers. The voice is warm, open, and highly articulate, letting every note within complex chords stay distinct. The low end is tight and controlled while the midrange carries a vocal quality that enhances both clean and overdriven tones. Excels in Les Paul-style guitars where extra clarity and definition are desired.',
+        seoDescription:
+          'PAF-voiced neck humbucker: warm and open with a tight low end and a vocal midrange. Extra clarity and definition for Les Paul-style guitars.',
         type: 'humbucker',
         magnet: 'alnico-3',
         price: 140,
@@ -325,6 +337,8 @@ export const pickups: readonly Pickup[] = [
         name: 'Macho Heaven · Bridge',
         description:
           'Delivers classic PAF dynamics with slightly increased aggression and authority. Despite its vintage output level, it offers impressive articulation and punch, with a focused attack, balanced lows, and smooth highs. The response stays tight and controlled under gain, making it ideal for expressive blues, rock, and classic lead tones.',
+        seoDescription:
+          'PAF-voiced bridge humbucker with added punch and authority: focused attack, balanced lows and smooth highs that stay tight under gain.',
         type: 'humbucker',
         magnet: 'alnico-4',
         price: 140,
@@ -354,6 +368,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Chow Chow',
     description:
       'An Alnico 2 PAF set with the unmistakable warmth and sweetness of the classic late-seventies voice. Rich mids, smooth highs, and natural compression make single notes bloom and chords stay full and balanced.',
+    seoDescription:
+      'Alnico 2 PAF humbucker set with late-seventies warmth: rich mids, smooth highs and natural compression that lets single notes bloom.',
     type: 'humbucker',
     magnet: 'alnico-2',
     price: 140,
@@ -376,6 +392,8 @@ export const pickups: readonly Pickup[] = [
         name: 'Chow Chow · Neck',
         description:
           'Delivers the unmistakable warmth and sweetness associated with classic Alnico 2 PAF designs. Rich mids, smooth highs, and natural compression create an expressive and musical response. Single notes bloom with harmonic complexity while chords remain full and balanced. Particularly well suited to vintage rock, blues, and melodic lead playing.',
+        seoDescription:
+          'Alnico 2 neck humbucker: warm, sweet and naturally compressed, with blooming single notes and full chords for vintage rock, blues and leads.',
         type: 'humbucker',
         magnet: 'alnico-2',
         price: 140,
@@ -403,6 +421,8 @@ export const pickups: readonly Pickup[] = [
         name: 'Chow Chow · Bridge',
         description:
           'Expands on the classic Alnico 2 character with additional midrange presence and sustain. The tone is rich, smooth, and harmonically dense, delivering the iconic vintage rock sound of legendary late-seventies and early-eighties recordings. Dynamic and responsive, it cleans up beautifully with the guitar volume while staying powerful enough for soaring leads and punchy rhythm work.',
+        seoDescription:
+          'Alnico 2 bridge humbucker with extra midrange presence and sustain: the harmonically dense vintage rock voice that cleans up with the volume.',
         type: 'humbucker',
         magnet: 'alnico-2',
         price: 140,
@@ -432,6 +452,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Rockroach',
     description:
       'A high-output rock bridge humbucker developed for classic hard rock and traditional metal. Its Alnico 5 magnet provides strong attack, tight bass, and excellent note definition; articulate highs and focused mids stay clear even under significant distortion — punchy for rhythm, cutting for lead.',
+    seoDescription:
+      'High-output Alnico 5 bridge humbucker for hard rock and metal: strong attack, tight bass and clear, focused mids that hold up under distortion.',
     type: 'humbucker',
     magnet: 'alnico-5',
     price: 125,
@@ -460,6 +482,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Karakonjul',
     description:
       'The most powerful pickup in the lineup, engineered for maximum impact without sacrificing articulation. The Alnico 8 magnet produces immense output, dense mids, and exceptionally tight lows while avoiding muddiness. Harmonics jump effortlessly off the strings, and coil-splitting reveals an unexpectedly balanced, clear voice.',
+    seoDescription:
+      'Our most powerful humbucker: an Alnico 8 bridge pickup with immense output, dense mids and tight lows that stay articulate. Splits cleanly, too.',
     type: 'humbucker',
     magnet: 'alnico-8',
     price: 125,
@@ -488,6 +512,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Little Karakonjul',
     description:
       'A thicker winding wire gives this bridge humbucker a rare combination of low DCR and surprisingly strong output. Fast attack, pronounced harmonics, and exceptional clarity define its character — tight percussive bass, lively overtone-rich highs, and a bold voice far larger than its measured output suggests.',
+    seoDescription:
+      'Thick-wire Alnico 8 bridge humbucker: low DCR yet strong output, with fast attack, tight percussive bass and lively, overtone-rich highs.',
     type: 'humbucker',
     magnet: 'alnico-8',
     price: 140,
@@ -516,6 +542,8 @@ export const pickups: readonly Pickup[] = [
     name: 'Twin Bliss',
     description:
       'A dual-magnet PAF humbucker using two smaller Alnico 5 bar magnets beneath the slug and screw rows rather than a single central magnet. The result is an exceptionally balanced frequency response: velvety cleans in the neck, articulate vintage tones with tight lows and sweet highs in the bridge. A versatile, classic-voiced all-rounder.',
+    seoDescription:
+      'Dual-magnet PAF humbucker with two Alnico 5 bars: velvety neck cleans, articulate vintage bridge tones and a balanced, classic all-round voice.',
     type: 'humbucker',
     magnet: 'alnico-5',
     price: 140,

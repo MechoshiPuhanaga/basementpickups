@@ -9,7 +9,12 @@ import { Heading } from '../../design-system/atoms/Heading';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Text } from '../../design-system/atoms/Text';
 import { Section } from '../../design-system/layouts/Section';
-import { ContactForm, type ContactFormData } from '../../design-system/molecules/ContactForm';
+import {
+  ContactForm,
+  ContactFormError,
+  type ContactFormData,
+  type ContactFormField,
+} from '../../design-system/molecules/ContactForm';
 import { EnquirySummary } from '../../design-system/molecules/EnquirySummary';
 import { useIsHydrated } from '../../utils/useIsHydrated';
 import styles from './ContactPage.module.css';
@@ -73,6 +78,12 @@ function formatItemsText(items: readonly CartItem[]): string {
  * (4xx) the server's specific message is surfaced; for system failures (5xx) we
  * throw without a message so the form shows its own fallback (with a mailto).
  */
+const CONTACT_FORM_FIELDS: readonly ContactFormField[] = ['name', 'email', 'subject', 'message'];
+
+function isContactFormField(value: unknown): value is ContactFormField {
+  return typeof value === 'string' && (CONTACT_FORM_FIELDS as readonly string[]).includes(value);
+}
+
 async function postEnquiry(
   data: ContactFormData,
   items: readonly CartItem[] | undefined,
@@ -91,15 +102,17 @@ async function postEnquiry(
 
   if (!response.ok) {
     let message = '';
+    let field: ContactFormField | undefined;
     if (response.status >= 400 && response.status < 500) {
       try {
-        const body = (await response.json()) as { error?: unknown };
+        const body = (await response.json()) as { error?: unknown; field?: unknown };
         if (typeof body.error === 'string') message = body.error;
+        if (isContactFormField(body.field)) field = body.field;
       } catch {
         // Non-JSON error response — fall back to the form's default message.
       }
     }
-    throw new Error(message);
+    throw new ContactFormError(message, field);
   }
 }
 

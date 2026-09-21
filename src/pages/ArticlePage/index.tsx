@@ -70,6 +70,8 @@ export default function ArticlePage() {
             <Image
               src={article.mainImage.src}
               alt={article.mainImage.alt}
+              width={article.mainImage.width}
+              height={article.mainImage.height}
               sizes="(max-width: 768px) 90vw, 720px"
               priority
               className={styles['hero']}

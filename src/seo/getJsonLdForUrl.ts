@@ -10,6 +10,7 @@ import {
 } from '../data/pickupLabels';
 import { getArticleBySlug } from '../data/articles';
 import { FAQ_ITEMS } from '../data/faq';
+import { toOgImage } from './getSeoForUrl';
 
 const SITE_NAME = 'Basement Pickups';
 const SITE_DESCRIPTION =
@@ -18,6 +19,9 @@ const PRICE_CURRENCY = 'EUR';
 // Pickups are wound to order rather than held as stock — schema.org/MadeToOrder
 // is the honest availability for the enquiry-based (no checkout) model.
 const AVAILABILITY = 'https://schema.org/MadeToOrder';
+const ITEM_CONDITION = 'https://schema.org/NewCondition';
+/** Square raster logo (the PWA icon); schema.org wants a real logo image here, not a photo. */
+const LOGO_PATH = '/icons/icon-512.png';
 
 const MAGNET_LABEL: Record<string, string> = {
   'alnico-2': 'Alnico 2',
@@ -107,7 +111,15 @@ function organizationLd(base: string): JsonLd {
     name: SITE_NAME,
     url: `${base}/`,
     description: SITE_DESCRIPTION,
-    logo: `${base}/assets/images/spirit-photos/bp-spirit-1-og.jpg`,
+    logo: `${base}${LOGO_PATH}`,
+  };
+}
+
+function publisherLd(base: string): JsonLd {
+  return {
+    '@type': 'Organization',
+    name: SITE_NAME,
+    logo: { '@type': 'ImageObject', url: `${base}${LOGO_PATH}`, width: 512, height: 512 },
   };
 }
 
@@ -117,6 +129,9 @@ function websiteLd(base: string): JsonLd {
     '@type': 'WebSite',
     name: SITE_NAME,
     url: `${base}/`,
+    description: SITE_DESCRIPTION,
+    inLanguage: 'en',
+    publisher: publisherLd(base),
   };
 }
 
@@ -131,12 +146,15 @@ function productLd(base: string, pickup: Pickup): JsonLd {
           highPrice: Math.max(...variants.map((v) => v.price)),
           offerCount: variants.length,
           availability: AVAILABILITY,
+          itemCondition: ITEM_CONDITION,
+          url: `${base}/products/${pickup.slug}`,
         }
       : {
           '@type': 'Offer',
           priceCurrency: PRICE_CURRENCY,
           price: pickup.price,
           availability: AVAILABILITY,
+          itemCondition: ITEM_CONDITION,
           url: `${base}/products/${pickup.slug}`,
         };
 
@@ -236,7 +254,10 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
             ? { dateModified: article.metadata.updatedAt }
             : {}),
           author: { '@type': 'Organization', name: article.metadata.author ?? SITE_NAME },
-          publisher: { '@type': 'Organization', name: SITE_NAME },
+          publisher: publisherLd(base),
+          // Articles still use placeholder SVGs, which fall back to the site's
+          // default 1200x630 image; swap in real photos when they exist.
+          image: `${base}${toOgImage(article.mainImage.src)}`,
           url: `${base}/articles/${article.slug}`,
           mainEntityOfPage: `${base}/articles/${article.slug}`,
         },

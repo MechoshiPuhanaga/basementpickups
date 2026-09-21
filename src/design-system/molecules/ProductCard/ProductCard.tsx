@@ -11,6 +11,8 @@ import styles from './ProductCard.module.css';
 
 export interface ProductCardProps {
   pickup: Pickup;
+  /** This card's photo is the page's LCP candidate: load it eagerly with high priority. */
+  priority?: boolean | undefined;
   className?: string | undefined;
 }
 
@@ -20,7 +22,7 @@ const TYPE_LABEL: Record<PickupType, string> = {
   p90: 'P-90',
 };
 
-export function ProductCard({ pickup, className }: ProductCardProps) {
+export function ProductCard({ pickup, priority = false, className }: ProductCardProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
@@ -32,6 +34,7 @@ export function ProductCard({ pickup, className }: ProductCardProps) {
               src={pickup.images.main}
               alt=""
               sizes="(max-width: 768px) 90vw, 33vw"
+              priority={priority}
               className={styles['image']}
             />
           </div>

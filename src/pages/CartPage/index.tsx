@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Button } from '../../design-system/atoms/Button';
@@ -30,6 +31,7 @@ function CartLineConfig({
       pickup={pickup}
       value={item.config ?? {}}
       onChange={onChange}
+      legend={`${item.name} build`}
       helpTo="/faq#option-availability"
     />
   );
@@ -38,6 +40,29 @@ function CartLineConfig({
 export default function CartPage() {
   const { items, subtotal, setQty, remove, updateConfig, clear } = useCart();
   const navigate = useNavigate();
+
+  // Removing a line unmounts the button that was pressed, which would drop
+  // keyboard focus to <body>. Remember where focus should land instead — the
+  // neighbouring line's Remove button, or the page's main landmark when the
+  // list becomes empty — and move it once the list has re-rendered.
+  const removeButtons = useRef(new Map<string, HTMLButtonElement>());
+  const pendingFocus = useRef<string | null>(null);
+  useEffect(() => {
+    const target = pendingFocus.current;
+    if (target === null) return;
+    pendingFocus.current = null;
+    const button = removeButtons.current.get(target);
+    if (button !== undefined) button.focus();
+    else document.getElementById('main')?.focus();
+  }, [items]);
+
+  function removeLine(index: number): void {
+    const line = items[index];
+    if (line === undefined) return;
+    const neighbour = items[index + 1] ?? items[index - 1];
+    pendingFocus.current = neighbour?.id ?? '';
+    remove(line.id);
+  }
 
   if (items.length === 0) {
     return (
@@ -81,7 +106,7 @@ export default function CartPage() {
           </Stack>
 
           <ul className={styles['list']} role="list">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <li key={item.id} className={styles['row']}>
                 <div className={styles['rowMain']}>
                   <div className={styles['name']}>
@@ -96,6 +121,7 @@ export default function CartPage() {
                     <IconButton
                       label={`Decrease ${item.name} quantity`}
                       variant="outlined"
+                      disabled={item.qty <= 1}
                       onClick={() => {
                         setQty(item.id, item.qty - 1);
                       }}
@@ -118,10 +144,15 @@ export default function CartPage() {
                   </div>
                   <div className={styles['removeCell']}>
                     <Button
+                      ref={(node) => {
+                        if (node === null) removeButtons.current.delete(item.id);
+                        else removeButtons.current.set(item.id, node);
+                      }}
                       variant="ghost"
                       size="sm"
+                      aria-label={`Remove ${item.name} from enquiry`}
                       onClick={() => {
-                        remove(item.id);
+                        removeLine(index);
                       }}
                     >
                       Remove

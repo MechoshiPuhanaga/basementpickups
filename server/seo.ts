@@ -17,9 +17,12 @@ export function renderSeoTags(seo: SeoMeta): string {
   const tags: string[] = [
     `<title>${e(seo.title)}</title>`,
     `<meta name="description" content="${e(seo.description)}" />`,
-    `<link rel="canonical" href="${e(seo.canonicalUrl)}" />`,
+    ...(seo.canonicalUrl !== undefined
+      ? [`<link rel="canonical" href="${e(seo.canonicalUrl)}" />`]
+      : []),
     ...(seo.robots !== undefined ? [`<meta name="robots" content="${e(seo.robots)}" />`] : []),
     `<meta property="og:site_name" content="${e(SITE_NAME)}" />`,
+    `<meta property="og:locale" content="en_GB" />`,
     `<meta property="og:type" content="${e(seo.ogType)}" />`,
     `<meta property="og:title" content="${e(seo.ogTitle)}" />`,
     `<meta property="og:description" content="${e(seo.ogDescription)}" />`,

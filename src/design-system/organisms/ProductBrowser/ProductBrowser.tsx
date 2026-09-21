@@ -221,7 +221,7 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
         </div>
       </div>
       {visible.length > 0 ? (
-        <ProductGrid pickups={visible} />
+        <ProductGrid pickups={visible} priorityFirst />
       ) : (
         <Text variant="editorial" tone="muted" align="center">
           No pickups match that magnet. Try a different filter.

@@ -2,6 +2,9 @@ export interface ArticleImage {
   readonly src: string;
   readonly alt: string;
   readonly caption?: string;
+  /** Intrinsic size (placeholder SVGs are 400×300); lets the layout reserve space. */
+  readonly width: number;
+  readonly height: number;
 }
 
 export interface ArticleMetadata {
@@ -52,6 +55,8 @@ So when someone asks what a PAF sounds like, the honest answer is that it does n
     keywords: ['PAF', 'vintage pickups', 'humbucker', 'tone', 'alnico'],
     mainImage: {
       src: '/assets/images/articles/the-language-of-paf/main.svg',
+      width: 400,
+      height: 300,
       alt: 'A vintage-style humbucker photographed on a dark workshop bench',
       caption: 'A low-output humbucker with aged-nickel cover.',
     },
@@ -87,6 +92,8 @@ When a coil comes off the bench scatter-wound well, you can feel it before you m
     keywords: ['scatter winding', 'craft', 'workshop', 'coil', 'tone'],
     mainImage: {
       src: '/assets/images/articles/scatter-winding-by-hand/main.svg',
+      width: 400,
+      height: 300,
       alt: 'Close-up of copper magnet wire being scatter-wound on a bobbin',
       caption: 'Scatter winding introduces subtle inconsistencies that shape harmonic response.',
     },
@@ -122,6 +129,8 @@ What all of this honors is a simple truth: a pickup is a system, and the magnet 
     keywords: ['magnets', 'alnico', 'aging', 'tone', 'vintage'],
     mainImage: {
       src: '/assets/images/articles/aging-an-alnico-magnet/main.svg',
+      width: 400,
+      height: 300,
       alt: 'A set of Alnico bar magnets photographed against dark felt',
       caption: 'Alnico 2 bar magnets, partially de-gaussed for a softer field.',
     },
@@ -158,6 +167,8 @@ None of this is glamorous, and none of it shows up in a demo video. But it is th
     keywords: ['installation', 'wiring', 'workshop', 'pots', 'shielding'],
     mainImage: {
       src: '/assets/images/articles/installation-without-regret/main.svg',
+      width: 400,
+      height: 300,
       alt: 'A guitar control cavity photographed under warm workshop lighting, partially wired',
       caption: 'A control cavity mid-wire, before the back plate goes on.',
     },

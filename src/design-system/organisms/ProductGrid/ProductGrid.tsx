@@ -12,6 +12,12 @@ export interface ProductGridProps {
   title?: string | undefined;
   lead?: string | undefined;
   columns?: GridColumns | undefined;
+  /**
+   * The grid is the first thing in the viewport (e.g. the shop page), so its
+   * first card is the LCP candidate and loads with high priority. Leave off
+   * when something above it (a hero) already owns the LCP.
+   */
+  priorityFirst?: boolean | undefined;
   className?: string | undefined;
 }
 
@@ -21,6 +27,7 @@ export function ProductGrid({
   title,
   lead,
   columns = 3,
+  priorityFirst = false,
   className,
 }: ProductGridProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
@@ -49,8 +56,8 @@ export function ProductGrid({
           </Stack>
         )}
         <Grid columns={columns} mobileColumns={2} gap="lg" align="stretch">
-          {pickups.map((pickup) => (
-            <ProductCard key={pickup.id} pickup={pickup} />
+          {pickups.map((pickup, index) => (
+            <ProductCard key={pickup.id} pickup={pickup} priority={priorityFirst && index === 0} />
           ))}
         </Grid>
       </Stack>

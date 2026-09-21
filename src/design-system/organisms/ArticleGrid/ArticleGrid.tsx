@@ -12,6 +12,12 @@ export interface ArticleGridProps {
   title?: string | undefined;
   lead?: string | undefined;
   columns?: GridColumns | undefined;
+  /**
+   * The grid is the first thing in the viewport (e.g. the articles index), so
+   * its first card is the LCP candidate and loads with high priority. Leave
+   * off when something above it (a hero) already owns the LCP.
+   */
+  priorityFirst?: boolean | undefined;
   className?: string | undefined;
 }
 
@@ -21,6 +27,7 @@ export function ArticleGrid({
   title,
   lead,
   columns = 3,
+  priorityFirst = false,
   className,
 }: ArticleGridProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
@@ -49,8 +56,12 @@ export function ArticleGrid({
           </Stack>
         )}
         <Grid columns={columns} gap="xl" align="start">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
+          {articles.map((article, index) => (
+            <ArticleCard
+              key={article.id}
+              article={article}
+              priority={priorityFirst && index === 0}
+            />
           ))}
         </Grid>
       </Stack>

@@ -100,7 +100,7 @@ export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
         </div>
       </div>
       {visible.length > 0 ? (
-        <ArticleGrid articles={visible} />
+        <ArticleGrid articles={visible} priorityFirst />
       ) : (
         <Text variant="editorial" tone="muted" align="center">
           No articles match that topic. Try another.

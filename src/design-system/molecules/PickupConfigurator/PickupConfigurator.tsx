@@ -4,6 +4,7 @@ import { PickupPreview } from '../../atoms/PickupPreview';
 import { Select } from '../../atoms/Select';
 import { Text } from '../../atoms/Text';
 import { TextLink } from '../../atoms/TextLink';
+import { VisuallyHidden } from '../../atoms/VisuallyHidden';
 import { bobbinColorLabel } from '../../../data/bobbinColors';
 import { deriveBobbinLabels } from '../../../data/bobbins';
 import { resolveConfig, type PickupConfig } from '../../../data/pickupConfig';
@@ -25,6 +26,11 @@ export interface PickupConfiguratorProps {
   value: PickupConfig;
   /** Receives the complete, resolved build after any change. */
   onChange: (next: PickupConfig) => void;
+  /**
+   * Screen-reader name for the whole group of controls (e.g. "White Pearl
+   * build"), so identical labels on several configurators stay distinguishable.
+   */
+  legend: string;
   /** Where the "options may vary" note links to (e.g. `/faq#option-availability`). */
   helpTo?: string | undefined;
   className?: string | undefined;
@@ -107,6 +113,7 @@ export function PickupConfigurator({
   pickup,
   value,
   onChange,
+  legend,
   helpTo,
   className,
 }: PickupConfiguratorProps) {
@@ -209,7 +216,8 @@ export function PickupConfigurator({
   }
 
   return (
-    <div className={classes}>
+    <fieldset className={classes}>
+      <VisuallyHidden as="legend">{legend}</VisuallyHidden>
       {bobbins.length > 0 && (
         <div className={styles['coils']}>
           <PickupPreview
@@ -246,6 +254,6 @@ export function PickupConfigurator({
           <TextLink to={helpTo}>What happens if my choice is not in stock?</TextLink>
         </Text>
       )}
-    </div>
+    </fieldset>
   );
 }

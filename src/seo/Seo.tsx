@@ -23,8 +23,12 @@ function upsertMeta(attr: 'name' | 'property', key: string, content: string): vo
   el.setAttribute('content', content);
 }
 
-function upsertCanonical(href: string): void {
+function upsertCanonical(href: string | undefined): void {
   let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (href === undefined) {
+    el?.remove();
+    return;
+  }
   if (el === null) {
     el = document.createElement('link');
     el.rel = 'canonical';

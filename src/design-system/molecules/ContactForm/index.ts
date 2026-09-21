@@ -1,2 +1,2 @@
-export { ContactForm } from './ContactForm';
-export type { ContactFormProps, ContactFormData } from './ContactForm';
+export { ContactForm, ContactFormError } from './ContactForm';
+export type { ContactFormProps, ContactFormData, ContactFormField } from './ContactForm';

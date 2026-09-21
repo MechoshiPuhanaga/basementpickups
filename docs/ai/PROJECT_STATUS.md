@@ -14,6 +14,7 @@ All six pages + the enquiry cart, the full design system, the real product catal
 
 - ~~Image optimization~~ — **done 2026-06-21**: AVIF/WebP responsive derivatives + DS `Image` atom (`<picture>`); ~2 MB PNGs now serve at ~6–55 KB. See session log.
 - **Manual browser/AT testing** — accessibility (screen reader, keyboard, 200%/320px reflow) and PWA (install prompt, offline reload) need a real-browser pass; can't be done headless.
+- **Real article photos** would also unlock proper `BlogPosting.image` / per-article link previews (JSON-LD now points at the default OG image).
 - Real **article photos** (still placeholder SVGs — they fall back to the default OG image in link previews until replaced).
 
 **Responsive pass: done** (developer-confirmed 2026-06-27). `MobileMenu` organism (burger → full-screen dialog overlay) via `MobileNav` + `NavIcon`; collapsible shop/article filters; responsive restacking across `ProductBrowser` / `ArticleBrowser` / `ProductGrid` / `Grid` / `ProductCard`; tighter `Section` top padding on mobile; `DecoSeparator` `crest` rule. Roadmap items 1 (responsive) **done** and 2 (Art Deco expansion) **dropped as not actual**.
@@ -374,6 +375,98 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-09-21 — SEO + a11y evaluation; a11y fixes (batch A)
+
+**Evaluation.** Lighthouse on a local prod build, all 23 sitemap pages: **a11y 100, SEO 100,
+best-practices 100** everywhere (perf 61–81 locally = no compression on localhost; Cloudflare
+compresses live — not a regression). Two code-level reviews (a11y + technical SEO) found the
+remaining gaps that automation can't see. **A11y batch A is done (below); SEO batch B is
+proposed, not started** — see "Open" at the end of this entry.
+
+**A11y fixes (DS first, then pages/server).** Verified with a headless-Chrome script
+(22/22 checks: menu inert/trap/focus, cart naming/focus, contact field errors) plus a full
+Lighthouse re-run; typecheck / lint / stylelint / prettier / build green.
+
+- **Form atoms focus ring** (`Input`/`Select`/`Textarea` CSS): removed `outline: none` from
+  `:focus-visible` so the global gold ring shows on top of the gold border (2.4.7 / 2.4.13).
+- **`Callout`** border mix 42% → 65% so the box outline clears ~3:1 (was ~2.3:1).
+- **`PickupPreview`**: dropped the redundant `<title>` (kept `role="img"` + `aria-label`).
+- **`Button`** gained a `ref` pass-through (native button only) for focus management.
+- **`PickupConfigurator`** is now a `<fieldset>` with a required visually-hidden `legend`
+  prop (`"<pickup name> build"`), so identical "Slug coil / Wire / …" selects on several cart
+  lines stay distinguishable (1.3.1 / 2.4.6). Product page + cart pass it.
+- **`ContactForm` field-level errors**: new exported `ContactFormError(message, field?)`
+  (+ `ContactFormField` type). With a `field`, the message renders under that control
+  (`.error`), the control gets `invalid` + `aria-describedby`, focus moves to it, and the
+  form-level live region stays empty (no double announce); editing the field clears it.
+  Without a field, behaviour is unchanged (status Callout + mailto fallback). 3.3.1 / 3.3.3.
+  **Server**: `server/contact.ts` 400 responses now include
+  `field: 'name'|'email'|'subject'|'message'`; `ContactPage` maps it into `ContactFormError`.
+- **`MobileMenu`**: overlay is now **portalled to `<body>`** and every other body child is
+  `inert` while open (focus, AT exploration and pointer can't reach the page behind); inert is
+  lifted as soon as closing starts so a link tap can focus the new page's `#main` (links also
+  call `close()` in the same update as the navigation). Focus returns to the burger only if
+  nothing else took focus. Focus trap now uses the standard focusable selector and skips
+  hidden nodes; the scrim is `aria-hidden` + `tabindex=-1` (pointer-only; the header close
+  button covers keyboard/AT), so AT no longer sees two "Close menu" buttons. Scroll lock is
+  released when the overlay is gone, not at closing start.
+- **Cart page**: "Remove" buttons are named per item (`aria-label="Remove <name> from
+enquiry"`); the "−" button is **disabled at qty 1** (removal is only the explicit Remove);
+  after a removal focus moves to the neighbouring line's Remove button, or to `#main` when
+  the list empties; `CartAnnouncer` now says "Your enquiry list is empty" at 0 instead of
+  going blank.
+
+**Verified fine (no change needed):** heading order, landmarks, skip link, reduced motion,
+`aria-current` on nav, labels on all controls, live regions, decorative SVGs hidden, all
+colour tokens added since June ≥ 6.7:1 for text. `Disclosure` heading duplication is
+`display: none` (only one exposed to AT).
+
+**Open (a11y):** `ProductGallery` thumbnails (dormant — no product has gallery images) have
+no accessible name and fake a tabs pattern; fix when galleries land (plain buttons +
+`aria-pressed` + name). Optional: suppress the "N items in your enquiry" announcement on
+first hydration; DOM breadcrumbs.
+
+**SEO batch B — done (same day, developer-approved; B1 chosen for variants).** Verified with
+curl against a local prod build (canonical/og:url, 404 headers, 301s, robots, sitemap,
+llms.txt, JSON-LD fields) + a full Lighthouse re-run; all gates green.
+
+- **`seoDescription`** (new required `Pickup` field): 13 hand-written ≤155-char snippets, used
+  for `meta description` + `og:description`. The long `description` stays on-page, in
+  `Product` JSON-LD and in `llms.txt` (variants use the short one there).
+- **Variant canonical (B1)**: `/products/<x>-neck|bridge` canonicalise (and `og:url`) to the
+  set page via `getPickupAndParent`; only set pages are in the sitemap (23 → 17 URLs).
+  Titles/descriptions stay variant-specific.
+- **`PUBLIC_ORIGIN`** (`server/index.ts`): canonical/OG/sitemap/robots/llms origin is pinned
+  to `https://basementpickups.com` in production (env override), request-derived in dev.
+  **Gotcha:** a local `NODE_ENV=production` preview now emits live-domain URLs — start it with
+  `PUBLIC_ORIGIN=http://localhost:<port>` for local audits (skill doc updated; the audit
+  script also re-roots sitemap URLs onto the audited base).
+- **Trailing slash** (except `/`) → 301 to the slash-less URL, query preserved.
+- **404**: `noindex, follow` and no canonical (`SeoMeta.canonicalUrl` is now optional;
+  server + client `Seo` handle absence).
+- **Head**: `og:locale=en_GB`; PNG favicon fallback (`/icons/icon-192.png`) beside the SVG.
+- **Crawler files**: `robots.txt` disallows `/cart` + `/api/`; robots/sitemap/llms get
+  `Cache-Control: public, max-age=3600`; sitemap `<loc>` is XML-escaped; `llms.txt` lists
+  `/` and nests variants under their set.
+- **JSON-LD**: `Organization.logo` → `/icons/icon-512.png`; `WebSite` gains
+  `description`/`inLanguage`/`publisher`; `Offer`/`AggregateOffer` carry `url` +
+  `itemCondition: NewCondition`; `BlogPosting` gains `image` (default OG until real article
+  photos) + `publisher.logo`.
+- **Copy**: contact description lengthened; Q&A title "Q&A — Lead Times, Specs and Handwork".
+- **LCP image priority on grid pages** (from the developer's DevTools Lighthouse on `/shop`:
+  first product photo was lazy + no fetchpriority): `ProductCard`/`ArticleCard` gained
+  `priority`; `ProductGrid`/`ArticleGrid` gained `priorityFirst` (first card only);
+  `ProductBrowser` (shop) and `ArticleBrowser` (articles index) set it. Home does **not** — its
+  hero already owns the LCP (one high-priority image per route, per the audit skill).
+- **Article placeholder images sized**: `ArticleImage` gained required `width`/`height`
+  (400×300 for the SVG placeholders); the `Image` atom accepts them for non-manifest sources,
+  so the article hero and cards no longer trip Lighthouse `unsized-images` (CSS still owns the
+  rendered aspect ratio).
+- **Not done, on purpose**: sitemap `lastmod` for products/static (no real dates — faking it
+  makes Google ignore the field); host→domain 301 (Cloudflare already redirects www/http;
+  a server-side redirect risks a loop if `PUBLIC_ORIGIN` is ever mis-set); DOM breadcrumbs;
+  `CollectionPage`/`ItemList` on shop/articles; route code splitting (deliberate SSR choice).
 
 ## 2026-06-27 — Bobbin-colour customization (roadmap item 4)
 

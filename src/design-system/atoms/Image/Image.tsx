@@ -10,6 +10,12 @@ export interface ImageProps {
   sizes?: string | undefined;
   /** Above-the-fold / LCP image: load eagerly with high fetch priority. */
   priority?: boolean | undefined;
+  /**
+   * Intrinsic size for sources that aren't in the manifest (SVGs), so the
+   * browser can reserve space before load. Manifest entries carry their own.
+   */
+  width?: number | undefined;
+  height?: number | undefined;
   className?: string | undefined;
 }
 
@@ -24,14 +30,24 @@ function toSrcSet(variants: readonly ImageVariant[]): string {
  * the manifest (SVGs, anything un-optimized) render as a plain `<img>`, so the
  * atom is safe for every image in the app.
  */
-export function Image({ src, alt, sizes, priority = false, className }: ImageProps) {
+export function Image({ src, alt, sizes, priority = false, width, height, className }: ImageProps) {
   const entry = imageManifest[src];
   const loadingProps = priority
     ? ({ loading: 'eager', fetchPriority: 'high' } as const)
     : ({ loading: 'lazy' } as const);
 
   if (entry === undefined) {
-    return <img src={src} alt={alt} className={className} decoding="async" {...loadingProps} />;
+    return (
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        decoding="async"
+        {...loadingProps}
+      />
+    );
   }
 
   return (

@@ -16,6 +16,15 @@ const __dirname = path.dirname(__filename);
 
 const isProd = process.env['NODE_ENV'] === 'production';
 const PORT = Number(process.env['PORT']) || 3000;
+// Public origin for canonical/OG URLs, sitemap, robots and llms.txt. In
+// production this must never follow the request Host (a direct *.herokuapp.com
+// hit would otherwise declare itself canonical); in dev it follows the request
+// so localhost previews stay self-consistent. Override with PUBLIC_ORIGIN.
+const PUBLIC_ORIGIN = (
+  process.env['PUBLIC_ORIGIN'] ?? (isProd ? 'https://basementpickups.com' : '')
+)
+  .trim()
+  .replace(/\/+$/, '');
 const ROOT = path.resolve(__dirname, '..');
 const ABORT_DELAY_MS = 10_000;
 
@@ -105,9 +114,8 @@ async function createDevViteServer(): Promise<ViteDevServer> {
 }
 
 function buildFetchRequest(req: express.Request): Request {
-  const host = req.get('host') ?? 'localhost';
-  const protocol = req.protocol || 'http';
-  const requestUrl = `${protocol}://${host}${req.originalUrl}`;
+  // The origin feeds the SSR SEO layer (canonical/OG URLs); the path drives routing.
+  const requestUrl = `${getRequestOrigin(req)}${req.originalUrl}`;
 
   const headers = new Headers();
   for (const [name, value] of Object.entries(req.headers)) {
@@ -123,18 +131,34 @@ function buildFetchRequest(req: express.Request): Request {
 }
 
 function getRequestOrigin(req: express.Request): string {
+  if (PUBLIC_ORIGIN !== '') return PUBLIC_ORIGIN;
   const host = req.get('host') ?? `localhost:${String(PORT)}`;
   const proto = req.protocol || 'http';
   return `${proto}://${host}`;
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 function buildRobotsTxt(origin: string): string {
-  return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
+  // /cart is noindex and per-visitor; /api is not a page.
+  return `User-agent: *\nAllow: /\nDisallow: /cart\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
 }
 
 function buildLlmsTxt(origin: string): string {
   const products = pickups
-    .map((p) => `- [${p.name}](${origin}/products/${p.slug}): ${p.description}`)
+    .flatMap((p) => [
+      `- [${p.name}](${origin}/products/${p.slug}): ${p.description}`,
+      ...(p.variants ?? []).map(
+        (v) => `  - [${v.name}](${origin}/products/${v.slug}): ${v.seoDescription}`,
+      ),
+    ])
     .join('\n');
   const posts = articles
     .map((a) => `- [${a.headline}](${origin}/articles/${a.slug}): ${a.excerpt}`)
@@ -148,6 +172,7 @@ Basement Pickups is a boutique workshop building hand-wound electric guitar pick
 
 ## Pages
 
+- [Home](${origin}/): The brand, featured pickups, and the latest articles.
 - [Shop](${origin}/shop): The full collection of available pickups.
 - [About](${origin}/about): The workshop, the craft, and the philosophy.
 - [Articles](${origin}/articles): Editorial on winding, tone, magnets, and process.
@@ -174,11 +199,10 @@ function buildSitemapXml(origin: string): string {
     '/contact',
   ].map((path) => ({ path }));
 
+  // Neck/bridge variant pages canonicalise to their set page (see
+  // getSeoForUrl), so only the set is listed.
   for (const pickup of pickups) {
     entries.push({ path: `/products/${pickup.slug}` });
-    for (const variant of pickup.variants ?? []) {
-      entries.push({ path: `/products/${variant.slug}` });
-    }
   }
 
   for (const article of articles) {
@@ -191,7 +215,7 @@ function buildSitemapXml(origin: string): string {
   const urls = entries
     .map(({ path: urlPath, lastmod }) => {
       const lastmodTag = lastmod !== undefined ? `<lastmod>${lastmod}</lastmod>` : '';
-      return `  <url><loc>${origin}${urlPath}</loc>${lastmodTag}</url>`;
+      return `  <url><loc>${escapeXml(`${origin}${urlPath}`)}</loc>${lastmodTag}</url>`;
     })
     .join('\n');
 
@@ -255,16 +279,38 @@ async function start(): Promise<void> {
     void handleContact(req, res);
   });
 
+  // Crawler files are cheap to rebuild but change only on deploy; let caches
+  // (and Cloudflare) hold them for an hour.
+  const CRAWLER_CACHE_CONTROL = 'public, max-age=3600';
+
   app.get('/robots.txt', (req, res) => {
+    res.setHeader('Cache-Control', CRAWLER_CACHE_CONTROL);
     res.type('text/plain').send(buildRobotsTxt(getRequestOrigin(req)));
   });
 
   app.get('/sitemap.xml', (req, res) => {
+    res.setHeader('Cache-Control', CRAWLER_CACHE_CONTROL);
     res.type('application/xml').send(buildSitemapXml(getRequestOrigin(req)));
   });
 
   app.get('/llms.txt', (req, res) => {
+    res.setHeader('Cache-Control', CRAWLER_CACHE_CONTROL);
     res.type('text/plain').send(buildLlmsTxt(getRequestOrigin(req)));
+  });
+
+  // One URL per page: a trailing slash (except the root) redirects permanently
+  // to the slash-less form, keeping any query string.
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      next();
+      return;
+    }
+    if (req.path.length > 1 && req.path.endsWith('/')) {
+      const query = req.originalUrl.slice(req.path.length);
+      res.redirect(301, req.path.replace(/\/+$/, '') + query);
+      return;
+    }
+    next();
   });
 
   app.use(async (req, res, next) => {

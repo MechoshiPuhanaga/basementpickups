@@ -460,8 +460,25 @@ Still open, without architectural rewrites:
 
 - dynamic OG image generation
 - CMS integration
-- `FAQPage` / review / `aggregateRating` schema
-- variant canonical strategy (neck/bridge currently self-canonical)
+- review / `aggregateRating` schema (`FAQPage` is done)
+- real article photos (BlogPosting `image` currently falls back to the site OG image)
+- DOM breadcrumbs (trail exists only as `BreadcrumbList` JSON-LD)
+- `lastmod` for product/static sitemap entries (omitted rather than faked — no real dates)
+
+Done 2026-09-21 (SEO batch B):
+
+- **Variant canonical strategy**: neck/bridge pages canonicalise to their set page
+  (`getSeoForUrl` uses `getPickupAndParent`), and only set pages are in the sitemap.
+- **`seoDescription`** per pickup/variant (≤155 chars, hand-written) feeds meta +
+  `og:description`; the long `description` stays on-page and in JSON-LD.
+- **Public origin** is pinned in production (`PUBLIC_ORIGIN`, default
+  `https://basementpickups.com`) for canonical/OG/sitemap/robots/llms; dev follows the request.
+- `og:locale`, PNG favicon fallback, `robots.txt` disallows `/cart` + `/api/`,
+  crawler files cached 1h, sitemap `<loc>` XML-escaped, `llms.txt` lists `/` and variants.
+- Trailing-slash URLs (except `/`) 301 to the slash-less form.
+- 404: `noindex, follow`, no canonical.
+- JSON-LD: `Organization.logo` → real logo, `WebSite` `inLanguage`/`description`/`publisher`,
+  offers carry `url` + `itemCondition`, `BlogPosting` has `image` + publisher logo.
 
 ---
 

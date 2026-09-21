@@ -1,8 +1,8 @@
 export interface SeoMeta {
   readonly title: string;
   readonly description: string;
-  /** Absolute canonical URL (origin + path). */
-  readonly canonicalUrl: string;
+  /** Absolute canonical URL (origin + path). Absent on pages that must not be indexed under any URL (404). */
+  readonly canonicalUrl?: string;
   readonly ogTitle: string;
   readonly ogDescription: string;
   readonly ogType: 'website' | 'article' | 'product';

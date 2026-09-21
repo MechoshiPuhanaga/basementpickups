@@ -79,7 +79,6 @@ export function PickupPreview({
       aria-label={label}
       data-polepieces={polepieces}
     >
-      <title>{label}</title>
       <rect
         className={styles['plate']}
         x="0.5"

@@ -23,7 +23,6 @@
 }
 
 .input:focus-visible {
-  outline: none;
   border-color: var(--color-accent-gold);
 }
 

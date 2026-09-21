@@ -8,7 +8,9 @@ import { useCart } from './CartContext';
 export function CartAnnouncer() {
   const { count } = useCart();
   const message =
-    count === 0 ? '' : `${String(count)} ${count === 1 ? 'item' : 'items'} in your enquiry`;
+    count === 0
+      ? 'Your enquiry list is empty'
+      : `${String(count)} ${count === 1 ? 'item' : 'items'} in your enquiry`;
 
   return (
     <VisuallyHidden as="div" role="status" aria-live="polite">

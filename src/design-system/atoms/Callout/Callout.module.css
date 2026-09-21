@@ -4,7 +4,7 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
-  border: 1px solid color-mix(in srgb, currentcolor 42%, transparent);
+  border: 1px solid color-mix(in srgb, currentcolor 65%, transparent);
   background: color-mix(in srgb, currentcolor 8%, transparent);
   font-family: var(--font-body);
   font-size: var(--type-scale-step-down);
