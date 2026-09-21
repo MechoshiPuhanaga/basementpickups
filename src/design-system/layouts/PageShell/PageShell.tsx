@@ -16,13 +16,13 @@ export function PageShell({ className, headerActions, headerMobileNav, children 
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <div className={classes}>
+    <div className={classes} data-testid="page-shell">
       <Seo />
-      <a href="#main" className={styles['skipLink']}>
+      <a href="#main" className={styles['skipLink']} data-testid="skip-link">
         Skip to content
       </a>
       <Header actions={headerActions} mobileNav={headerMobileNav} />
-      <main id="main" tabIndex={-1} className={styles['main']}>
+      <main id="main" tabIndex={-1} className={styles['main']} data-testid="main">
         {children}
       </main>
       <Footer />

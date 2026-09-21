@@ -1,8 +1,9 @@
 import { imageManifest } from '../../../assets/imageManifest';
 import type { ImageVariant } from '../../../assets/imageManifest.types';
+import type { TestIdProps } from '../../testing';
 import styles from './Image.module.css';
 
-export interface ImageProps {
+export interface ImageProps extends TestIdProps {
   /** Served URL of the original image; optimized derivatives are looked up by this path. */
   src: string;
   alt: string;
@@ -30,8 +31,18 @@ function toSrcSet(variants: readonly ImageVariant[]): string {
  * the manifest (SVGs, anything un-optimized) render as a plain `<img>`, so the
  * atom is safe for every image in the app.
  */
-export function Image({ src, alt, sizes, priority = false, width, height, className }: ImageProps) {
+export function Image({
+  src,
+  alt,
+  sizes,
+  priority = false,
+  width,
+  height,
+  className,
+  'data-testid': testId,
+}: ImageProps) {
   const entry = imageManifest[src];
+  const imgTestId = testId === undefined ? undefined : `${testId}-img`;
   const loadingProps = priority
     ? ({ loading: 'eager', fetchPriority: 'high' } as const)
     : ({ loading: 'lazy' } as const);
@@ -45,13 +56,14 @@ export function Image({ src, alt, sizes, priority = false, width, height, classN
         height={height}
         className={className}
         decoding="async"
+        data-testid={testId}
         {...loadingProps}
       />
     );
   }
 
   return (
-    <picture className={styles['picture']}>
+    <picture className={styles['picture']} data-testid={testId}>
       <source type="image/avif" srcSet={toSrcSet(entry.avif)} sizes={sizes} />
       <source type="image/webp" srcSet={toSrcSet(entry.webp)} sizes={sizes} />
       <img
@@ -61,6 +73,7 @@ export function Image({ src, alt, sizes, priority = false, width, height, classN
         height={entry.height}
         className={className}
         decoding="async"
+        data-testid={imgTestId}
         {...loadingProps}
       />
     </picture>

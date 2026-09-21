@@ -102,16 +102,16 @@ export interface ContactPayload {
   readonly items?: readonly ContactItem[];
 }
 
-interface ParsedRequest {
+export interface ParsedRequest {
   readonly ok: true;
   readonly data: ContactPayload;
   readonly isBot: boolean;
 }
 
 /** Which form control a validation message concerns, so the client can mark and focus it. */
-type ContactField = 'name' | 'email' | 'subject' | 'message';
+export type ContactField = 'name' | 'email' | 'subject' | 'message';
 
-interface InvalidRequest {
+export interface InvalidRequest {
   readonly ok: false;
   readonly error: string;
   readonly field: ContactField;
@@ -163,7 +163,7 @@ function parseItems(value: unknown): ContactItem[] | undefined {
 }
 
 /** Validate and normalise the request body. */
-function parseRequest(body: unknown): ParsedRequest | InvalidRequest {
+export function parseRequest(body: unknown): ParsedRequest | InvalidRequest {
   const name = readField(body, 'name');
   const email = readField(body, 'email');
   const subject = readField(body, 'subject') || 'Website inquiry';

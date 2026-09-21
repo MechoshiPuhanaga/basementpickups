@@ -1,14 +1,15 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './IconButton.module.css';
 
 export type IconButtonVariant = 'ghost' | 'outlined';
 export type IconButtonSize = 'sm' | 'md' | 'lg';
 
-export interface IconButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'className' | 'aria-label' | 'children'
-> {
+export interface IconButtonProps
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'aria-label' | 'children'>,
+    TestIdProps {
   label: string;
   variant?: IconButtonVariant | undefined;
   size?: IconButtonSize | undefined;

@@ -1,20 +1,25 @@
+import type { TestIdProps } from '../../testing';
 import styles from './DecoSeparator.module.css';
 
 export type DecoSeparatorVariant = 'diamond' | 'double-line' | 'small' | 'medallion' | 'crest';
 
-export interface DecoSeparatorProps {
+export interface DecoSeparatorProps extends TestIdProps {
   variant?: DecoSeparatorVariant | undefined;
   className?: string | undefined;
 }
 
-export function DecoSeparator({ variant = 'diamond', className }: DecoSeparatorProps) {
+export function DecoSeparator({
+  variant = 'diamond',
+  className,
+  'data-testid': testId,
+}: DecoSeparatorProps) {
   const classes = [styles['separator'], styles[`variant-${variant}`], className]
     .filter(Boolean)
     .join(' ');
 
   if (variant === 'medallion') {
     return (
-      <div className={classes} role="presentation" aria-hidden="true">
+      <div className={classes} role="presentation" aria-hidden="true" data-testid={testId}>
         <svg
           className={styles['medallion']}
           viewBox="-8 426 1216 350"
@@ -30,7 +35,7 @@ export function DecoSeparator({ variant = 'diamond', className }: DecoSeparatorP
 
   if (variant === 'crest') {
     return (
-      <div className={classes} role="presentation" aria-hidden="true">
+      <div className={classes} role="presentation" aria-hidden="true" data-testid={testId}>
         <span className={styles['crestDiamond']} />
         <span className={styles['line']} />
         <span className={styles['crestEmblem']} />
@@ -42,7 +47,7 @@ export function DecoSeparator({ variant = 'diamond', className }: DecoSeparatorP
 
   if (variant === 'double-line') {
     return (
-      <div className={classes} role="presentation" aria-hidden="true">
+      <div className={classes} role="presentation" aria-hidden="true" data-testid={testId}>
         <span className={styles['line']} />
         <span className={styles['line']} />
       </div>
@@ -50,7 +55,7 @@ export function DecoSeparator({ variant = 'diamond', className }: DecoSeparatorP
   }
 
   return (
-    <div className={classes} role="presentation" aria-hidden="true">
+    <div className={classes} role="presentation" aria-hidden="true" data-testid={testId}>
       <span className={styles['line']} />
       <svg
         className={styles['diamond']}

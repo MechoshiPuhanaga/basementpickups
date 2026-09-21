@@ -11,7 +11,7 @@ import { brandValues } from '../../data/brandValues';
 export default function AboutPage() {
   return (
     <>
-      <Section spacing="sm" maxWidth="narrow">
+      <Section spacing="sm" maxWidth="narrow" data-testid="about-page">
         <Stack direction="column" gap="lg" align="stretch">
           <Stack direction="column" gap="md" align="center">
             <Text variant="label" tone="gold" align="center">
@@ -52,14 +52,15 @@ export default function AboutPage() {
           </Stack>
         </Stack>
       </Section>
-      <Section spacing="md" maxWidth="narrow">
+      <Section spacing="md" maxWidth="narrow" data-testid="about-photo">
         <FramedImage
           src="/assets/images/spirit-photos/bp-spirit-2.png"
           alt="A guitar resting in the workshop under warm, low light"
           ratio="landscape"
+          data-testid="about-photo-image"
         />
       </Section>
-      <Section spacing="lg" maxWidth="default">
+      <Section spacing="lg" maxWidth="default" data-testid="about-values">
         <Stack direction="column" gap="xl" align="stretch">
           <Stack direction="column" gap="md" align="center">
             <Text variant="label" tone="gold" align="center">

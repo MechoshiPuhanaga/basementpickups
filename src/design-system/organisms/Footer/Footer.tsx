@@ -7,24 +7,30 @@ import { Heading } from '../../atoms/Heading';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import { primaryNav } from '../../../data/navigation';
+import type { TestIdProps } from '../../testing';
 import styles from './Footer.module.css';
 
-export interface FooterProps {
+export interface FooterProps extends TestIdProps {
   className?: string | undefined;
 }
 
-export function Footer({ className }: FooterProps) {
+export function Footer({ className, 'data-testid': testId = 'site-footer' }: FooterProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const year = new Date().getFullYear();
 
   return (
-    <footer className={classes}>
+    <footer className={classes} data-testid={testId}>
       <DecoSeparator variant="crest" />
       <Box paddingBlock="xl" paddingInline="lg">
         <Stack direction="column" gap="xl" align="stretch">
           <Grid columns={2} gap="xl" align="start">
             <Stack direction="column" gap="sm" align="start">
-              <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
+              <Link
+                to="/"
+                className={styles['brand']}
+                aria-label="Basement Pickups — home"
+                data-testid={`${testId}-brand-link`}
+              >
                 <img
                   src="/assets/logo/BP_Gold_horizont.svg"
                   alt=""
@@ -45,7 +51,11 @@ export function Footer({ className }: FooterProps) {
                 <ul className={styles['navList']} role="list">
                   {primaryNav.map((link) => (
                     <li key={link.href}>
-                      <Link to={link.href} className={styles['navLink']}>
+                      <Link
+                        to={link.href}
+                        className={styles['navLink']}
+                        data-testid={`${testId}-link-${link.href === '/' ? 'home' : link.href.slice(1)}`}
+                      >
                         {link.label}
                       </Link>
                     </li>

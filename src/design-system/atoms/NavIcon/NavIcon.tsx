@@ -1,8 +1,9 @@
+import type { TestIdProps } from '../../testing';
 import styles from './NavIcon.module.css';
 
 export type NavIconName = 'home' | 'about' | 'shop' | 'articles' | 'faq' | 'contact' | 'cart';
 
-export interface NavIconProps {
+export interface NavIconProps extends TestIdProps {
   name: NavIconName;
   size?: number | undefined;
   className?: string | undefined;
@@ -12,7 +13,7 @@ export interface NavIconProps {
  * Decorative Art Deco line icons used in navigation. Geometric, single-weight
  * linework that inherits the current color (gold in nav contexts).
  */
-export function NavIcon({ name, size = 22, className }: NavIconProps) {
+export function NavIcon({ name, size = 22, className, 'data-testid': testId }: NavIconProps) {
   const classes = [styles['icon'], className].filter(Boolean).join(' ');
 
   return (
@@ -28,6 +29,8 @@ export function NavIcon({ name, size = 22, className }: NavIconProps) {
       strokeLinejoin="miter"
       aria-hidden="true"
       focusable="false"
+      data-testid={testId}
+      data-name={name}
     >
       {name === 'home' && (
         <>

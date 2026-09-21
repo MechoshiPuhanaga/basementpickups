@@ -147,26 +147,38 @@ function buildGalleryImages(pickup: Pickup) {
   return [main, ...extras];
 }
 
+function specTestId(label: string): string {
+  return `spec-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+}
+
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className={styles['specRow']}>
+    <div className={styles['specRow']} data-testid={specTestId(label)}>
       <Text variant="label" tone="muted">
         {label}
       </Text>
-      <Text variant="body">{value}</Text>
+      <Text variant="body" data-testid={`${specTestId(label)}-value`}>
+        {value}
+      </Text>
     </div>
   );
 }
 
 function SwatchRow({ label, colors }: { label: string; colors: readonly string[] }) {
   return (
-    <div className={styles['specRow']}>
+    <div className={styles['specRow']} data-testid={specTestId(label)}>
       <Text variant="label" tone="muted">
         {label}
       </Text>
       <Stack direction="row" gap="xs" wrap>
         {colors.map((color) => (
-          <Swatch key={color} color={color} label={bobbinColorLabel(color)} size="sm" />
+          <Swatch
+            key={color}
+            color={color}
+            label={bobbinColorLabel(color)}
+            size="sm"
+            data-testid={`${specTestId(label)}-${color}`}
+          />
         ))}
       </Stack>
     </div>
@@ -184,7 +196,7 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
   const isBase = active.slug === parent.slug;
 
   return (
-    <Stack direction="column" gap="sm" align="stretch">
+    <Stack direction="column" gap="sm" align="stretch" data-testid="product-variants">
       <Heading level={2} variant="section">
         Variants
       </Heading>
@@ -203,6 +215,7 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
               linkState={{ preserveScroll: true }}
               variant={isActive ? 'primary' : 'ghost'}
               size="sm"
+              data-testid={`variant-link-${option.slug}`}
             >
               {option.slug === parent.slug ? 'Base' : option.name.replace(`${parent.name} · `, '')}
             </Button>
@@ -229,7 +242,12 @@ function AddToEnquiry({ pickup }: { pickup: Pickup }) {
   return (
     <>
       {hasConfigChoices(pickup) && (
-        <Disclosure title="Configure" desktop="heading" headingLevel={2}>
+        <Disclosure
+          title="Configure"
+          desktop="heading"
+          headingLevel={2}
+          data-testid="product-configure"
+        >
           <PickupConfigurator
             pickup={pickup}
             value={selection}
@@ -242,6 +260,7 @@ function AddToEnquiry({ pickup }: { pickup: Pickup }) {
       <Button
         variant="solid"
         size="lg"
+        data-testid="add-to-cart"
         onClick={() => {
           cart.add({
             slug: pickup.slug,
@@ -263,7 +282,7 @@ export default function ProductPage() {
 
   if (found === undefined) {
     return (
-      <Section spacing="lg" maxWidth="narrow">
+      <Section spacing="lg" maxWidth="narrow" data-testid="product-not-found">
         <Stack direction="column" gap="md" align="center">
           <Heading level={1} variant="display" align="center">
             Pickup not found
@@ -271,7 +290,7 @@ export default function ProductPage() {
           <Text variant="editorial" tone="muted" align="center">
             We couldn&rsquo;t find a pickup matching that URL. Try the shop.
           </Text>
-          <Button linkTo="/shop" variant="primary" size="md">
+          <Button linkTo="/shop" variant="primary" size="md" data-testid="product-not-found-link">
             Shop pickups
           </Button>
         </Stack>
@@ -288,32 +307,46 @@ export default function ProductPage() {
   const isBaseWithVariants = pickup.slug === parent.slug && (parent.variants?.length ?? 0) > 0;
 
   return (
-    <Section spacing="lg" maxWidth="default">
+    <Section spacing="lg" maxWidth="default" data-testid="product-page">
       <ProductLayout
+        data-testid="product-layout"
         gallery={<ProductGallery images={images} productName={pickup.name} />}
         details={
           <Stack direction="column" gap="lg" align="stretch">
             <Stack direction="column" gap="xs" align="start">
-              <Text variant="label" tone="gold">
+              <Text variant="label" tone="gold" data-testid="product-type">
                 {TYPE_LABEL[pickup.type]}
               </Text>
-              <Heading level={1} variant="display" align="start">
+              <Heading level={1} variant="display" align="start" data-testid="product-title">
                 {pickup.name}
               </Heading>
               <Stack direction="row" gap="sm" align="center" wrap>
-                <Price amount={pickup.price} size="lg" tone="primary" />
+                <Price amount={pickup.price} size="lg" tone="primary" data-testid="product-price" />
                 <Stack direction="row" gap="xs" wrap>
                   {pickup.positions.map((position) => (
-                    <Badge key={position} variant="outline" tone="gold" size="sm">
+                    <Badge
+                      key={position}
+                      variant="outline"
+                      tone="gold"
+                      size="sm"
+                      data-testid={`product-position-${position}`}
+                    >
                       {position}
                     </Badge>
                   ))}
                 </Stack>
               </Stack>
             </Stack>
-            <Text variant="body">{pickup.description}</Text>
+            <Text variant="body" data-testid="product-description">
+              {pickup.description}
+            </Text>
             <VariantSelector parent={parent} active={pickup} />
-            <Disclosure title="Specifications" desktop="heading" headingLevel={2}>
+            <Disclosure
+              title="Specifications"
+              desktop="heading"
+              headingLevel={2}
+              data-testid="product-specs"
+            >
               <div className={styles['specs']}>
                 <SpecRow label="Type" value={TYPE_LABEL[pickup.type]} />
                 <SpecRow label="Magnet" value={formatMagnet(pickup, parent)} />

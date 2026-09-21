@@ -1,15 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 import { Link } from 'react-router';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Button.module.css';
 
 export type ButtonVariant = 'primary' | 'ghost' | 'solid';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'className' | 'children'
-> {
+export interface ButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'children'>, TestIdProps {
   variant?: ButtonVariant | undefined;
   size?: ButtonSize | undefined;
   className?: string | undefined;
@@ -30,6 +29,7 @@ export function Button({
   linkState,
   type = 'button',
   ref,
+  'data-testid': testId,
   ...rest
 }: ButtonProps) {
   const classes = [styles['button'], className].filter(Boolean).join(' ');
@@ -42,6 +42,7 @@ export function Button({
         className={classes}
         data-variant={variant}
         data-size={size}
+        data-testid={testId}
       >
         <span className={styles['label']}>{children}</span>
       </Link>
@@ -56,6 +57,7 @@ export function Button({
       className={classes}
       data-variant={variant}
       data-size={size}
+      data-testid={testId}
     >
       <span className={styles['label']}>{children}</span>
     </button>

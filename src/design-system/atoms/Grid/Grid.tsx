@@ -1,12 +1,13 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Grid.module.css';
 
 export type GridColumns = 1 | 2 | 3 | 4;
 export type GridGap = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type GridAlign = 'start' | 'center' | 'end' | 'stretch';
 
-export interface GridProps {
+export interface GridProps extends TestIdProps {
   as?: ElementType | undefined;
   columns?: GridColumns | undefined;
   /** Column count on phones/tablets (≤768px). Defaults to 1 (single column). */
@@ -25,6 +26,7 @@ export function Grid({
   align,
   className,
   children,
+  'data-testid': testId,
 }: GridProps) {
   const classes = [styles['grid'], className].filter(Boolean).join(' ');
 
@@ -35,6 +37,7 @@ export function Grid({
       data-mobile-columns={mobileColumns}
       data-gap={gap}
       data-align={align}
+      data-testid={testId}
     >
       {children}
     </Tag>

@@ -21,7 +21,7 @@ export default function HomePage() {
         imageAlt="A handwound humbucker resting under warm workshop light"
         imagePosition="left"
       />
-      <Section spacing="lg" maxWidth="default">
+      <Section spacing="lg" maxWidth="default" data-testid="home-featured">
         <ProductGrid
           eyebrow="Featured"
           title="Built by hand"
@@ -29,7 +29,7 @@ export default function HomePage() {
           pickups={featured}
         />
       </Section>
-      <Section spacing="lg" maxWidth="default">
+      <Section spacing="lg" maxWidth="default" data-testid="home-journal">
         <ArticleGrid
           eyebrow="From the journal"
           title="On tone and craft"

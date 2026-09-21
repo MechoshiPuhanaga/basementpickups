@@ -1,9 +1,10 @@
 import { useId, useState, type ReactNode } from 'react';
 
 import { Heading, type HeadingLevel } from '../../atoms/Heading';
+import type { TestIdProps } from '../../testing';
 import styles from './Disclosure.module.css';
 
-export interface DisclosureProps {
+export interface DisclosureProps extends TestIdProps {
   /**
    * The toggle label on mobile. In `desktop="heading"` mode this is also the
    * section heading shown (always open) on larger screens.
@@ -48,11 +49,13 @@ export function Disclosure({
   headingLevel = 2,
   defaultOpen = false,
   className,
+  'data-testid': testId,
 }: DisclosureProps) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = useId();
   const isHeading = desktop === 'heading';
   const classes = [styles['disclosure'], className].filter(Boolean).join(' ');
+  const part = (name: string) => (testId === undefined ? undefined : `${testId}-${name}`);
 
   const toggle = (
     <button
@@ -60,6 +63,7 @@ export function Disclosure({
       className={styles['toggle']}
       aria-expanded={open}
       aria-controls={panelId}
+      data-testid={part('trigger')}
       onClick={() => {
         setOpen((prev) => !prev);
       }}
@@ -88,7 +92,12 @@ export function Disclosure({
   );
 
   return (
-    <div className={classes} data-desktop={desktop} data-open={open ? 'true' : 'false'}>
+    <div
+      className={classes}
+      data-desktop={desktop}
+      data-open={open ? 'true' : 'false'}
+      data-testid={testId}
+    >
       {isHeading && (
         <Heading level={headingLevel} variant="section" className={styles['staticHeading']}>
           {title}
@@ -101,7 +110,7 @@ export function Disclosure({
       ) : (
         toggle
       )}
-      <div id={panelId} className={styles['panel']}>
+      <div id={panelId} className={styles['panel']} data-testid={part('panel')}>
         <div className={styles['panelInner']}>{children}</div>
       </div>
     </div>

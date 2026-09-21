@@ -1,5 +1,6 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Text.module.css';
 
 export type TextVariant = 'body' | 'lead' | 'editorial' | 'label' | 'meta';
@@ -7,7 +8,7 @@ export type TextTone = 'primary' | 'muted' | 'gold';
 export type TextAlign = 'start' | 'center' | 'end';
 export type TextWeight = 'regular' | 'medium' | 'semibold';
 
-export interface TextProps {
+export interface TextProps extends TestIdProps {
   as?: ElementType | undefined;
   variant?: TextVariant | undefined;
   tone?: TextTone | undefined;
@@ -27,6 +28,7 @@ export function Text({
   italic,
   className,
   children,
+  'data-testid': testId,
 }: TextProps) {
   const classes = [styles['text'], className].filter(Boolean).join(' ');
 
@@ -38,6 +40,7 @@ export function Text({
       data-align={align}
       data-weight={weight}
       data-italic={italic ? 'true' : undefined}
+      data-testid={testId}
     >
       {children}
     </Tag>

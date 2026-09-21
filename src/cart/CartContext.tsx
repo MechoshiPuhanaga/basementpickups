@@ -113,13 +113,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   const add = useCallback((item: Omit<CartItem, 'qty' | 'id'>) => {
-    const id = cartLineKey(item.slug, item.config);
+    // Resolve against the catalog exactly as `readStorage` does, so a line's
+    // identity is the same before and after a reload whatever the caller passed.
+    const pickup = getPickupBySlug(item.slug);
+    const config = pickup === undefined ? item.config : resolveConfig(pickup, item.config);
+    const id = cartLineKey(item.slug, config);
     setItems((prev) => {
       const existing = prev.find((i) => i.id === id);
       if (existing) {
         return prev.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i));
       }
-      return [...prev, { ...item, id, qty: 1 }];
+      return [...prev, { ...item, ...(config ? { config } : {}), id, qty: 1 }];
     });
   }, []);
 
@@ -135,10 +139,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const updateConfig = useCallback((id: string, nextConfig: PickupConfig) => {
+  const updateConfig = useCallback((id: string, next: PickupConfig) => {
     setItems((prev) => {
       const target = prev.find((i) => i.id === id);
       if (target === undefined) return prev;
+      const pickup = getPickupBySlug(target.slug);
+      const nextConfig = pickup === undefined ? next : resolveConfig(pickup, next);
       const nextId = cartLineKey(target.slug, nextConfig);
       if (nextId === id) {
         return prev.map((i) => (i.id === id ? { ...i, config: nextConfig } : i));

@@ -1,13 +1,12 @@
 import type { TextareaHTMLAttributes } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Textarea.module.css';
 
 export type TextareaSize = 'sm' | 'md' | 'lg';
 
-export interface TextareaProps extends Omit<
-  TextareaHTMLAttributes<HTMLTextAreaElement>,
-  'className'
-> {
+export interface TextareaProps
+  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>, TestIdProps {
   textareaSize?: TextareaSize | undefined;
   invalid?: boolean | undefined;
   className?: string | undefined;

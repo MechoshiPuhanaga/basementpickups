@@ -1,9 +1,10 @@
 import { DecoCorner, type DecoCornerVariant } from '../DecoCorner';
+import type { TestIdProps } from '../../testing';
 import styles from './DecoFrame.module.css';
 
 export type DecoFrameVariant = 'panel' | 'product-card' | 'hero' | 'image';
 
-export interface DecoFrameProps {
+export interface DecoFrameProps extends TestIdProps {
   variant?: DecoFrameVariant | undefined;
   className?: string | undefined;
 }
@@ -20,14 +21,14 @@ const VARIANT_CONFIG: Record<DecoFrameVariant, VariantConfig> = {
   image: { corner: 'simple', cornerSize: 24 },
 };
 
-export function DecoFrame({ variant = 'panel', className }: DecoFrameProps) {
+export function DecoFrame({ variant = 'panel', className, 'data-testid': testId }: DecoFrameProps) {
   const config = VARIANT_CONFIG[variant];
   const classes = [styles['frame'], styles[`variant-${variant}`], className]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={classes} aria-hidden="true">
+    <div className={classes} aria-hidden="true" data-testid={testId}>
       <span className={styles['border']} />
       <DecoCorner
         variant={config.corner}

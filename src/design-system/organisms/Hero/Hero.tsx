@@ -4,6 +4,7 @@ import { Heading } from '../../atoms/Heading';
 import { Image } from '../../atoms/Image';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
+import type { TestIdProps } from '../../testing';
 import styles from './Hero.module.css';
 
 export interface HeroCta {
@@ -11,7 +12,7 @@ export interface HeroCta {
   readonly href: string;
 }
 
-export interface HeroProps {
+export interface HeroProps extends TestIdProps {
   eyebrow?: string | undefined;
   headline: string;
   lead?: string | undefined;
@@ -33,11 +34,12 @@ export function Hero({
   imageAlt,
   imagePosition = 'left',
   className,
+  'data-testid': testId = 'hero',
 }: HeroProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <section className={classes} data-image-position={imagePosition}>
+    <section className={classes} data-image-position={imagePosition} data-testid={testId}>
       <div className={styles['layout']}>
         <div className={styles['imageSide']}>
           <Frame variant="hero" padding="sm">
@@ -59,7 +61,7 @@ export function Hero({
                 {eyebrow}
               </Text>
             )}
-            <Heading level={1} variant="hero" align="start">
+            <Heading level={1} variant="hero" align="start" data-testid={`${testId}-headline`}>
               {headline}
             </Heading>
             {lead !== undefined && (
@@ -70,12 +72,22 @@ export function Hero({
             {(primaryCta !== undefined || secondaryCta !== undefined) && (
               <div className={styles['ctaRow']}>
                 {primaryCta !== undefined && (
-                  <Button linkTo={primaryCta.href} variant="primary" size="lg">
+                  <Button
+                    linkTo={primaryCta.href}
+                    variant="primary"
+                    size="lg"
+                    data-testid={`${testId}-cta-primary`}
+                  >
                     {primaryCta.label}
                   </Button>
                 )}
                 {secondaryCta !== undefined && (
-                  <Button linkTo={secondaryCta.href} variant="ghost" size="lg">
+                  <Button
+                    linkTo={secondaryCta.href}
+                    variant="ghost"
+                    size="lg"
+                    data-testid={`${testId}-cta-secondary`}
+                  >
                     {secondaryCta.label}
                   </Button>
                 )}

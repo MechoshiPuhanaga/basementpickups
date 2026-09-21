@@ -1,3 +1,4 @@
+import type { TestIdProps } from '../../testing';
 import styles from './FaqIcon.module.css';
 
 export type FaqIconName =
@@ -15,7 +16,7 @@ export type FaqIconName =
   | 'more-options'
   | 'option-availability';
 
-export interface FaqIconProps {
+export interface FaqIconProps extends TestIdProps {
   name: FaqIconName;
   size?: number | undefined;
   className?: string | undefined;
@@ -26,7 +27,7 @@ export interface FaqIconProps {
  * single-weight linework that inherits the current color (gold). Follows the
  * NavIcon conventions: 24x24 viewBox, currentColor stroke, non-scaling stroke.
  */
-export function FaqIcon({ name, size = 28, className }: FaqIconProps) {
+export function FaqIcon({ name, size = 28, className, 'data-testid': testId }: FaqIconProps) {
   const classes = [styles['icon'], className].filter(Boolean).join(' ');
 
   return (
@@ -42,6 +43,8 @@ export function FaqIcon({ name, size = 28, className }: FaqIconProps) {
       strokeLinejoin="miter"
       aria-hidden="true"
       focusable="false"
+      data-testid={testId}
+      data-name={name}
     >
       {/* Made to order — a wound bobbin / wire spool. */}
       {name === 'made-to-order' && (

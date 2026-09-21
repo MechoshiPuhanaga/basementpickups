@@ -1,5 +1,6 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Stack.module.css';
 
 export type StackDirection = 'column' | 'row';
@@ -7,7 +8,7 @@ export type StackGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type StackAlign = 'start' | 'center' | 'end' | 'stretch';
 export type StackJustify = 'start' | 'center' | 'end' | 'between';
 
-export interface StackProps {
+export interface StackProps extends TestIdProps {
   as?: ElementType | undefined;
   direction?: StackDirection | undefined;
   gap?: StackGap | undefined;
@@ -30,6 +31,7 @@ export function Stack({
   id,
   className,
   children,
+  'data-testid': testId,
 }: StackProps) {
   const classes = [styles['stack'], className].filter(Boolean).join(' ');
 
@@ -42,6 +44,7 @@ export function Stack({
       data-align={align}
       data-justify={justify}
       data-wrap={wrap ? 'true' : undefined}
+      data-testid={testId}
     >
       {children}
     </Tag>

@@ -1,10 +1,11 @@
 import { Frame } from '../../atoms/Frame';
 import { Image } from '../../atoms/Image';
+import type { TestIdProps } from '../../testing';
 import styles from './FramedImage.module.css';
 
 export type FramedImageRatio = 'landscape' | 'square';
 
-export interface FramedImageProps {
+export interface FramedImageProps extends TestIdProps {
   src: string;
   alt: string;
   ratio?: FramedImageRatio | undefined;
@@ -24,13 +25,20 @@ export function FramedImage({
   ratio = 'landscape',
   sizes = '(max-width: 768px) 90vw, 600px',
   className,
+  'data-testid': testId,
 }: FramedImageProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <Frame variant="image" padding="sm" className={classes}>
+    <Frame variant="image" padding="sm" className={classes} data-testid={testId}>
       <div className={styles['imageWrap']} data-ratio={ratio}>
-        <Image src={src} alt={alt} sizes={sizes} className={styles['image']} />
+        <Image
+          src={src}
+          alt={alt}
+          sizes={sizes}
+          className={styles['image']}
+          data-testid={testId === undefined ? undefined : `${testId}-image`}
+        />
       </div>
     </Frame>
   );

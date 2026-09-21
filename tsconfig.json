@@ -40,6 +40,6 @@
 
     "noEmit": true
   },
-  "include": ["src", "server"],
+  "include": ["src", "server", "tests", "vitest.config.ts", "playwright.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -13,7 +13,7 @@ export function CartAnnouncer() {
       : `${String(count)} ${count === 1 ? 'item' : 'items'} in your enquiry`;
 
   return (
-    <VisuallyHidden as="div" role="status" aria-live="polite">
+    <VisuallyHidden as="div" role="status" aria-live="polite" data-testid="cart-announcer">
       {message}
     </VisuallyHidden>
   );

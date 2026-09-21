@@ -1,9 +1,10 @@
+import type { TestIdProps } from '../../testing';
 import styles from './Price.module.css';
 
 export type PriceSize = 'sm' | 'md' | 'lg';
 export type PriceTone = 'primary' | 'gold' | 'muted';
 
-export interface PriceProps {
+export interface PriceProps extends TestIdProps {
   amount: number | string;
   currency?: string | undefined;
   size?: PriceSize | undefined;
@@ -25,12 +26,13 @@ export function Price({
   size = 'md',
   tone = 'primary',
   className,
+  'data-testid': testId,
 }: PriceProps) {
   const classes = [styles['price'], className].filter(Boolean).join(' ');
   const formatted = formatAmount(amount);
 
   return (
-    <span className={classes} data-size={size} data-tone={tone}>
+    <span className={classes} data-size={size} data-tone={tone} data-testid={testId}>
       <span className={styles['currency']} aria-hidden="true">
         {currency}
       </span>

@@ -7,7 +7,7 @@ import { Section } from '../../design-system/layouts/Section';
 
 export default function NotFoundPage() {
   return (
-    <Section spacing="xl" maxWidth="narrow">
+    <Section spacing="xl" maxWidth="narrow" data-testid="not-found">
       <Stack direction="column" gap="md" align="center">
         <Text variant="label" tone="gold" align="center">
           404
@@ -21,10 +21,10 @@ export default function NotFoundPage() {
           the workshop tour instead.
         </Text>
         <Stack direction="row" gap="md" justify="center" wrap>
-          <Button linkTo="/" variant="primary" size="md">
+          <Button linkTo="/" variant="primary" size="md" data-testid="not-found-home">
             Return home
           </Button>
-          <Button linkTo="/shop" variant="ghost" size="md">
+          <Button linkTo="/shop" variant="ghost" size="md" data-testid="not-found-shop">
             Shop pickups
           </Button>
         </Stack>

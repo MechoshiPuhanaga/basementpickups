@@ -1,8 +1,9 @@
+import type { TestIdProps } from '../../testing';
 import styles from './DecoOrnament.module.css';
 
 export type DecoOrnamentVariant = 'diamond' | 'centerpiece';
 
-export interface DecoOrnamentProps {
+export interface DecoOrnamentProps extends TestIdProps {
   variant?: DecoOrnamentVariant | undefined;
   size?: number | undefined;
   /** Render the diamond as a solid fill instead of an outline. */
@@ -10,7 +11,13 @@ export interface DecoOrnamentProps {
   className?: string | undefined;
 }
 
-export function DecoOrnament({ variant = 'diamond', size, filled, className }: DecoOrnamentProps) {
+export function DecoOrnament({
+  variant = 'diamond',
+  size,
+  filled,
+  className,
+  'data-testid': testId,
+}: DecoOrnamentProps) {
   const classes = [styles['ornament'], styles[`variant-${variant}`], className]
     .filter(Boolean)
     .join(' ');
@@ -28,6 +35,7 @@ export function DecoOrnament({ variant = 'diamond', size, filled, className }: D
         strokeLinecap="square"
         aria-hidden="true"
         focusable="false"
+        data-testid={testId}
       >
         <line x1="0" y1="8" x2="30" y2="8" vectorEffect="non-scaling-stroke" />
         <line x1="50" y1="8" x2="80" y2="8" vectorEffect="non-scaling-stroke" />
@@ -48,6 +56,7 @@ export function DecoOrnament({ variant = 'diamond', size, filled, className }: D
       strokeLinecap="square"
       aria-hidden="true"
       focusable="false"
+      data-testid={testId}
     >
       <path d="M7 1 L13 7 L7 13 L1 7 Z" vectorEffect="non-scaling-stroke" />
     </svg>

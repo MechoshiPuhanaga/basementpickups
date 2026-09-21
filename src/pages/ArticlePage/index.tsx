@@ -36,7 +36,7 @@ export default function ArticlePage() {
 
   if (article === undefined) {
     return (
-      <Section spacing="lg" maxWidth="narrow">
+      <Section spacing="lg" maxWidth="narrow" data-testid="article-not-found">
         <Stack direction="column" gap="md" align="center">
           <Heading level={1} variant="display" align="center">
             Article not found
@@ -44,7 +44,12 @@ export default function ArticlePage() {
           <Text variant="editorial" tone="muted" align="center">
             We couldn&rsquo;t find that article. Browse the latest writing from the workshop.
           </Text>
-          <Button linkTo="/articles" variant="primary" size="md">
+          <Button
+            linkTo="/articles"
+            variant="primary"
+            size="md"
+            data-testid="article-not-found-link"
+          >
             Read articles
           </Button>
         </Stack>
@@ -63,8 +68,9 @@ export default function ArticlePage() {
   const paragraphs = paragraphsFromBody(article.body);
 
   return (
-    <Section spacing="lg" maxWidth="default">
+    <Section spacing="lg" maxWidth="default" data-testid="article-page">
       <ArticleLayout
+        data-testid="article"
         hero={
           <div className={styles['heroWrap']}>
             <Image
@@ -75,6 +81,7 @@ export default function ArticlePage() {
               sizes="(max-width: 768px) 90vw, 720px"
               priority
               className={styles['hero']}
+              data-testid="article-hero-image"
             />
             {article.mainImage.caption !== undefined && (
               <Text variant="meta" tone="muted" align="center">
@@ -85,10 +92,10 @@ export default function ArticlePage() {
         }
         header={
           <Stack direction="column" gap="md" align="center">
-            <Text variant="label" tone="gold" align="center">
+            <Text variant="label" tone="gold" align="center" data-testid="article-meta">
               {meta}
             </Text>
-            <Heading level={1} variant="display" align="center">
+            <Heading level={1} variant="display" align="center" data-testid="article-headline">
               {article.headline}
             </Heading>
             {article.subheadline !== undefined && (

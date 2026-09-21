@@ -1,8 +1,9 @@
+import type { TestIdProps } from '../../testing';
 import styles from './Swatch.module.css';
 
 export type SwatchSize = 'sm' | 'md';
 
-export interface SwatchProps {
+export interface SwatchProps extends TestIdProps {
   /**
    * A bobbin-color name token (e.g. `cream`, `light-blue`); see
    * `src/data/bobbinColors.ts`. The fill is resolved in CSS via `data-color`
@@ -17,7 +18,13 @@ export interface SwatchProps {
 }
 
 /** A single round color chip used to show available finishes (e.g. bobbins). */
-export function Swatch({ color, label, size = 'md', className }: SwatchProps) {
+export function Swatch({
+  color,
+  label,
+  size = 'md',
+  className,
+  'data-testid': testId,
+}: SwatchProps) {
   const classes = [styles['swatch'], className].filter(Boolean).join(' ');
 
   return (
@@ -28,6 +35,7 @@ export function Swatch({ color, label, size = 'md', className }: SwatchProps) {
       role="img"
       aria-label={label}
       title={label}
+      data-testid={testId}
     />
   );
 }

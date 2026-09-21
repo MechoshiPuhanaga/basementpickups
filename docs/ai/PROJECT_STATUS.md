@@ -376,6 +376,25 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 
 # Session Log
 
+## 2026-09-21 — Test quality gate (Vitest + Playwright, coverage reports)
+
+- Added the four-tier gate (see `docs/ai/TESTING.md`, skill `skills/write-tests.md`):
+  static checks → Vitest `unit` / `component` (jsdom) / `integration` (real Express app
+  from `server/app.ts` against `dist/`) → Playwright e2e (prod server on :3100, desktop +
+  Pixel 7). `pnpm run check` runs everything; reports in `coverage/` and `playwright-report/`.
+- Server split for testability: `server/app.ts` (`createApp(options)`), `server/security.ts`,
+  `server/crawlers.ts`; `server/index.ts` only listens. Two small fixes: `app.set('env')`
+  follows the `isProd` option (no stack traces on 413), `/index.html` → 301 `/`.
+- Every DS component forwards `data-testid` (shared `TestIdProps`); fixed parts carry
+  stable ids. Tests locate elements by test id only.
+- Numbers: 498 Vitest tests (90 files), 48 Playwright tests; coverage 97.5% lines /
+  92% branches, thresholds 95 / 88. New dev deps: vitest, @vitest/coverage-v8, jsdom,
+  @testing-library/{react,jest-dom,user-event}, @playwright/test (Chromium installed).
+- Next (agreed, not done): CI job running `pnpm run check` before the Heroku deploy.
+- Observations from the test pass (not fixed): ProductBrowser empty-state copy always says
+  "magnet" even when the type filter caused it; MobileMenu sr-text says "1 items";
+  `src/app/router.ts` is only covered by e2e.
+
 ## 2026-09-21 — SEO + a11y evaluation; a11y fixes (batch A)
 
 **Evaluation.** Lighthouse on a local prod build, all 23 sitemap pages: **a11y 100, SEO 100,

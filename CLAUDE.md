@@ -43,6 +43,9 @@ Routing work
 Accessibility work
   -> docs/ai/ACCESSIBILITY.md
 
+Writing or changing tests
+  -> docs/ai/TESTING.md + docs/ai/skills/write-tests.md
+
 Creating atoms
   -> docs/ai/skills/create-atom.md
 
@@ -176,6 +179,7 @@ optimize-images.md
 add-product.md
 audit-lighthouse.md
 add-faq-item.md
+write-tests.md
 ```
 
 Examples:
@@ -207,6 +211,9 @@ Auditing quality (perf / a11y / best-practices / SEO)
 
 Adding a Q&A / FAQ entry (wording + Art Deco icon)
   -> read skills/add-faq-item.md
+
+Adding or changing code (tests are part of the change)
+  -> read skills/write-tests.md
 ```
 
 Skills are implementation contracts.

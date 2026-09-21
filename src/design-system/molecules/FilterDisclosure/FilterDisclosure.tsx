@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 
 import { Disclosure } from '../Disclosure';
+import type { TestIdProps } from '../../testing';
 
-export interface FilterDisclosureProps {
+export interface FilterDisclosureProps extends TestIdProps {
   /** Currently selected filters, shown as chips on the toggle. */
   filters: readonly string[];
   label?: string | undefined;
@@ -28,6 +29,7 @@ export function FilterDisclosure({
   label = 'Filters',
   children,
   className,
+  'data-testid': testId,
 }: FilterDisclosureProps) {
   return (
     <Disclosure
@@ -36,6 +38,7 @@ export function FilterDisclosure({
       icon={FILTER_ICON}
       summary={filters}
       className={className}
+      data-testid={testId}
     >
       {children}
     </Disclosure>

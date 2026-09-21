@@ -5,6 +5,7 @@ import { Link, NavLink, useLocation } from 'react-router';
 import { DecoOrnament } from '../../atoms/DecoOrnament';
 import { DecoSeparator } from '../../atoms/DecoSeparator';
 import { NavIcon, type NavIconName } from '../../atoms/NavIcon';
+import type { TestIdProps } from '../../testing';
 import styles from './MobileMenu.module.css';
 
 export interface MobileMenuLink {
@@ -12,7 +13,7 @@ export interface MobileMenuLink {
   readonly href: string;
 }
 
-export interface MobileMenuProps {
+export interface MobileMenuProps extends TestIdProps {
   links: readonly MobileMenuLink[];
   enquiryCount: number;
   enquiryHref?: string | undefined;
@@ -60,6 +61,7 @@ export function MobileMenu({
   enquiryHref = '/cart',
   enquiryLabel = 'Enquiry',
   className,
+  'data-testid': testId = 'mobile-menu',
 }: MobileMenuProps) {
   const [state, setState] = useState<MenuState>('closed');
   const open = state === 'open';
@@ -170,7 +172,7 @@ export function MobileMenu({
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <div className={classes}>
+    <div className={classes} data-testid={testId}>
       <button
         ref={triggerRef}
         type="button"
@@ -178,6 +180,7 @@ export function MobileMenu({
         aria-label="Open menu"
         aria-expanded={open}
         aria-haspopup="dialog"
+        data-testid={`${testId}-trigger`}
         onClick={() => {
           setState('open');
         }}
@@ -201,6 +204,7 @@ export function MobileMenu({
               data-state={state}
               aria-hidden="true"
               tabIndex={-1}
+              data-testid={`${testId}-scrim`}
               onClick={close}
               inert={state === 'closing'}
             />
@@ -212,6 +216,7 @@ export function MobileMenu({
               aria-modal="true"
               aria-label="Site menu"
               tabIndex={-1}
+              data-testid={`${testId}-dialog`}
               inert={state === 'closing'}
               onAnimationEnd={(event) => {
                 if (event.target === event.currentTarget) finishClose();
@@ -223,6 +228,7 @@ export function MobileMenu({
                   className={styles['brand']}
                   aria-label="Basement Pickups — home"
                   onClick={close}
+                  data-testid={`${testId}-brand`}
                 >
                   <img
                     src="/assets/logo/BP_Gold_horizont.svg"
@@ -237,6 +243,7 @@ export function MobileMenu({
                   className={styles['close']}
                   aria-label="Close menu"
                   onClick={close}
+                  data-testid={`${testId}-close`}
                 >
                   <svg
                     width="28"
@@ -270,6 +277,7 @@ export function MobileMenu({
                             .filter(Boolean)
                             .join(' ')
                         }
+                        data-testid={`${testId}-link-${link.href === '/' ? 'home' : link.href.slice(1)}`}
                       >
                         <NavIcon
                           name={iconForHref(link.href)}
@@ -291,11 +299,20 @@ export function MobileMenu({
 
               <DecoSeparator variant="medallion" className={styles['divider']} />
 
-              <Link to={enquiryHref} className={styles['enquiry']} onClick={close}>
+              <Link
+                to={enquiryHref}
+                className={styles['enquiry']}
+                onClick={close}
+                data-testid={`${testId}-enquiry`}
+              >
                 <span className={styles['enquiryGlyph']}>
                   <NavIcon name="cart" size={52} />
                   {enquiryCount > 0 && (
-                    <span className={styles['badge']} aria-hidden="true">
+                    <span
+                      className={styles['badge']}
+                      aria-hidden="true"
+                      data-testid={`${testId}-badge`}
+                    >
                       {enquiryCount}
                     </span>
                   )}
@@ -304,7 +321,9 @@ export function MobileMenu({
                   <span className={styles['enquiryLabel']}>
                     {enquiryLabel}
                     {enquiryCount > 0 && (
-                      <span className={styles['srOnly']}>{`, ${String(enquiryCount)} items`}</span>
+                      <span
+                        className={styles['srOnly']}
+                      >{`, ${String(enquiryCount)} ${enquiryCount === 1 ? 'item' : 'items'}`}</span>
                     )}
                   </span>
                   <span className={styles['enquiryHint']}>View your enquiry list</span>

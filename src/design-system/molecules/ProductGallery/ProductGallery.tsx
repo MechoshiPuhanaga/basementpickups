@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Frame } from '../../atoms/Frame';
 import { Image } from '../../atoms/Image';
+import type { TestIdProps } from '../../testing';
 import styles from './ProductGallery.module.css';
 
 export interface ProductGalleryImage {
@@ -9,13 +10,18 @@ export interface ProductGalleryImage {
   readonly alt?: string;
 }
 
-export interface ProductGalleryProps {
+export interface ProductGalleryProps extends TestIdProps {
   images: readonly ProductGalleryImage[];
   productName: string;
   className?: string | undefined;
 }
 
-export function ProductGallery({ images, productName, className }: ProductGalleryProps) {
+export function ProductGallery({
+  images,
+  productName,
+  className,
+  'data-testid': testId = 'product-gallery',
+}: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
@@ -27,15 +33,16 @@ export function ProductGallery({ images, productName, className }: ProductGaller
   const activeAlt = active.alt ?? productName;
 
   return (
-    <div className={classes}>
+    <div className={classes} data-testid={testId}>
       <Frame variant="image" padding="sm">
-        <div className={styles['mainWrap']}>
+        <div className={styles['mainWrap']} data-testid={`${testId}-main`}>
           <Image
             src={active.src}
             alt={activeAlt}
             sizes="(max-width: 900px) 90vw, 50vw"
             priority
             className={styles['mainImage']}
+            data-testid={`${testId}-image`}
           />
         </div>
       </Frame>
@@ -55,6 +62,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
                 aria-selected={selected}
                 className={styles['thumb']}
                 data-selected={selected ? 'true' : undefined}
+                data-testid={`${testId}-thumb-${String(index)}`}
                 onClick={() => {
                   setActiveIndex(index);
                 }}

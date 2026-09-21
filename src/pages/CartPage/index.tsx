@@ -15,6 +15,11 @@ import type { PickupConfig } from '../../data/pickupConfig';
 import { getPickupBySlug } from '../../data/pickups';
 import styles from './CartPage.module.css';
 
+/** Cart line key → test-id-safe token (`#`, `:` and `,` become `-`). */
+export function cartLineTestId(id: string): string {
+  return id.replace(/[#:,]/g, '-');
+}
+
 /** Per-line build (colours, wire, pole pieces, cover), editable in the enquiry; changes merge matching lines. */
 function CartLineConfig({
   item,
@@ -33,6 +38,7 @@ function CartLineConfig({
       onChange={onChange}
       legend={`${item.name} build`}
       helpTo="/faq#option-availability"
+      data-testid={`cart-config-${cartLineTestId(item.id)}`}
     />
   );
 }
@@ -66,7 +72,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <Section spacing="sm" maxWidth="narrow">
+      <Section spacing="sm" maxWidth="narrow" data-testid="cart-empty">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
             Enquiry
@@ -79,7 +85,7 @@ export default function CartPage() {
             Your enquiry list is empty. Add a few pickups and send them to the workshop in a single
             message.
           </Text>
-          <Button linkTo="/shop" variant="primary" size="md">
+          <Button linkTo="/shop" variant="primary" size="md" data-testid="cart-empty-shop">
             Browse the shop
           </Button>
         </Stack>
@@ -88,7 +94,7 @@ export default function CartPage() {
   }
 
   return (
-    <Section spacing="sm" maxWidth="default">
+    <Section spacing="sm" maxWidth="default" data-testid="cart-page">
       <div className={styles['layout']}>
         <Stack direction="column" gap="xl" align="stretch">
           <Stack direction="column" gap="md" align="center">
@@ -105,12 +111,20 @@ export default function CartPage() {
             </Text>
           </Stack>
 
-          <ul className={styles['list']} role="list">
+          <ul className={styles['list']} role="list" data-testid="cart-list">
             {items.map((item, index) => (
-              <li key={item.id} className={styles['row']}>
+              <li
+                key={item.id}
+                className={styles['row']}
+                data-testid={`cart-line-${cartLineTestId(item.id)}`}
+              >
                 <div className={styles['rowMain']}>
                   <div className={styles['name']}>
-                    <Heading level={2} variant="section">
+                    <Heading
+                      level={2}
+                      variant="section"
+                      data-testid={`cart-line-name-${cartLineTestId(item.id)}`}
+                    >
                       {item.name}
                     </Heading>
                     <Text variant="meta" tone="muted">
@@ -122,16 +136,23 @@ export default function CartPage() {
                       label={`Decrease ${item.name} quantity`}
                       variant="outlined"
                       disabled={item.qty <= 1}
+                      data-testid={`cart-qty-dec-${cartLineTestId(item.id)}`}
                       onClick={() => {
                         setQty(item.id, item.qty - 1);
                       }}
                     >
                       −
                     </IconButton>
-                    <span className={styles['qtyValue']}>{item.qty}</span>
+                    <span
+                      className={styles['qtyValue']}
+                      data-testid={`cart-qty-${cartLineTestId(item.id)}`}
+                    >
+                      {item.qty}
+                    </span>
                     <IconButton
                       label={`Increase ${item.name} quantity`}
                       variant="outlined"
+                      data-testid={`cart-qty-inc-${cartLineTestId(item.id)}`}
                       onClick={() => {
                         setQty(item.id, item.qty + 1);
                       }}
@@ -140,7 +161,11 @@ export default function CartPage() {
                     </IconButton>
                   </div>
                   <div className={styles['lineTotal']}>
-                    <Price amount={item.price * item.qty} size="md" />
+                    <Price
+                      amount={item.price * item.qty}
+                      size="md"
+                      data-testid={`cart-line-total-${cartLineTestId(item.id)}`}
+                    />
                   </div>
                   <div className={styles['removeCell']}>
                     <Button
@@ -151,6 +176,7 @@ export default function CartPage() {
                       variant="ghost"
                       size="sm"
                       aria-label={`Remove ${item.name} from enquiry`}
+                      data-testid={`cart-remove-${cartLineTestId(item.id)}`}
                       onClick={() => {
                         removeLine(index);
                       }}
@@ -173,13 +199,14 @@ export default function CartPage() {
             <Text variant="label" tone="muted">
               Indicative subtotal
             </Text>
-            <Price amount={subtotal} size="lg" tone="primary" />
+            <Price amount={subtotal} size="lg" tone="primary" data-testid="cart-subtotal" />
           </div>
 
           <div className={styles['actions']}>
             <Button
               variant="ghost"
               size="md"
+              data-testid="cart-clear"
               onClick={() => {
                 clear();
               }}
@@ -189,6 +216,7 @@ export default function CartPage() {
             <Button
               variant="primary"
               size="lg"
+              data-testid="cart-send-enquiry"
               onClick={() => {
                 // Pass only the flag — the contact page reads the live cart, so
                 // later colour edits (and Back navigation) stay in sync. A stale

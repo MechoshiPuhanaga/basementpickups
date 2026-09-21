@@ -1,11 +1,12 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Section.module.css';
 
 export type SectionSpacing = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionMaxWidth = 'narrow' | 'default' | 'wide' | 'full';
 
-export interface SectionProps {
+export interface SectionProps extends TestIdProps {
   as?: ElementType | undefined;
   spacing?: SectionSpacing | undefined;
   maxWidth?: SectionMaxWidth | undefined;
@@ -19,11 +20,12 @@ export function Section({
   maxWidth = 'default',
   className,
   children,
+  'data-testid': testId,
 }: SectionProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <Tag className={classes} data-spacing={spacing} data-max-width={maxWidth}>
+    <Tag className={classes} data-spacing={spacing} data-max-width={maxWidth} data-testid={testId}>
       <div className={styles['inner']}>{children}</div>
     </Tag>
   );

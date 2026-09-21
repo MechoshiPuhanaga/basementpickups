@@ -1,10 +1,11 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Box.module.css';
 
 export type BoxPadding = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 
-export interface BoxProps {
+export interface BoxProps extends TestIdProps {
   as?: ElementType | undefined;
   padding?: BoxPadding | undefined;
   paddingInline?: BoxPadding | undefined;
@@ -20,6 +21,7 @@ export function Box({
   paddingBlock,
   className,
   children,
+  'data-testid': testId,
 }: BoxProps) {
   const classes = [styles['box'], className].filter(Boolean).join(' ');
 
@@ -29,6 +31,7 @@ export function Box({
       data-padding={padding}
       data-padding-inline={paddingInline}
       data-padding-block={paddingBlock}
+      data-testid={testId}
     >
       {children}
     </Tag>

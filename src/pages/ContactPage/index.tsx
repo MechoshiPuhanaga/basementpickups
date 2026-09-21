@@ -151,7 +151,7 @@ export default function ContactPage() {
   }
 
   return (
-    <Section spacing="sm" maxWidth="default">
+    <Section spacing="sm" maxWidth="default" data-testid="contact-page">
       <Stack direction="column" gap="xl" align="stretch">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
@@ -207,6 +207,7 @@ export default function ContactPage() {
                   href={`mailto:${CONTACT_EMAIL}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-testid="contact-email-link"
                 >
                   {CONTACT_EMAIL}
                 </a>

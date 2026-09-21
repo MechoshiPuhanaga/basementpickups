@@ -17,7 +17,7 @@ export function Header({ className, actions, mobileNav }: HeaderProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <header className={classes}>
+    <header className={classes} data-testid="site-header">
       <Box paddingBlock="md" paddingInline="lg">
         <Stack
           direction="row"
@@ -27,7 +27,12 @@ export function Header({ className, actions, mobileNav }: HeaderProps) {
           wrap
           className={styles['bar']}
         >
-          <Link to="/" className={styles['brand']} aria-label="Basement Pickups — home">
+          <Link
+            to="/"
+            className={styles['brand']}
+            aria-label="Basement Pickups — home"
+            data-testid="brand-link"
+          >
             <img
               src="/assets/logo/BP_Gold_horizont.svg"
               alt=""
@@ -37,7 +42,7 @@ export function Header({ className, actions, mobileNav }: HeaderProps) {
             />
           </Link>
           <div className={styles['rightGroup']}>
-            <nav aria-label="Primary" className={styles['nav']}>
+            <nav aria-label="Primary" className={styles['nav']} data-testid="primary-nav">
               <ul className={styles['navList']} role="list">
                 {primaryNav.map((link) => (
                   <li key={link.href} className={styles['navItem']}>
@@ -49,6 +54,7 @@ export function Header({ className, actions, mobileNav }: HeaderProps) {
                           .filter(Boolean)
                           .join(' ')
                       }
+                      data-testid={`nav-link-${link.href === '/' ? 'home' : link.href.slice(1)}`}
                     >
                       {link.label}
                     </NavLink>

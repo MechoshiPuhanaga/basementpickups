@@ -1,4 +1,5 @@
 import type { BobbinStyle, PickupPolepiece, PickupType } from '../../../data/pickups';
+import type { TestIdProps } from '../../testing';
 import styles from './PickupPreview.module.css';
 
 export interface PreviewCoil {
@@ -8,7 +9,7 @@ export interface PreviewCoil {
   readonly color: string;
 }
 
-export interface PickupPreviewProps {
+export interface PickupPreviewProps extends TestIdProps {
   /** Pickup family — sets the coil outline/proportions. */
   type: PickupType;
   /** The coils, top to bottom, as they sit on the baseplate. */
@@ -61,6 +62,7 @@ export function PickupPreview({
   label,
   poles = 6,
   className,
+  'data-testid': testId,
 }: PickupPreviewProps) {
   const shape = SHAPES[type];
   const classes = [styles['preview'], className].filter(Boolean).join(' ');
@@ -78,6 +80,8 @@ export function PickupPreview({
       role="img"
       aria-label={label}
       data-polepieces={polepieces}
+      data-type={type}
+      data-testid={testId}
     >
       <rect
         className={styles['plate']}

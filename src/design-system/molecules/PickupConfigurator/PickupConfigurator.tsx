@@ -16,11 +16,12 @@ import {
   spacingLabel,
 } from '../../../data/pickupLabels';
 import type { Choice, Pickup } from '../../../data/pickups';
+import type { TestIdProps } from '../../testing';
 import styles from './PickupConfigurator.module.css';
 
 export type { PickupConfig };
 
-export interface PickupConfiguratorProps {
+export interface PickupConfiguratorProps extends TestIdProps {
   pickup: Pickup;
   /** Current build; missing or invalid entries fall back to the pickup's defaults. */
   value: PickupConfig;
@@ -44,6 +45,7 @@ interface OptionFieldProps<T extends string | number> {
   optionLabel: (value: T) => string;
   onChange: (value: T) => void;
   className?: string | undefined;
+  testId: string;
 }
 
 /**
@@ -59,11 +61,12 @@ function OptionField<T extends string | number>({
   optionLabel,
   onChange,
   className,
+  testId,
 }: OptionFieldProps<T>) {
   const fieldClasses = [styles['field'], className].filter(Boolean).join(' ');
   if (choice.options.length <= 1) {
     return (
-      <div className={fieldClasses}>
+      <div className={fieldClasses} data-testid={testId}>
         <Text variant="label" tone="muted" as="span">
           {label}
         </Text>
@@ -83,6 +86,7 @@ function OptionField<T extends string | number>({
         className={styles['select']}
         selectSize="sm"
         value={String(value)}
+        data-testid={testId}
         onChange={(event) => {
           // Map the select's string back to the typed option it came from.
           const next = choice.options.find((option) => String(option) === event.target.value);
@@ -116,6 +120,7 @@ export function PickupConfigurator({
   legend,
   helpTo,
   className,
+  'data-testid': testId = 'pickup-configurator',
 }: PickupConfiguratorProps) {
   const baseId = useId();
   const resolved = resolveConfig(pickup, value);
@@ -143,6 +148,7 @@ export function PickupConfigurator({
       <OptionField
         key="conductors"
         id={`${baseId}-conductors`}
+        testId={`${testId}-conductors`}
         className={styles['wide']}
         label="Wire"
         choice={pickup.conductors}
@@ -159,6 +165,7 @@ export function PickupConfigurator({
       <OptionField
         key="polepieces"
         id={`${baseId}-polepieces`}
+        testId={`${testId}-polepieces`}
         label="Pole pieces"
         choice={pickup.hardware.polepieces}
         value={resolved.polepieces}
@@ -174,6 +181,7 @@ export function PickupConfigurator({
       <OptionField
         key="cover"
         id={`${baseId}-cover`}
+        testId={`${testId}-cover`}
         label="Cover"
         choice={pickup.hardware.cover}
         value={resolved.cover}
@@ -189,6 +197,7 @@ export function PickupConfigurator({
       <OptionField
         key="potting"
         id={`${baseId}-potting`}
+        testId={`${testId}-potting`}
         label="Potting"
         choice={pickup.potting}
         value={resolved.potting}
@@ -204,6 +213,7 @@ export function PickupConfigurator({
       <OptionField
         key="spacing"
         id={`${baseId}-spacing`}
+        testId={`${testId}-spacing`}
         label="String spacing"
         choice={spacing}
         value={resolved.spacingMm}
@@ -216,12 +226,13 @@ export function PickupConfigurator({
   }
 
   return (
-    <fieldset className={classes}>
+    <fieldset className={classes} data-testid={testId}>
       <VisuallyHidden as="legend">{legend}</VisuallyHidden>
       {bobbins.length > 0 && (
         <div className={styles['coils']}>
           <PickupPreview
             className={styles['preview']}
+            data-testid={`${testId}-preview`}
             type={pickup.type}
             coils={bobbins.map((bobbin) => ({
               style: bobbin.style,
@@ -235,6 +246,7 @@ export function PickupConfigurator({
               <OptionField
                 key={bobbin.id}
                 id={`${baseId}-${bobbin.id}`}
+                testId={`${testId}-bobbin-${bobbin.id}`}
                 label={labels[index] ?? bobbin.style}
                 choice={{ options: bobbin.palette, defaultOption: bobbin.defaultColor }}
                 value={resolved.bobbins?.[bobbin.id] ?? bobbin.defaultColor}
@@ -251,7 +263,9 @@ export function PickupConfigurator({
       {helpTo !== undefined && (
         <Text variant="meta" tone="muted" className={styles['note']}>
           Not every option is always available.{' '}
-          <TextLink to={helpTo}>What happens if my choice is not in stock?</TextLink>
+          <TextLink to={helpTo} data-testid={`${testId}-help`}>
+            What happens if my choice is not in stock?
+          </TextLink>
         </Text>
       )}
     </fieldset>

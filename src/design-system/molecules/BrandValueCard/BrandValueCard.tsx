@@ -4,9 +4,10 @@ import { Heading } from '../../atoms/Heading';
 import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import type { BrandValue, BrandValueIcon } from '../../../data/brandValues';
+import type { TestIdProps } from '../../testing';
 import styles from './BrandValueCard.module.css';
 
-export interface BrandValueCardProps {
+export interface BrandValueCardProps extends TestIdProps {
   value: BrandValue;
   className?: string | undefined;
 }
@@ -73,11 +74,11 @@ function renderIcon(icon: BrandValueIcon): ReactNode {
   }
 }
 
-export function BrandValueCard({ value, className }: BrandValueCardProps) {
+export function BrandValueCard({ value, className, 'data-testid': testId }: BrandValueCardProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <article className={classes}>
+    <article className={classes} data-testid={testId ?? `brand-value-${value.id}`}>
       <Stack direction="column" gap="sm" align="center">
         <div className={styles['icon']} aria-hidden="true">
           {renderIcon(value.icon)}

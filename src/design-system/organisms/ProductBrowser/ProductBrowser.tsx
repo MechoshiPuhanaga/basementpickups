@@ -6,9 +6,10 @@ import { VisuallyHidden } from '../../atoms/VisuallyHidden';
 import { FilterDisclosure } from '../../molecules/FilterDisclosure';
 import { ProductGrid } from '../ProductGrid';
 import type { Pickup, PickupMagnet, PickupType } from '../../../data/pickups';
+import type { TestIdProps } from '../../testing';
 import styles from './ProductBrowser.module.css';
 
-export interface ProductBrowserProps {
+export interface ProductBrowserProps extends TestIdProps {
   pickups: readonly Pickup[];
   className?: string | undefined;
 }
@@ -84,7 +85,11 @@ function parseInductance(value: string | undefined): number {
   return num !== undefined ? Number.parseFloat(num) : Number.POSITIVE_INFINITY;
 }
 
-export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
+export function ProductBrowser({
+  pickups,
+  className,
+  'data-testid': testId = 'product-browser',
+}: ProductBrowserProps) {
   const [sort, setSort] = useState<SortKey>('featured');
   const [magnet, setMagnet] = useState<MagnetFilter>('all');
   const [type, setType] = useState<TypeFilter>('all');
@@ -149,10 +154,10 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
   ].filter((value): value is string => value !== undefined);
 
   return (
-    <div className={classes}>
+    <div className={classes} data-testid={testId}>
       <VisuallyHidden as="h2">All pickups</VisuallyHidden>
       <div className={styles['controls']}>
-        <FilterDisclosure filters={activeFilters}>
+        <FilterDisclosure filters={activeFilters} data-testid={`${testId}-filters`}>
           <div className={styles['fields']}>
             <label className={styles['field']}>
               <Text variant="label" tone="muted" as="span">
@@ -161,6 +166,7 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
               <Select
                 selectSize="sm"
                 value={sort}
+                data-testid={`${testId}-sort`}
                 onChange={(event) => {
                   setSort(event.target.value as SortKey);
                 }}
@@ -181,6 +187,7 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
               <Select
                 selectSize="sm"
                 value={type}
+                data-testid={`${testId}-type`}
                 onChange={(event) => {
                   setType(event.target.value as TypeFilter);
                 }}
@@ -200,6 +207,7 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
               <Select
                 selectSize="sm"
                 value={magnet}
+                data-testid={`${testId}-magnet`}
                 onChange={(event) => {
                   setMagnet(event.target.value as MagnetFilter);
                 }}
@@ -214,17 +222,22 @@ export function ProductBrowser({ pickups, className }: ProductBrowserProps) {
             </label>
           </div>
         </FilterDisclosure>
-        <div className={styles['count']} role="status" aria-live="polite">
+        <div
+          className={styles['count']}
+          role="status"
+          aria-live="polite"
+          data-testid={`${testId}-count`}
+        >
           <Text variant="meta" tone="muted">
             {visible.length} {visible.length === 1 ? 'model' : 'models'}
           </Text>
         </div>
       </div>
       {visible.length > 0 ? (
-        <ProductGrid pickups={visible} priorityFirst />
+        <ProductGrid pickups={visible} priorityFirst data-testid={`${testId}-grid`} />
       ) : (
-        <Text variant="editorial" tone="muted" align="center">
-          No pickups match that magnet. Try a different filter.
+        <Text variant="editorial" tone="muted" align="center" data-testid={`${testId}-empty`}>
+          No pickups match those filters.
         </Text>
       )}
     </div>

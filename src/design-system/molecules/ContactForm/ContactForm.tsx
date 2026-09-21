@@ -6,6 +6,7 @@ import { Input } from '../../atoms/Input';
 import { Select } from '../../atoms/Select';
 import { Stack } from '../../atoms/Stack';
 import { Textarea } from '../../atoms/Textarea';
+import type { TestIdProps } from '../../testing';
 import styles from './ContactForm.module.css';
 
 function readField(formData: FormData, key: string): string {
@@ -63,7 +64,7 @@ export interface ContactFormData {
   readonly company: string;
 }
 
-export interface ContactFormProps {
+export interface ContactFormProps extends TestIdProps {
   subjects?: readonly string[] | undefined;
   defaultSubject?: string | undefined;
   defaultMessage?: string | undefined;
@@ -113,6 +114,7 @@ export function ContactForm({
   contactEmail,
   mailtoItemsText,
   className,
+  'data-testid': testId = 'contact-form',
 }: ContactFormProps) {
   const [status, setStatus] = useState<ContactFormStatus>('idle');
   const [serverError, setServerError] = useState<string>('');
@@ -186,7 +188,11 @@ export function ContactForm({
   function renderFieldError(field: ContactFormField) {
     if (fieldError?.field !== field) return null;
     return (
-      <p id={`${FIELD_IDS[field]}-error`} className={styles['error']}>
+      <p
+        id={`${FIELD_IDS[field]}-error`}
+        className={styles['error']}
+        data-testid={`${testId}-field-error-${field}`}
+      >
         {fieldError.message}
       </p>
     );
@@ -209,6 +215,7 @@ export function ContactForm({
         }
       }}
       aria-label="Contact form"
+      data-testid={testId}
     >
       <Stack direction="column" gap="lg" align="stretch">
         <div className={styles['field']}>
@@ -222,6 +229,7 @@ export function ContactForm({
             required
             autoComplete="name"
             disabled={isSubmitting}
+            data-testid={`${testId}-name`}
             {...invalidProps('name')}
           />
           {renderFieldError('name')}
@@ -237,6 +245,7 @@ export function ContactForm({
             required
             autoComplete="email"
             disabled={isSubmitting}
+            data-testid={`${testId}-email`}
             {...invalidProps('email')}
           />
           {renderFieldError('email')}
@@ -250,6 +259,7 @@ export function ContactForm({
             name="subject"
             defaultValue={defaultSubject ?? ''}
             disabled={isSubmitting}
+            data-testid={`${testId}-subject`}
             {...invalidProps('subject')}
           >
             <option value="" disabled>
@@ -275,6 +285,7 @@ export function ContactForm({
             defaultValue={defaultMessage}
             placeholder={messagePlaceholder}
             disabled={isSubmitting}
+            data-testid={`${testId}-message`}
             {...invalidProps('message')}
           />
           {renderFieldError('message')}
@@ -283,11 +294,24 @@ export function ContactForm({
         {/* Honeypot — hidden from users and assistive tech; bots fill it. */}
         <div className={styles['honeypot']} aria-hidden="true">
           <label htmlFor="contact-company">Company</label>
-          <input id="contact-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+          <input
+            id="contact-company"
+            name="company"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            data-testid={`${testId}-company`}
+          />
         </div>
 
         <div className={styles['actions']}>
-          <Button type="submit" variant="primary" size="md" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            disabled={isSubmitting}
+            data-testid={`${testId}-submit`}
+          >
             {isSubmitting ? 'Sending…' : submitLabel}
           </Button>
         </div>
@@ -297,16 +321,24 @@ export function ContactForm({
           className={styles['status']}
           role={status === 'error' ? 'alert' : 'status'}
           aria-live={status === 'error' ? 'assertive' : 'polite'}
+          data-testid={`${testId}-status`}
+          data-status={status}
         >
-          {status === 'success' && <Callout tone="success">{successMessage}</Callout>}
+          {status === 'success' && (
+            <Callout tone="success" data-testid={`${testId}-success`}>
+              {successMessage}
+            </Callout>
+          )}
           {status === 'error' &&
             fieldError === null &&
             (serverError !== '' ? (
               // A specific validation message from the server — the visitor can fix it.
-              <Callout tone="error">{serverError}</Callout>
+              <Callout tone="error" data-testid={`${testId}-error`}>
+                {serverError}
+              </Callout>
             ) : (
               // A system failure — offer a prefilled mailto fallback if we can.
-              <Callout tone="error">
+              <Callout tone="error" data-testid={`${testId}-error`}>
                 {errorMessage}
                 {contactEmail !== undefined && lastData !== null && (
                   <>
@@ -316,6 +348,7 @@ export function ContactForm({
                       href={buildMailto(contactEmail, lastData, mailtoItemsText)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-testid={`${testId}-mailto`}
                     >
                       Send it from your email app instead
                     </a>

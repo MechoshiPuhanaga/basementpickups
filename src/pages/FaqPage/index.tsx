@@ -8,7 +8,7 @@ import { FAQ_ITEMS } from '../../data/faq';
 
 export default function FaqPage() {
   return (
-    <Section spacing="sm" maxWidth="narrow">
+    <Section spacing="sm" maxWidth="narrow" data-testid="faq-page">
       <Stack direction="column" gap="xl" align="stretch">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
@@ -26,7 +26,14 @@ export default function FaqPage() {
 
         <Stack direction="column" gap="xl" align="stretch">
           {FAQ_ITEMS.map((item) => (
-            <Stack key={item.id} id={item.id} direction="column" gap="sm" align="start">
+            <Stack
+              key={item.id}
+              id={item.id}
+              direction="column"
+              gap="sm"
+              align="start"
+              data-testid={`faq-item-${item.id}`}
+            >
               <Stack direction="row" gap="sm" align="center">
                 <FaqIcon name={item.icon} size={32} />
                 <Heading level={2} variant="section">

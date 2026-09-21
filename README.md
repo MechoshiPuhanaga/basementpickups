@@ -32,15 +32,19 @@ Then open **http://localhost:3000**.
 
 ## Daily commands
 
-| Command                             | What it does                                                  |
-| ----------------------------------- | ------------------------------------------------------------- |
-| `pnpm dev`                          | Dev server on :3000 with HMR + SSR                            |
-| `pnpm typecheck`                    | `tsc --noEmit` against strict config                          |
-| `pnpm lint` / `pnpm lint:fix`       | ESLint over all `.ts` / `.tsx`                                |
-| `pnpm stylelint`                    | Stylelint over `src/**/*.css`                                 |
-| `pnpm format` / `pnpm format:check` | Prettier write / check                                        |
-| `pnpm build`                        | Builds `dist/client` + `dist/server`                          |
-| `pnpm start`                        | Runs the production server against the built bundles on :3000 |
+| Command                             | What it does                                                   |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `pnpm dev`                          | Dev server on :3000 with HMR + SSR                             |
+| `pnpm typecheck`                    | `tsc --noEmit` against strict config                           |
+| `pnpm lint` / `pnpm lint:fix`       | ESLint over all `.ts` / `.tsx`                                 |
+| `pnpm stylelint`                    | Stylelint over `src/**/*.css`                                  |
+| `pnpm format` / `pnpm format:check` | Prettier write / check                                         |
+| `pnpm build`                        | Builds `dist/client` + `dist/server`                           |
+| `pnpm start`                        | Runs the production server against the built bundles on :3000  |
+| `pnpm test`                         | Vitest unit + component tests                                  |
+| `pnpm test:coverage`                | All Vitest projects + coverage report in `coverage/`           |
+| `pnpm test:e2e`                     | Playwright browser tests (needs `pnpm build`; server on :3100) |
+| `pnpm check`                        | Full quality gate: static checks, build, coverage, e2e         |
 
 ---
 

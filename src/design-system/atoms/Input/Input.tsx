@@ -1,13 +1,12 @@
 import type { InputHTMLAttributes } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './Input.module.css';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
-export interface InputProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  'className' | 'size'
-> {
+export interface InputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className' | 'size'>, TestIdProps {
   inputSize?: InputSize | undefined;
   invalid?: boolean | undefined;
   className?: string | undefined;

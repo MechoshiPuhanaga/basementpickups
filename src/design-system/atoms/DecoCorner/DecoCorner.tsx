@@ -1,10 +1,11 @@
+import type { TestIdProps } from '../../testing';
 import styles from './DecoCorner.module.css';
 
 export type DecoCornerVariant = 'simple' | 'stepped' | 'double' | 'bracket';
 
 export type DecoCornerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
-export interface DecoCornerProps {
+export interface DecoCornerProps extends TestIdProps {
   variant?: DecoCornerVariant | undefined;
   position?: DecoCornerPosition | undefined;
   size?: number | undefined;
@@ -16,6 +17,7 @@ export function DecoCorner({
   position = 'top-left',
   size = 40,
   className,
+  'data-testid': testId,
 }: DecoCornerProps) {
   const classes = [
     styles['corner'],
@@ -36,6 +38,7 @@ export function DecoCorner({
         fill="currentColor"
         aria-hidden="true"
         focusable="false"
+        data-testid={testId}
       >
         <path
           transform="rotate(-90 600 600)"
@@ -57,6 +60,7 @@ export function DecoCorner({
       strokeLinejoin="miter"
       aria-hidden="true"
       focusable="false"
+      data-testid={testId}
     >
       {variant === 'simple' && (
         <path d="M0 28 L0 0 L28 0" strokeWidth="1" vectorEffect="non-scaling-stroke" />

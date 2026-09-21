@@ -1,8 +1,9 @@
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
+import type { TestIdProps } from '../../testing';
 import styles from './NewsletterSignup.module.css';
 
-export interface NewsletterSignupProps {
+export interface NewsletterSignupProps extends TestIdProps {
   label?: string | undefined;
   placeholder?: string | undefined;
   submitLabel?: string | undefined;
@@ -21,6 +22,7 @@ export function NewsletterSignup({
   submitLabel = 'Subscribe',
   onSubmit,
   className,
+  'data-testid': testId = 'newsletter-form',
 }: NewsletterSignupProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
@@ -37,6 +39,7 @@ export function NewsletterSignup({
       }}
       noValidate={false}
       aria-label="Newsletter signup"
+      data-testid={testId}
     >
       <label htmlFor={inputId} className={styles['srOnly']}>
         {label}
@@ -50,8 +53,9 @@ export function NewsletterSignup({
           autoComplete="email"
           placeholder={placeholder}
           className={styles['input']}
+          data-testid={`${testId}-email`}
         />
-        <Button type="submit" variant="primary" size="md">
+        <Button type="submit" variant="primary" size="md" data-testid={`${testId}-submit`}>
           {submitLabel}
         </Button>
       </div>

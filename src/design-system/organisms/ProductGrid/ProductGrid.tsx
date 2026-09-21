@@ -4,9 +4,10 @@ import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import { ProductCard } from '../../molecules/ProductCard';
 import type { Pickup } from '../../../data/pickups';
+import type { TestIdProps } from '../../testing';
 import styles from './ProductGrid.module.css';
 
-export interface ProductGridProps {
+export interface ProductGridProps extends TestIdProps {
   pickups: readonly Pickup[];
   eyebrow?: string | undefined;
   title?: string | undefined;
@@ -29,12 +30,13 @@ export function ProductGrid({
   columns = 3,
   priorityFirst = false,
   className,
+  'data-testid': testId = 'product-grid',
 }: ProductGridProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const hasHeader = eyebrow !== undefined || title !== undefined || lead !== undefined;
 
   return (
-    <section className={classes}>
+    <section className={classes} data-testid={testId}>
       <Stack direction="column" gap="xl" align="stretch">
         {hasHeader && (
           <Stack direction="column" gap="xs" align="center" className={styles['header']}>

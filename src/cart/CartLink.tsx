@@ -6,7 +6,7 @@ export function CartLink() {
   const { count } = useCart();
 
   return (
-    <Button linkTo="/cart" variant="ghost" size="sm">
+    <Button linkTo="/cart" variant="ghost" size="sm" data-testid="cart-link">
       {count > 0 ? `Enquiry (${String(count)})` : 'Enquiry'}
     </Button>
   );

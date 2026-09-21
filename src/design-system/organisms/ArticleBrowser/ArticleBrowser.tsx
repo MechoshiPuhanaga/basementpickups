@@ -6,9 +6,10 @@ import { VisuallyHidden } from '../../atoms/VisuallyHidden';
 import { FilterDisclosure } from '../../molecules/FilterDisclosure';
 import { ArticleGrid } from '../ArticleGrid';
 import type { Article } from '../../../data/articles';
+import type { TestIdProps } from '../../testing';
 import styles from './ArticleBrowser.module.css';
 
-export interface ArticleBrowserProps {
+export interface ArticleBrowserProps extends TestIdProps {
   articles: readonly Article[];
   className?: string | undefined;
 }
@@ -25,7 +26,11 @@ function publishedTime(article: Article): number {
   return Number.isNaN(time) ? 0 : time;
 }
 
-export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
+export function ArticleBrowser({
+  articles,
+  className,
+  'data-testid': testId = 'article-browser',
+}: ArticleBrowserProps) {
   const [sort, setSort] = useState<SortKey>('newest');
   const [keyword, setKeyword] = useState<string>('all');
 
@@ -52,10 +57,10 @@ export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
   );
 
   return (
-    <div className={classes}>
+    <div className={classes} data-testid={testId}>
       <VisuallyHidden as="h2">All articles</VisuallyHidden>
       <div className={styles['controls']}>
-        <FilterDisclosure filters={activeFilters}>
+        <FilterDisclosure filters={activeFilters} data-testid={`${testId}-filters`}>
           <div className={styles['fields']}>
             <label className={styles['field']}>
               <Text variant="label" tone="muted" as="span">
@@ -64,6 +69,7 @@ export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
               <Select
                 selectSize="sm"
                 value={sort}
+                data-testid={`${testId}-sort`}
                 onChange={(event) => {
                   setSort(event.target.value as SortKey);
                 }}
@@ -79,6 +85,7 @@ export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
               <Select
                 selectSize="sm"
                 value={keyword}
+                data-testid={`${testId}-topic`}
                 onChange={(event) => {
                   setKeyword(event.target.value);
                 }}
@@ -93,16 +100,21 @@ export function ArticleBrowser({ articles, className }: ArticleBrowserProps) {
             </label>
           </div>
         </FilterDisclosure>
-        <div className={styles['count']} role="status" aria-live="polite">
+        <div
+          className={styles['count']}
+          role="status"
+          aria-live="polite"
+          data-testid={`${testId}-count`}
+        >
           <Text variant="meta" tone="muted">
             {visible.length} {visible.length === 1 ? 'article' : 'articles'}
           </Text>
         </div>
       </div>
       {visible.length > 0 ? (
-        <ArticleGrid articles={visible} priorityFirst />
+        <ArticleGrid articles={visible} priorityFirst data-testid={`${testId}-grid`} />
       ) : (
-        <Text variant="editorial" tone="muted" align="center">
+        <Text variant="editorial" tone="muted" align="center" data-testid={`${testId}-empty`}>
           No articles match that topic. Try another.
         </Text>
       )}

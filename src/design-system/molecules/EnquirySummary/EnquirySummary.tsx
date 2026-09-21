@@ -1,6 +1,7 @@
 import { Price } from '../../atoms/Price';
 import { Surface } from '../../atoms/Surface';
 import { Text } from '../../atoms/Text';
+import type { TestIdProps } from '../../testing';
 import styles from './EnquirySummary.module.css';
 
 export interface EnquirySummaryItem {
@@ -11,7 +12,7 @@ export interface EnquirySummaryItem {
   readonly options?: readonly { readonly label: string; readonly value: string }[] | undefined;
 }
 
-export interface EnquirySummaryProps {
+export interface EnquirySummaryProps extends TestIdProps {
   items: readonly EnquirySummaryItem[];
   title?: string | undefined;
   note?: string | undefined;
@@ -31,18 +32,23 @@ export function EnquirySummary({
   title = 'Your enquiry',
   note = DEFAULT_NOTE,
   className,
+  'data-testid': testId = 'enquiry-summary',
 }: EnquirySummaryProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
   const classes = [styles['root'], className].filter(Boolean).join(' ');
 
   return (
-    <Surface as="section" variant="raised" border="gold" className={classes}>
+    <Surface as="section" variant="raised" border="gold" className={classes} data-testid={testId}>
       <Text variant="label" tone="gold">
         {title}
       </Text>
       <ul className={styles['list']}>
         {items.map((item, index) => (
-          <li key={`${item.name}-${String(index)}`} className={styles['item']}>
+          <li
+            key={`${item.name}-${String(index)}`}
+            className={styles['item']}
+            data-testid={`${testId}-item-${String(index)}`}
+          >
             <span className={styles['details']}>
               <span className={styles['name']}>
                 <span className={styles['qty']}>{item.qty}×</span> {item.name}
@@ -53,7 +59,12 @@ export function EnquirySummary({
                 </span>
               )}
             </span>
-            <Price amount={item.price * item.qty} tone="primary" size="sm" />
+            <Price
+              amount={item.price * item.qty}
+              tone="primary"
+              size="sm"
+              data-testid={`${testId}-item-${String(index)}-total`}
+            />
           </li>
         ))}
       </ul>
@@ -61,7 +72,7 @@ export function EnquirySummary({
         <Text variant="label" tone="muted">
           Subtotal
         </Text>
-        <Price amount={subtotal} tone="gold" size="md" />
+        <Price amount={subtotal} tone="gold" size="md" data-testid={`${testId}-subtotal`} />
       </div>
       <Text variant="meta" tone="muted">
         {note}

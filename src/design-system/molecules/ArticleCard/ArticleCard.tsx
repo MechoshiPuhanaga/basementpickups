@@ -6,9 +6,10 @@ import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import type { Article } from '../../../data/articles';
 import { formatReadingTime } from '../../../utils/readingTime';
+import type { TestIdProps } from '../../testing';
 import styles from './ArticleCard.module.css';
 
-export interface ArticleCardProps {
+export interface ArticleCardProps extends TestIdProps {
   article: Article;
   /** This card's image is the page's LCP candidate: load it eagerly with high priority. */
   priority?: boolean | undefined;
@@ -27,13 +28,22 @@ function formatPublishedAt(iso: string): string {
   return dateFormatter.format(date);
 }
 
-export function ArticleCard({ article, priority = false, className }: ArticleCardProps) {
+export function ArticleCard({
+  article,
+  priority = false,
+  className,
+  'data-testid': testId,
+}: ArticleCardProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const dateLabel = formatPublishedAt(article.metadata.publishedAt);
   const metaLabel = `${dateLabel} · ${formatReadingTime(article.body)}`;
 
   return (
-    <Link to={`/articles/${article.slug}`} className={classes}>
+    <Link
+      to={`/articles/${article.slug}`}
+      className={classes}
+      data-testid={testId ?? `article-card-${article.slug}`}
+    >
       <Stack direction="column" gap="md" align="stretch">
         <div className={styles['imageWrap']}>
           <Image

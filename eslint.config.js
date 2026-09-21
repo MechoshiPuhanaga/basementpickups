@@ -8,7 +8,15 @@ import { fixupPluginRules } from '@eslint/compat';
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**', 'public/**', 'pnpm-lock.yaml'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'public/**',
+      'pnpm-lock.yaml',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,

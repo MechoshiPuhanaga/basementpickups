@@ -1,8 +1,9 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { TestIdProps } from '../../testing';
 import styles from './VisuallyHidden.module.css';
 
-export interface VisuallyHiddenProps {
+export interface VisuallyHiddenProps extends TestIdProps {
   as?: ElementType | undefined;
   role?: string | undefined;
   'aria-live'?: 'polite' | 'assertive' | 'off' | undefined;

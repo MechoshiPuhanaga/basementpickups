@@ -4,9 +4,10 @@ import { Stack } from '../../atoms/Stack';
 import { Text } from '../../atoms/Text';
 import { ArticleCard } from '../../molecules/ArticleCard';
 import type { Article } from '../../../data/articles';
+import type { TestIdProps } from '../../testing';
 import styles from './ArticleGrid.module.css';
 
-export interface ArticleGridProps {
+export interface ArticleGridProps extends TestIdProps {
   articles: readonly Article[];
   eyebrow?: string | undefined;
   title?: string | undefined;
@@ -29,12 +30,13 @@ export function ArticleGrid({
   columns = 3,
   priorityFirst = false,
   className,
+  'data-testid': testId = 'article-grid',
 }: ArticleGridProps) {
   const classes = [styles['root'], className].filter(Boolean).join(' ');
   const hasHeader = eyebrow !== undefined || title !== undefined || lead !== undefined;
 
   return (
-    <section className={classes}>
+    <section className={classes} data-testid={testId}>
       <Stack direction="column" gap="xl" align="stretch">
         {hasHeader && (
           <Stack direction="column" gap="xs" align="center" className={styles['header']}>

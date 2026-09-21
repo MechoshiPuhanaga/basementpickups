@@ -8,7 +8,7 @@ import { pickups } from '../../data/pickups';
 
 export default function ShopPage() {
   return (
-    <Section spacing="sm" maxWidth="default">
+    <Section spacing="sm" maxWidth="default" data-testid="shop-page">
       <Stack direction="column" gap="lg" align="stretch">
         <Stack direction="column" gap="md" align="center">
           <Text variant="label" tone="gold" align="center">
