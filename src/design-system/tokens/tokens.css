@@ -45,6 +45,7 @@
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
   --layout-max-inline: 1280px;
   --layout-gutter: var(--space-5);
+  --type-scale-caption: 0.75rem;
   --type-scale-step-down: 0.875rem;
   --type-scale-body: 1rem;
   --type-scale-lead: 1.125rem;
@@ -54,5 +55,6 @@
   --type-scale-hero: 4.5rem;
   --letter-spacing-display: 0.18em;
   --letter-spacing-label: 0.12em;
+  --letter-spacing-caption: 0.08em;
   --letter-spacing-body: 0;
 }

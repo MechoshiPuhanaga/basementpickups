@@ -4,6 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { routes } from '../../app/routes';
+import { pickups } from '../../data/pickups';
 
 const scrollTo = vi.fn();
 
@@ -127,6 +128,73 @@ describe('ProductPage', () => {
     expect(screen.getByTestId('add-to-cart')).toHaveTextContent('Add to enquiry');
     expect(screen.getByTestId('pickup-configurator-cover-select')).toHaveValue('none');
     expect(screen.getByTestId('cart-link')).toHaveTextContent('Enquiry (2)');
+  });
+
+  it('gives a set page breadcrumbs and a neck & bridge section linking each variant', () => {
+    renderProduct('white-pearl');
+    expect(screen.getByTestId('breadcrumbs-link-1')).toHaveAttribute('href', '/shop');
+    expect(screen.getByTestId('breadcrumbs-current')).toHaveTextContent('White Pearl');
+
+    const neck = pickups
+      .find((p) => p.slug === 'white-pearl')
+      ?.variants?.find((v) => v.slug === 'white-pearl-neck');
+    if (neck === undefined) throw new Error('fixture: white-pearl-neck');
+    expect(screen.getByTestId('product-positions')).toBeInTheDocument();
+    const block = screen.getByTestId('position-white-pearl-neck');
+    expect(block).toHaveTextContent(neck.name);
+    expect(block).toHaveTextContent(neck.description);
+    expect(block).toHaveTextContent('Alnico 3 · DCR 5.9k · 2.8H');
+    expect(screen.getByTestId('position-link-white-pearl-neck')).toHaveAttribute(
+      'href',
+      '/products/white-pearl-neck',
+    );
+    expect(screen.getByTestId('position-link-white-pearl-neck')).toHaveTextContent(
+      'View the neck pickup',
+    );
+    expect(screen.getByTestId('position-white-pearl-bridge')).toBeInTheDocument();
+  });
+
+  it('puts a variant under its set in the breadcrumbs, without the neck & bridge section', () => {
+    renderProduct('white-pearl-bridge');
+    expect(screen.getByTestId('breadcrumbs-link-2')).toHaveAttribute(
+      'href',
+      '/products/white-pearl',
+    );
+    expect(screen.getByTestId('breadcrumbs-current')).toHaveTextContent('White Pearl · Bridge');
+    expect(screen.queryByTestId('product-positions')).toBeNull();
+  });
+
+  it('has no neck & bridge section on a single model', () => {
+    renderProduct('rockroach');
+    expect(screen.getByTestId('breadcrumbs-current')).toHaveTextContent('Rockroach');
+    expect(screen.queryByTestId('product-positions')).toBeNull();
+  });
+
+  it('links related pickups and the articles that feature the pickup', () => {
+    renderProduct('rockroach');
+    const related = screen.getByTestId('product-related');
+    expect(related).toHaveTextContent('More from the bench');
+    expect(screen.getByTestId('product-card-karakonjul')).toHaveAttribute(
+      'href',
+      '/products/karakonjul',
+    );
+    expect(screen.getByTestId('product-card-little-karakonjul')).toBeInTheDocument();
+    expect(screen.getByTestId('product-reading')).toHaveTextContent('Further reading');
+    expect(screen.getByTestId('article-card-installation-without-regret')).toHaveAttribute(
+      'href',
+      '/articles/installation-without-regret',
+    );
+  });
+
+  it("shows the set's related pickups on a variant page", () => {
+    renderProduct('white-pearl-neck');
+    expect(screen.getByTestId('product-card-macho-heaven')).toBeInTheDocument();
+  });
+
+  it('omits further reading when no article features the pickup', () => {
+    renderProduct('little-karakonjul');
+    expect(screen.getByTestId('product-related')).toBeInTheDocument();
+    expect(screen.queryByTestId('product-reading')).toBeNull();
   });
 
   it('shows a not-found state for an unknown slug', () => {

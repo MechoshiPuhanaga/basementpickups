@@ -155,6 +155,9 @@ export type Pickup = {
   /** ≤155-char search snippet, written by hand (meta description / og:description). */
   seoDescription: string;
 
+  /** Search title before " | Basement Pickups" (≤41 chars, starts with `name`); sets/singles only. */
+  seoTitle?: string;
+
   type: PickupType;
 
   magnet: PickupMagnet;
@@ -177,6 +180,9 @@ export type Pickup = {
   };
 
   variants?: Pickup[];
+
+  /** Hand-picked set/single slugs for "More from the bench" (sets/singles only). */
+  related?: string[];
 };
 ```
 
@@ -486,6 +492,9 @@ export type Article = {
   body: string;
 
   keywords: string[];
+
+  /** Set/single pickup slugs shown as "Pickups in this story" (1–3). */
+  relatedProducts: string[];
 
   mainImage: ArticleImage;
 

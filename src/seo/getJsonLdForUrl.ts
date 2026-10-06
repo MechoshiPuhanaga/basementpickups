@@ -10,7 +10,10 @@ import {
 } from '../data/pickupLabels';
 import { getArticleBySlug } from '../data/articles';
 import { FAQ_ITEMS } from '../data/faq';
+import { CONTACT_EMAIL } from '../data/site';
+import { imageManifest } from '../assets/imageManifest';
 import { toOgImage } from './getSeoForUrl';
+import { articleCrumbs, FAQ_CRUMBS, productCrumbs, type Crumb } from './breadcrumbs';
 
 const SITE_NAME = 'Basement Pickups';
 const SITE_DESCRIPTION =
@@ -104,23 +107,46 @@ function productProperties(pickup: Pickup): JsonLd[] {
  */
 export type JsonLd = Record<string, unknown>;
 
-function organizationLd(base: string): JsonLd {
+/**
+ * One Organization node, identified by `@id`. Every block that names the
+ * business (WebSite publisher, BlogPosting publisher, Product manufacturer)
+ * embeds this same node, so consumers merge them into a single entity — the
+ * embedded copy keeps each page self-contained (an `@id` alone isn't resolved
+ * across pages).
+ */
+function organizationRef(base: string): JsonLd {
   return {
-    '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${base}/#organization`,
     name: SITE_NAME,
     url: `${base}/`,
-    description: SITE_DESCRIPTION,
-    logo: `${base}${LOGO_PATH}`,
+    logo: { '@type': 'ImageObject', url: `${base}${LOGO_PATH}`, width: 512, height: 512 },
   };
 }
 
-function publisherLd(base: string): JsonLd {
+function organizationLd(base: string): JsonLd {
   return {
-    '@type': 'Organization',
-    name: SITE_NAME,
-    logo: { '@type': 'ImageObject', url: `${base}${LOGO_PATH}`, width: 512, height: 512 },
+    '@context': 'https://schema.org',
+    ...organizationRef(base),
+    description: SITE_DESCRIPTION,
+    email: CONTACT_EMAIL,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: CONTACT_EMAIL,
+      availableLanguage: ['en'],
+    },
   };
+}
+
+/**
+ * Product images for search: the largest optimized square WebP (falling back to
+ * the source photo) plus the 1200x630 link-preview JPEG, rather than only the
+ * multi-megabyte source PNG.
+ */
+function productImages(base: string, src: string): string[] {
+  const largestWebp = imageManifest[src]?.webp.at(-1)?.src;
+  return [largestWebp ?? src, toOgImage(src)].map((path) => `${base}${path}`);
 }
 
 function websiteLd(base: string): JsonLd {
@@ -131,7 +157,7 @@ function websiteLd(base: string): JsonLd {
     url: `${base}/`,
     description: SITE_DESCRIPTION,
     inLanguage: 'en',
-    publisher: publisherLd(base),
+    publisher: organizationRef(base),
   };
 }
 
@@ -165,19 +191,17 @@ function productLd(base: string, pickup: Pickup): JsonLd {
     description: pickup.description,
     sku: pickup.id,
     category: pickup.type,
-    image: `${base}${pickup.images.main}`,
+    image: productImages(base, pickup.images.main),
     url: `${base}/products/${pickup.slug}`,
     brand: { '@type': 'Brand', name: SITE_NAME },
+    manufacturer: organizationRef(base),
     material: MAGNET_LABEL[pickup.magnet] ?? pickup.magnet,
     additionalProperty: productProperties(pickup),
     offers,
   };
 }
 
-function breadcrumbLd(
-  base: string,
-  crumbs: readonly { readonly name: string; readonly path: string }[],
-): JsonLd {
+function breadcrumbLd(base: string, crumbs: readonly Crumb[]): JsonLd {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -214,10 +238,7 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
           acceptedAnswer: { '@type': 'Answer', text: item.answer },
         })),
       },
-      breadcrumbLd(base, [
-        { name: 'Home', path: '/' },
-        { name: 'Q&A', path: '/faq' },
-      ]),
+      breadcrumbLd(base, FAQ_CRUMBS),
     ];
   }
 
@@ -226,16 +247,12 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
     const found = getPickupAndParent(productMatch[1] ?? '');
     if (found) {
       const { pickup, parent } = found;
-      const crumbs = [
-        { name: 'Home', path: '/' },
-        { name: 'Shop', path: '/shop' },
-      ];
-      // Variant pages sit under their base product in the trail.
-      if (parent.slug !== pickup.slug) {
-        crumbs.push({ name: parent.name, path: `/products/${parent.slug}` });
-      }
-      crumbs.push({ name: pickup.name, path: `/products/${pickup.slug}` });
-      return [productLd(base, pickup), breadcrumbLd(base, crumbs)];
+      const breadcrumbs = breadcrumbLd(base, productCrumbs(pickup, parent));
+      // Variant pages canonicalise to their set, whose Product (with an
+      // AggregateOffer over the positions) is the one product entity; a second
+      // Product here would contradict that canonical.
+      if (parent.slug !== pickup.slug) return [breadcrumbs];
+      return [productLd(base, pickup), breadcrumbs];
     }
   }
 
@@ -254,18 +271,14 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
             ? { dateModified: article.metadata.updatedAt }
             : {}),
           author: { '@type': 'Organization', name: article.metadata.author ?? SITE_NAME },
-          publisher: publisherLd(base),
+          publisher: organizationRef(base),
           // Articles still use placeholder SVGs, which fall back to the site's
           // default 1200x630 image; swap in real photos when they exist.
           image: `${base}${toOgImage(article.mainImage.src)}`,
           url: `${base}/articles/${article.slug}`,
           mainEntityOfPage: `${base}/articles/${article.slug}`,
         },
-        breadcrumbLd(base, [
-          { name: 'Home', path: '/' },
-          { name: 'Articles', path: '/articles' },
-          { name: article.headline, path: `/articles/${article.slug}` },
-        ]),
+        breadcrumbLd(base, articleCrumbs(article)),
       ];
     }
   }

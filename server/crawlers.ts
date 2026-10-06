@@ -11,8 +11,9 @@ export function escapeXml(value: string): string {
 }
 
 export function buildRobotsTxt(origin: string): string {
-  // /cart is noindex and per-visitor; /api is not a page.
-  return `User-agent: *\nAllow: /\nDisallow: /cart\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
+  // /api is not a page. /cart stays crawlable on purpose: it is `noindex`, and a
+  // robots.txt block would stop crawlers from ever seeing that meta tag.
+  return `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
 }
 
 export function buildLlmsTxt(origin: string): string {

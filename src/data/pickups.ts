@@ -100,6 +100,11 @@ export interface Pickup {
   readonly description: string;
   /** Search-result snippet (≤155 chars): the description distilled, not truncated. */
   readonly seoDescription: string;
+  /**
+   * Search-result title (before " | Basement Pickups"): the name plus what it is, so the
+   * full title stays ≤60 chars. Falls back to `name` when omitted (variant pages).
+   */
+  readonly seoTitle?: string;
   readonly type: PickupType;
   readonly magnet: PickupMagnet;
   readonly price: number;
@@ -112,6 +117,11 @@ export interface Pickup {
   readonly specs: PickupSpecs;
   readonly images: PickupImages;
   readonly variants?: readonly Pickup[];
+  /**
+   * Hand-picked set/single slugs shown as "More from the bench" on the product
+   * page (variants use their set's list). Resolved by `getRelatedPickups`.
+   */
+  readonly related?: readonly string[];
 }
 
 const PHOTO = (slug: string): string => `/assets/images/product-photos/${slug}.png`;
@@ -199,6 +209,8 @@ export const pickups: readonly Pickup[] = [
     id: 'white-pearl',
     slug: 'white-pearl',
     name: 'White Pearl',
+    related: ['macho-heaven', 'chow-chow', 'twin-bliss'],
+    seoTitle: 'White Pearl — Strat Humbucker Set',
     description:
       'A Strat-style humbucker set built for clarity, openness, and articulation. Airy top end, controlled lows, and a balanced, musical voice that rewards picking dynamics and the volume knob.',
     seoDescription:
@@ -282,6 +294,8 @@ export const pickups: readonly Pickup[] = [
     id: 'macho-heaven',
     slug: 'macho-heaven',
     name: 'Macho Heaven',
+    related: ['chow-chow', 'twin-bliss', 'white-pearl'],
+    seoTitle: 'Macho Heaven — Vintage PAF Humbucker Set',
     description:
       'A vintage PAF set that captures the sweetness and expressiveness of a classic humbucker while eliminating the muddiness of traditional designs. Warm, open, and highly articulate, with a vocal midrange that flatters both clean and overdriven tones.',
     seoDescription:
@@ -366,6 +380,8 @@ export const pickups: readonly Pickup[] = [
     id: 'chow-chow',
     slug: 'chow-chow',
     name: 'Chow Chow',
+    related: ['macho-heaven', 'twin-bliss', 'white-pearl'],
+    seoTitle: 'Chow Chow — Alnico 2 PAF Humbucker Set',
     description:
       'An Alnico 2 PAF set with the unmistakable warmth and sweetness of the classic late-seventies voice. Rich mids, smooth highs, and natural compression make single notes bloom and chords stay full and balanced.',
     seoDescription:
@@ -450,6 +466,8 @@ export const pickups: readonly Pickup[] = [
     id: 'rockroach',
     slug: 'rockroach',
     name: 'Rockroach',
+    related: ['karakonjul', 'little-karakonjul', 'twin-bliss'],
+    seoTitle: 'Rockroach — Hard Rock Bridge Humbucker',
     description:
       'A high-output rock bridge humbucker developed for classic hard rock and traditional metal. Its Alnico 5 magnet provides strong attack, tight bass, and excellent note definition; articulate highs and focused mids stay clear even under significant distortion — punchy for rhythm, cutting for lead.',
     seoDescription:
@@ -480,6 +498,8 @@ export const pickups: readonly Pickup[] = [
     id: 'karakonjul',
     slug: 'karakonjul',
     name: 'Karakonjul',
+    related: ['rockroach', 'little-karakonjul', 'macho-heaven'],
+    seoTitle: 'Karakonjul — High-Output Bridge Humbucker',
     description:
       'The most powerful pickup in the lineup, engineered for maximum impact without sacrificing articulation. The Alnico 8 magnet produces immense output, dense mids, and exceptionally tight lows while avoiding muddiness. Harmonics jump effortlessly off the strings, and coil-splitting reveals an unexpectedly balanced, clear voice.',
     seoDescription:
@@ -510,6 +530,8 @@ export const pickups: readonly Pickup[] = [
     id: 'little-karakonjul',
     slug: 'little-karakonjul',
     name: 'Little Karakonjul',
+    related: ['karakonjul', 'rockroach', 'twin-bliss'],
+    seoTitle: 'Little Karakonjul — Low-DCR Humbucker',
     description:
       'A thicker winding wire gives this bridge humbucker a rare combination of low DCR and surprisingly strong output. Fast attack, pronounced harmonics, and exceptional clarity define its character — tight percussive bass, lively overtone-rich highs, and a bold voice far larger than its measured output suggests.',
     seoDescription:
@@ -540,6 +562,8 @@ export const pickups: readonly Pickup[] = [
     id: 'twin-bliss',
     slug: 'twin-bliss',
     name: 'Twin Bliss',
+    related: ['macho-heaven', 'chow-chow', 'little-karakonjul'],
+    seoTitle: 'Twin Bliss — Dual-Magnet PAF Humbucker',
     description:
       'A dual-magnet PAF humbucker using two smaller Alnico 5 bar magnets beneath the slug and screw rows rather than a single central magnet. The result is an exceptionally balanced frequency response: velvety cleans in the neck, articulate vintage tones with tight lows and sweet highs in the bridge. A versatile, classic-voiced all-rounder.',
     seoDescription:
@@ -575,6 +599,13 @@ export function getPickupBySlug(slug: string): Pickup | undefined {
     }
   }
   return undefined;
+}
+
+/** A set/single's hand-picked related pickups, in order (unknown slugs are skipped). */
+export function getRelatedPickups(pickup: Pickup): readonly Pickup[] {
+  return (pickup.related ?? [])
+    .map((slug) => pickups.find((p) => p.slug === slug))
+    .filter((p): p is Pickup => p !== undefined);
 }
 
 export interface PickupWithParent {

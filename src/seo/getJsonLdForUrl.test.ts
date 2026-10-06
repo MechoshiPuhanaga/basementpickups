@@ -6,6 +6,7 @@ import { FAQ_ITEMS } from '../data/faq';
 import { getPickupBySlug } from '../data/pickups';
 
 const ORIGIN = 'https://basementpickups.com';
+const ORG_ID = `${ORIGIN}/#organization`;
 
 function typeOf(block: JsonLd | undefined): unknown {
   return block?.['@type'];
@@ -23,11 +24,25 @@ describe('getJsonLdForUrl — home', () => {
   it('returns Organization and WebSite with absolute URLs', () => {
     const [org, site] = getJsonLdForUrl('/', ORIGIN);
     expect(typeOf(org)).toBe('Organization');
+    expect(org?.['@id']).toBe(ORG_ID);
     expect(org?.['url']).toBe(`${ORIGIN}/`);
-    expect(org?.['logo']).toBe(`${ORIGIN}/icons/icon-512.png`);
+    expect(org?.['logo']).toEqual({
+      '@type': 'ImageObject',
+      url: `${ORIGIN}/icons/icon-512.png`,
+      width: 512,
+      height: 512,
+    });
+    expect(org?.['email']).toBe('contact@basementpickups.com');
+    expect(org?.['contactPoint']).toEqual({
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: 'contact@basementpickups.com',
+      availableLanguage: ['en'],
+    });
+    expect(org).not.toHaveProperty('sameAs');
     expect(typeOf(site)).toBe('WebSite');
     expect(site?.['inLanguage']).toBe('en');
-    expect((site?.['publisher'] as JsonLd)['@type']).toBe('Organization');
+    expect((site?.['publisher'] as JsonLd)['@id']).toBe(ORG_ID);
   });
 
   it('normalises trailing slashes on both path and origin', () => {
@@ -62,7 +77,11 @@ describe('getJsonLdForUrl — products', () => {
     expect(product?.['sku']).toBe('rockroach');
     expect(product?.['category']).toBe('humbucker');
     expect(product?.['material']).toBe('Alnico 5');
-    expect(product?.['image']).toBe(`${ORIGIN}/assets/images/product-photos/rockroach.png`);
+    expect(product?.['image']).toEqual([
+      `${ORIGIN}/assets/images/product-photos/rockroach-1254.webp`,
+      `${ORIGIN}/assets/images/product-photos/rockroach-og.jpg`,
+    ]);
+    expect((product?.['manufacturer'] as JsonLd)['@id']).toBe(ORG_ID);
     expect(product?.['offers']).toEqual({
       '@type': 'Offer',
       priceCurrency: 'EUR',
@@ -120,11 +139,10 @@ describe('getJsonLdForUrl — products', () => {
     expect(props(product)['Cover']).toBe('None');
   });
 
-  it('nests a variant under its parent in the breadcrumb trail', () => {
-    const [product, crumbs] = getJsonLdForUrl('/products/chow-chow-neck', ORIGIN);
-    expect(product?.['name']).toBe('Chow Chow · Neck');
-    expect(product?.['material']).toBe('Alnico 2');
-    expect(props(product)['Pole pieces']).toBe('Nickel');
+  it('gives a variant page only breadcrumbs (its set owns the Product), nested under the set', () => {
+    const blocks = getJsonLdForUrl('/products/chow-chow-neck', ORIGIN);
+    expect(blocks.map(typeOf)).toEqual(['BreadcrumbList']);
+    const [crumbs] = blocks;
     const items = crumbs?.['itemListElement'] as { name: string; item: string }[];
     expect(items.map((c) => c.name)).toEqual(['Home', 'Shop', 'Chow Chow', 'Chow Chow · Neck']);
     expect(items[3]?.item).toBe(`${ORIGIN}/products/chow-chow-neck`);
@@ -148,6 +166,7 @@ describe('getJsonLdForUrl — articles', () => {
     expect(post?.['image']).toBe(`${ORIGIN}/assets/images/spirit-photos/bp-spirit-1-og.jpg`);
     expect(post?.['url']).toBe(`${ORIGIN}/articles/${article.slug}`);
     expect(post?.['mainEntityOfPage']).toBe(`${ORIGIN}/articles/${article.slug}`);
+    expect((post?.['publisher'] as JsonLd)['@id']).toBe(ORG_ID);
     const items = crumbs?.['itemListElement'] as { name: string }[];
     expect(items.map((c) => c.name)).toEqual(['Home', 'Articles', article.headline]);
   });

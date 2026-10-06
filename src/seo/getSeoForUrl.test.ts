@@ -34,6 +34,7 @@ describe('getSeoForUrl — static pages', () => {
     expect(seo.title).toBe(title);
     expect(seo.ogTitle).toBe(title);
     expect(seo.description).not.toBe('');
+    expect(seo.description.length, `${pathname} description ≤ 160`).toBeLessThanOrEqual(160);
     expect(seo.ogDescription).toBe(seo.description);
     expect(seo.ogType).toBe('website');
     expect(seo.canonicalUrl).toBe(`${ORIGIN}${pathname}`);
@@ -47,11 +48,11 @@ describe('getSeoForUrl — static pages', () => {
     expect(seo.article).toBeUndefined();
   });
 
-  it('marks the cart as noindex, nofollow but still canonical', () => {
+  it('marks the cart as noindex, nofollow with no canonical link', () => {
     const seo = getSeoForUrl('/cart', ORIGIN);
     expect(seo.title).toBe('Your enquiry | Basement Pickups');
     expect(seo.robots).toBe('noindex, nofollow');
-    expect(seo.canonicalUrl).toBe(`${ORIGIN}/cart`);
+    expect(seo.canonicalUrl).toBeUndefined();
   });
 
   it('normalises trailing slashes and an empty origin', () => {
@@ -68,9 +69,10 @@ describe('getSeoForUrl — static pages', () => {
 });
 
 describe('getSeoForUrl — products', () => {
-  it('describes a set page with its own photo', () => {
+  it('describes a set page with its own photo and its search title', () => {
     const seo = getSeoForUrl('/products/rockroach', ORIGIN);
-    expect(seo.title).toBe('Rockroach | Basement Pickups');
+    expect(seo.title).toBe('Rockroach — Hard Rock Bridge Humbucker | Basement Pickups');
+    expect(seo.ogTitle).toBe(seo.title);
     expect(seo.ogType).toBe('product');
     expect(seo.canonicalUrl).toBe(`${ORIGIN}/products/rockroach`);
     expect(seo.ogImage).toBe(`${ORIGIN}/assets/images/product-photos/rockroach-og.jpg`);

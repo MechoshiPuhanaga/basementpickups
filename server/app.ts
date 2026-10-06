@@ -199,16 +199,24 @@ export async function createApp(options: AppOptions = {}): Promise<express.Expre
     res.type('text/plain').send(buildLlmsTxt(getRequestOrigin(req, config)));
   });
 
-  // One URL per page: a trailing slash (except the root) redirects permanently
-  // to the slash-less form, keeping any query string.
+  // One URL per page: page paths are lower-case and slash-less (except the root),
+  // so anything else redirects permanently, keeping any query string. Paths with
+  // a file extension are assets with case-sensitive names and keep their case.
   app.use((req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       next();
       return;
     }
-    if (req.path.length > 1 && req.path.endsWith('/')) {
+    let target = req.path;
+    if (target.length > 1 && target.endsWith('/')) {
+      target = target.replace(/\/+$/, '') || '/';
+    }
+    if (!/\.[a-z0-9]+$/i.test(target)) {
+      target = target.toLowerCase();
+    }
+    if (target !== req.path) {
       const query = req.originalUrl.slice(req.path.length);
-      res.redirect(301, req.path.replace(/\/+$/, '') + query);
+      res.redirect(301, target + query);
       return;
     }
     next();

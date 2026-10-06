@@ -462,7 +462,6 @@ Still open, without architectural rewrites:
 - CMS integration
 - review / `aggregateRating` schema (`FAQPage` is done)
 - real article photos (BlogPosting `image` currently falls back to the site OG image)
-- DOM breadcrumbs (trail exists only as `BreadcrumbList` JSON-LD)
 - `lastmod` for product/static sitemap entries (omitted rather than faked — no real dates)
 
 Done 2026-09-21 (SEO batch B):
@@ -473,10 +472,48 @@ Done 2026-09-21 (SEO batch B):
   `og:description`; the long `description` stays on-page and in JSON-LD.
 - **Public origin** is pinned in production (`PUBLIC_ORIGIN`, default
   `https://basementpickups.com`) for canonical/OG/sitemap/robots/llms; dev follows the request.
-- `og:locale`, PNG favicon fallback, `robots.txt` disallows `/cart` + `/api/`,
+- `og:locale`, PNG favicon fallback, `robots.txt` disallows `/api/` (`/cart` since
+  2026-10-06: crawlable but `noindex`),
   crawler files cached 1h, sitemap `<loc>` XML-escaped, `llms.txt` lists `/` and variants.
 - Trailing-slash URLs (except `/`) 301 to the slash-less form.
 - 404: `noindex, follow`, no canonical.
+
+Done 2026-10-06 (SEO batch A, after the live + Search Console audit):
+
+- **`seoTitle`** per set/single pickup (`<name> — <what it is>`, ≤41 chars so the full
+  title stays ≤60); variants fall back to `name`. h1 stays the name.
+- Hand-written meta descriptions for `/`, `/shop`, `/about`, `/articles`.
+- `/cart`: `noindex, nofollow`, **no canonical**, and **not** blocked in robots.txt (a block
+  would hide the `noindex` from crawlers).
+- One URL per page: page paths 301 to **lower-case + slash-less** (query kept); paths with
+  a file extension keep their case (assets).
+- Root `/favicon.ico` (16/32/48) and `/apple-touch-icon.png` (180) in `public/`, generated
+  once from `public/icons/icon-512.png`.
+
+Done 2026-10-06 (SEO batch B — content + internal links):
+
+- **Set pages** (the canonical URLs) carry a "Neck & bridge" section: each variant's full
+  description, a magnet · DCR · inductance line and a text link to the variant.
+- **Visible breadcrumbs** on product and article pages (DS `Breadcrumbs`), built from
+  `src/seo/breadcrumbs.ts` — the same trail as the `BreadcrumbList` JSON-LD.
+- **Related pickups** ("More from the bench", hand-picked `Pickup.related`) on every product
+  page (variants use their set's list) and **Further reading** (articles whose
+  `relatedProducts` include the set).
+- **Article pages**: "Pickups in this story" (`Article.relatedProducts`), "Related articles"
+  (the other articles) and an "Explore our pickups" button, per the article design reference.
+
+Done 2026-10-06 (SEO batch C — structured data):
+
+- **Variant pages emit only `BreadcrumbList`** — the set page's `Product` (AggregateOffer over
+  the positions) is the single product entity, matching the canonical. (`ProductGroup` was
+  rejected: Google's `variesBy` has no "position".)
+- `Product.image` = [largest square WebP from the image manifest, the 1200×630 OG JPEG]
+  instead of the multi-MB source PNG.
+- One `Organization` node with `@id` `<origin>/#organization`, embedded (not just referenced)
+  as WebSite/BlogPosting `publisher` and Product `manufacturer`; home adds `email` +
+  `contactPoint` (`CONTACT_EMAIL` in `src/data/site.ts`). No `sameAs` — no social profiles.
+- Deliberately skipped: shipping/return policy (merchant listings need a checkout),
+  `ItemList`/`AboutPage`/`ContactPage`, `SearchAction` (no site search).
 - JSON-LD: `Organization.logo` → real logo, `WebSite` `inLanguage`/`description`/`publisher`,
   offers carry `url` + `itemCondition`, `BlogPosting` has `image` + publisher logo.
 

@@ -21,6 +21,8 @@ export interface Article {
   readonly excerpt: string;
   readonly body: string;
   readonly keywords: readonly string[];
+  /** Set/single pickup slugs featured with the article ("Pickups in this story"). */
+  readonly relatedProducts: readonly string[];
   readonly mainImage: ArticleImage;
   readonly images?: readonly ArticleImage[];
   readonly metadata: ArticleMetadata;
@@ -53,6 +55,7 @@ When we wind a PAF-voiced pickup, we are not trying to clone a specific 1959 exa
 
 So when someone asks what a PAF sounds like, the honest answer is that it does not have a single sound. It has a vocabulary: clarity under gain, compression that comes from the amp rather than the pickup, a top end that stays sweet instead of brittle, and a dynamic range wide enough that the volume knob becomes part of your playing. Learn to listen for those qualities and you stop chasing a relic and start chasing a behavior. That behavior is the real patent — applied for in 1957, and never quite expired.`,
     keywords: ['PAF', 'vintage pickups', 'humbucker', 'tone', 'alnico'],
+    relatedProducts: ['macho-heaven', 'chow-chow', 'twin-bliss'],
     mainImage: {
       src: '/assets/images/articles/the-language-of-paf/main.svg',
       width: 400,
@@ -90,6 +93,7 @@ There is a romance to scatter winding that sometimes gets oversold, so it is wor
 
 When a coil comes off the bench scatter-wound well, you can feel it before you measure it. The pickup has a kind of looseness and bloom — notes open up, chords stay legible, and the treble has shimmer instead of glare. Put that next to a machine-perfect coil of the same resistance and the difference is not subtle. One sounds like a specification. The other sounds like a hand was involved. That is the whole reason we still wind this way, one wandering pass of wire at a time.`,
     keywords: ['scatter winding', 'craft', 'workshop', 'coil', 'tone'],
+    relatedProducts: ['macho-heaven', 'chow-chow', 'white-pearl'],
     mainImage: {
       src: '/assets/images/articles/scatter-winding-by-hand/main.svg',
       width: 400,
@@ -127,6 +131,7 @@ Aging asymmetrically is a subtler trick worth mentioning. Real vintage magnets d
 
 What all of this honors is a simple truth: a pickup is a system, and the magnet is the part of that system that quietly drifts over time. Pretending a fresh pickup will sound like a sixty-year-old one straight off the bench is wishful thinking — the magnet is at full charge, and full charge has a sound. Aging the magnet, deliberately and by measurement, lets us deliver some of that hard-won vintage character now, without asking a player to wait out the decades. Done with restraint and a meter, it is not a gimmick. It is just acknowledging that the best-sounding magnets in history were, every one of them, a little bit tired.`,
     keywords: ['magnets', 'alnico', 'aging', 'tone', 'vintage'],
+    relatedProducts: ['chow-chow', 'macho-heaven', 'white-pearl'],
     mainImage: {
       src: '/assets/images/articles/aging-an-alnico-magnet/main.svg',
       width: 400,
@@ -165,6 +170,7 @@ Finally, set the height, because the best wiring in the world cannot fix a picku
 
 None of this is glamorous, and none of it shows up in a demo video. But it is the work that lets a pickup sound like itself in your guitar instead of like a compromise. We document the wiring, recommend pot and cap values, and include a height guide with every set for exactly this reason. The instrument should sound like the pickup — not like the shortcuts taken on the day it went in.`,
     keywords: ['installation', 'wiring', 'workshop', 'pots', 'shielding'],
+    relatedProducts: ['rockroach', 'karakonjul', 'white-pearl'],
     mainImage: {
       src: '/assets/images/articles/installation-without-regret/main.svg',
       width: 400,
@@ -181,4 +187,9 @@ None of this is glamorous, and none of it shows up in a demo video. But it is th
 
 export function getArticleBySlug(slug: string): Article | undefined {
   return articles.find((a) => a.slug === slug);
+}
+
+/** Articles that feature a set/single pickup (the reverse of `relatedProducts`). */
+export function getArticlesFeaturing(pickupSlug: string): readonly Article[] {
+  return articles.filter((a) => a.relatedProducts.includes(pickupSlug));
 }

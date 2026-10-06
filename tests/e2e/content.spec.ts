@@ -45,3 +45,36 @@ test('the configurator help link lands on the FAQ entry client-side', async ({ p
   await expect(page).toHaveURL(/\/faq#option-availability$/);
   await expect(page.getByTestId('faq-item-option-availability')).toBeInViewport();
 });
+
+test('a set page links down to its variants and across to related pickups and back up', async ({
+  page,
+}) => {
+  const set = pickups.find((p) => (p.variants?.length ?? 0) > 0 && (p.related?.length ?? 0) > 0);
+  const variant = set?.variants?.[0];
+  const relatedSlug = set?.related?.[0];
+  if (set === undefined || variant === undefined || relatedSlug === undefined) {
+    throw new Error('catalog needs a set with variants and related pickups');
+  }
+  await page.goto(`/products/${set.slug}`);
+  await page.getByTestId(`position-link-${variant.slug}`).click();
+  await expect(page).toHaveURL(new RegExp(`/products/${variant.slug}$`));
+  await expect(page).toHaveTitle(titleFor(`/products/${variant.slug}`));
+
+  await page.getByTestId(`product-card-${relatedSlug}`).click();
+  await expect(page).toHaveURL(new RegExp(`/products/${relatedSlug}$`));
+
+  await page.getByTestId('breadcrumbs-link-1').click();
+  await expect(page).toHaveURL(/\/shop$/);
+});
+
+test('an article links to its featured pickups and the shop', async ({ page }) => {
+  const article = articles[0];
+  const featured = article?.relatedProducts[0];
+  if (article === undefined || featured === undefined) throw new Error('no featured pickup');
+  await page.goto(`/articles/${article.slug}`);
+  await page.getByTestId(`product-card-${featured}`).click();
+  await expect(page).toHaveURL(new RegExp(`/products/${featured}$`));
+  await page.goBack();
+  await page.getByTestId('article-explore').click();
+  await expect(page).toHaveURL(/\/shop$/);
+});

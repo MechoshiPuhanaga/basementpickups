@@ -13,9 +13,9 @@ describe('escapeXml', () => {
 });
 
 describe('buildRobotsTxt', () => {
-  it('allows everything except the cart and API, and points at the sitemap', () => {
+  it('allows everything except the API (the noindex cart stays crawlable), and points at the sitemap', () => {
     expect(buildRobotsTxt(ORIGIN)).toBe(
-      `User-agent: *\nAllow: /\nDisallow: /cart\nDisallow: /api/\n\nSitemap: ${ORIGIN}/sitemap.xml\n`,
+      `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${ORIGIN}/sitemap.xml\n`,
     );
   });
 });

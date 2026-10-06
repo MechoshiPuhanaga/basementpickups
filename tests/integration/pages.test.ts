@@ -68,10 +68,10 @@ describe('SSR pages', () => {
     },
   );
 
-  it('the cart page is noindex and canonical', async () => {
+  it('the cart page is noindex with no canonical link', async () => {
     const html = await (await app.get('/cart')).text();
     expect(html).toContain('<meta name="robots" content="noindex, nofollow" />');
-    expect(html).toContain(`<link rel="canonical" href="${ORIGIN}/cart" />`);
+    expect(findTag(html, 'link', 'rel', 'canonical')).toBeNull();
   });
 
   it('a variant page canonicalises to its set page', async () => {
@@ -81,8 +81,27 @@ describe('SSR pages', () => {
     expect(html).toContain(`<meta property="og:url" content="${ORIGIN}${SET_PATH}" />`);
   });
 
+  it("a set page server-renders breadcrumbs and each variant's copy and link", async () => {
+    const html = await (await app.get(SET_PATH)).text();
+    expect(html).toContain('data-testid="breadcrumbs"');
+    expect(html).toContain(escapeHtml(variant.description));
+    expect(html).toContain(`href="${VARIANT_PATH}"`);
+  });
+
+  it('product and article pages server-render their related links', async () => {
+    const product = await (await app.get(SET_PATH)).text();
+    for (const slug of setPickup.related ?? [])
+      expect(product).toContain(`href="/products/${slug}"`);
+    const story = await (await app.get(ARTICLE_PATH)).text();
+    for (const slug of article.relatedProducts) expect(story).toContain(`href="/products/${slug}"`);
+    expect(story).toContain('data-testid="article-related"');
+  });
+
   it('a set page canonicalises to itself with product Open Graph type', async () => {
     const html = await (await app.get(SET_PATH)).text();
+    expect(html).toContain(
+      `<title>${escapeHtml(`${setPickup.seoTitle ?? setPickup.name} | Basement Pickups`)}</title>`,
+    );
     expect(html).toContain(`<link rel="canonical" href="${ORIGIN}${SET_PATH}" />`);
     expect(html).toContain('<meta property="og:type" content="product" />');
   });
@@ -117,12 +136,12 @@ describe('SSR pages', () => {
     expect(offers['lowPrice']).toBe(Math.min(...(setPickup.variants ?? []).map((v) => v.price)));
   });
 
-  it('a variant page offers its own catalogue price in euros', async () => {
+  it('a variant page carries breadcrumbs only — its set page owns the Product', async () => {
     const html = await (await app.get(VARIANT_PATH)).text();
-    const offers = productOffers(html);
-    expect(offers['@type']).toBe('Offer');
-    expect(offers['priceCurrency']).toBe('EUR');
-    expect(offers['price']).toBe(variant.price);
+    const types = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(
+      (m) => (JSON.parse(m[1] ?? '') as Record<string, unknown>)['@type'],
+    );
+    expect(types).toEqual(['BreadcrumbList']);
   });
 
   it('the hydration script carries the same nonce as the CSP header', async () => {

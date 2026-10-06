@@ -38,6 +38,30 @@ describe('ArticlePage', () => {
     );
   });
 
+  it('links the featured pickups, the other articles and the shop', () => {
+    renderArticle(withCaption.slug);
+    expect(screen.getByTestId('article-pickups')).toHaveTextContent('Pickups in this story');
+    for (const slug of withCaption.relatedProducts) {
+      expect(screen.getByTestId(`product-card-${slug}`)).toHaveAttribute(
+        'href',
+        `/products/${slug}`,
+      );
+    }
+    const others = articles.filter((a) => a.slug !== withCaption.slug);
+    for (const other of others) {
+      expect(screen.getByTestId(`article-card-${other.slug}`)).toBeInTheDocument();
+    }
+    expect(screen.queryByTestId(`article-card-${withCaption.slug}`)).toBeNull();
+    expect(screen.getByTestId('article-explore')).toHaveAttribute('href', '/shop');
+  });
+
+  it('shows breadcrumbs back to the articles index', () => {
+    renderArticle(withCaption.slug);
+    expect(screen.getByTestId('breadcrumbs-link-0')).toHaveAttribute('href', '/');
+    expect(screen.getByTestId('breadcrumbs-link-1')).toHaveAttribute('href', '/articles');
+    expect(screen.getByTestId('breadcrumbs-current')).toHaveTextContent(withCaption.headline);
+  });
+
   it('shows a not-found state for an unknown slug', () => {
     renderArticle('does-not-exist');
     expect(screen.getByTestId('article-not-found')).toHaveTextContent('Article not found');

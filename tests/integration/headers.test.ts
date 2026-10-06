@@ -109,6 +109,15 @@ describe('static assets', () => {
     expect((await res.text()).length).toBeGreaterThan(0);
   });
 
+  it('serves the root favicon and Apple touch icon instead of 404s', async () => {
+    const favicon = await app.get('/favicon.ico');
+    expect(favicon.status).toBe(200);
+    expect(favicon.headers.get('content-type')).toBe('image/vnd.microsoft.icon');
+    const touch = await app.get('/apple-touch-icon.png');
+    expect(touch.status).toBe(200);
+    expect(touch.headers.get('content-type')).toBe('image/png');
+  });
+
   it('serves the web manifest and offline page', async () => {
     const manifest = await app.get('/manifest.webmanifest');
     expect(manifest.status).toBe(200);
@@ -119,12 +128,15 @@ describe('static assets', () => {
   });
 });
 
-describe('trailing-slash redirects', () => {
+describe('canonical-URL redirects (trailing slash, upper case)', () => {
   it.each([
     ['/shop/', '/shop'],
     ['/shop/?a=1', '/shop?a=1'],
     ['/products/white-pearl///', '/products/white-pearl'],
     ['/articles/?x=1&y=2', '/articles?x=1&y=2'],
+    ['/Shop', '/shop'],
+    ['/Products/White-Pearl?Ref=A', '/products/white-pearl?Ref=A'],
+    ['/FAQ/', '/faq'],
   ])('GET %s → 301 %s', async (from, to) => {
     const res = await app.get(from);
     expect(res.status).toBe(301);
@@ -140,6 +152,12 @@ describe('trailing-slash redirects', () => {
   it('the root and slash-less URLs are not redirected', async () => {
     expect((await app.get('/')).status).toBe(200);
     expect((await app.get('/shop')).status).toBe(200);
+  });
+
+  it('asset paths keep their case (file names are case-sensitive)', async () => {
+    const res = await app.get('/assets/logo/BP_Gold_logo.svg');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('location')).toBeNull();
   });
 
   it('POST requests are never redirected', async () => {

@@ -16,10 +16,9 @@ import {
   type ContactFormField,
 } from '../../design-system/molecules/ContactForm';
 import { EnquirySummary } from '../../design-system/molecules/EnquirySummary';
+import { CONTACT_EMAIL } from '../../data/site';
 import { useIsHydrated } from '../../utils/useIsHydrated';
 import styles from './ContactPage.module.css';
-
-const CONTACT_EMAIL = 'contact@basementpickups.com';
 
 /** Safely read a string field from arbitrary router navigation state. */
 function readState(state: unknown, key: string): string | undefined {

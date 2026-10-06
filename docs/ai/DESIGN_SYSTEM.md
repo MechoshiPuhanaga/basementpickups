@@ -473,7 +473,14 @@ ContactForm
 BrandValueCard
 ProductGallery
 NewsletterSignup
+Breadcrumbs
 ```
+
+`Breadcrumbs` (2026-10-06) renders a page trail (`items: { label, to }[]`, last item =
+current page with `aria-current`) as a labelled `nav` > `ol`. Pages build the items from
+`src/seo/breadcrumbs.ts`, the same source as the `BreadcrumbList` JSON-LD. On phones (≤540px) it
+drops to `--type-scale-caption` (12px) with `--letter-spacing-caption`, so it stays secondary
+to the page title.
 
 Molecules may contain:
 

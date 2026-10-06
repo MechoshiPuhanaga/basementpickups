@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { articles, getArticleBySlug } from './articles';
+import { articles, getArticleBySlug, getArticlesFeaturing } from './articles';
+import { pickups } from './pickups';
 
 const PUBLIC_DIR = path.resolve(import.meta.dirname, '../../public');
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -48,6 +49,26 @@ describe('articles catalog', () => {
         expect(fs.existsSync(path.join(PUBLIC_DIR, img.src)), img.src).toBe(true);
       }
     }
+  });
+});
+
+describe('related products', () => {
+  it('features one to three distinct set/single pickups per article', () => {
+    const topSlugs = new Set(pickups.map((p) => p.slug));
+    for (const a of articles) {
+      expect(a.relatedProducts.length, a.slug).toBeGreaterThan(0);
+      expect(a.relatedProducts.length, a.slug).toBeLessThanOrEqual(3);
+      expect(new Set(a.relatedProducts).size, a.slug).toBe(a.relatedProducts.length);
+      for (const slug of a.relatedProducts)
+        expect(topSlugs.has(slug), `${a.slug} → ${slug}`).toBe(true);
+    }
+  });
+
+  it('finds the articles featuring a pickup', () => {
+    expect(getArticlesFeaturing('rockroach').map((a) => a.slug)).toEqual([
+      'installation-without-regret',
+    ]);
+    expect(getArticlesFeaturing('nope')).toEqual([]);
   });
 });
 

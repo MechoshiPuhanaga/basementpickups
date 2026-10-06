@@ -17,7 +17,7 @@ afterAll(async () => {
 const CRAWLER_CACHE = 'public, max-age=3600';
 
 describe('robots.txt', () => {
-  it('allows crawling except the cart and API, and points at the sitemap', async () => {
+  it('allows crawling except the API (the noindex cart stays crawlable), and points at the sitemap', async () => {
     const res = await app.get('/robots.txt');
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('text/plain; charset=utf-8');
@@ -25,7 +25,7 @@ describe('robots.txt', () => {
     const text = await res.text();
     expect(text).toContain('User-agent: *');
     expect(text).toContain('Allow: /');
-    expect(text).toContain('Disallow: /cart');
+    expect(text).not.toContain('Disallow: /cart');
     expect(text).toContain('Disallow: /api/');
     expect(text).toContain(`Sitemap: ${ORIGIN}/sitemap.xml`);
   });

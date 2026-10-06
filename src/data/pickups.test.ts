@@ -2,13 +2,48 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { getPickupAndParent, getPickupBySlug, pickups, type Pickup } from './pickups';
+import {
+  getPickupAndParent,
+  getPickupBySlug,
+  getRelatedPickups,
+  pickups,
+  type Pickup,
+} from './pickups';
 import { BOBBIN_COLOR_LABELS } from './bobbinColors';
 
 const PUBLIC_DIR = path.resolve(import.meta.dirname, '../../public');
 
 /** Every pickup in the catalog, variants included. */
 const allPickups: readonly Pickup[] = pickups.flatMap((p) => [p, ...(p.variants ?? [])]);
+
+describe('related pickups', () => {
+  it('gives every set/single three distinct related set/single pickups, never itself', () => {
+    const topSlugs = new Set(pickups.map((p) => p.slug));
+    for (const p of pickups) {
+      const related = p.related ?? [];
+      expect(related, p.slug).toHaveLength(3);
+      expect(new Set(related).size, p.slug).toBe(related.length);
+      expect(related, p.slug).not.toContain(p.slug);
+      for (const slug of related) expect(topSlugs.has(slug), `${p.slug} → ${slug}`).toBe(true);
+    }
+  });
+
+  it('leaves related lists to the set (variants carry none)', () => {
+    for (const p of pickups) {
+      for (const v of p.variants ?? []) expect(v.related, v.slug).toBeUndefined();
+    }
+  });
+
+  it('resolves slugs in order and skips unknown ones', () => {
+    const base = pickups[0];
+    if (base === undefined) throw new Error('fixture: empty catalog');
+    expect(getRelatedPickups(base).map((p) => p.slug)).toEqual(base.related);
+    expect(getRelatedPickups({ ...base, related: ['nope', 'rockroach'] })).toHaveLength(1);
+    const variant = base.variants?.[0];
+    if (variant === undefined) throw new Error('fixture: first pickup has no variants');
+    expect(getRelatedPickups(variant)).toEqual([]);
+  });
+});
 
 describe('catalog invariants', () => {
   it('has the seven real products', () => {
@@ -38,6 +73,11 @@ describe('catalog invariants', () => {
       expect(p.description.trim(), p.slug).not.toBe('');
       expect(p.seoDescription.trim(), p.slug).not.toBe('');
       expect(p.seoDescription.length, `${p.slug} seoDescription ≤ 160`).toBeLessThanOrEqual(160);
+      if (p.seoTitle !== undefined) {
+        expect(p.seoTitle.startsWith(p.name), `${p.slug} seoTitle starts with the name`).toBe(true);
+        // Leaves room for the " | Basement Pickups" suffix within a 60-char title.
+        expect(p.seoTitle.length, `${p.slug} seoTitle ≤ 41`).toBeLessThanOrEqual(41);
+      }
       expect(p.positions.length, p.slug).toBeGreaterThan(0);
     }
   });

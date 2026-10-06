@@ -371,10 +371,115 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
    the cart line and sent as a per-item `option` (e.g. "String spacing: 52 mm"). Single-value models show
    it read-only or omit the control. Distinct from roadmap item 6 (a shop **filter**); this is a
    **per-line choice**. Pairs naturally with item 7 under one "Configure" section.
+9. **SEO follow-ups from the 2026-10-06 audit** — technical SEO is clean (Lighthouse SEO 100 on all
+   17 sitemap pages; dev = live), but **Google had indexed only `/`**. Infra blockers fixed the same
+   day (see session log). Remaining, highest value first:
+   - **Ops (no code):** request indexing for **Macho Heaven** and **`/faq`** (daily quota hit); in
+     1–3 days confirm the resubmitted `sitemap.xml` shows _Success_ (day-1 "Couldn't fetch" was a
+     placeholder — file verified) and the indexed count rises.
+   - ~~**Batch A — quick wins**~~ — **done 2026-10-06**: `seoTitle` on the 7 set/single
+     pickups, new meta descriptions for `/`, `/shop`, `/about`, `/articles`, `/cart` crawlable +
+     no canonical, root `favicon.ico` + `apple-touch-icon.png`, mixed-case paths 301 to
+     lower-case. See session log.
+   - ~~**Batch B — content + links**~~ — **done 2026-10-06**: neck & bridge section on set
+     pages, visible breadcrumbs, related pickups + further reading on product pages, featured
+     pickups + related articles + "Explore our pickups" on article pages. See session log.
+   - ~~**Batch C — structured data**~~ — **done 2026-10-06**: variant pages breadcrumbs-only,
+     product image list (WebP + OG), one `@id` Organization with contact email. **Left:**
+     run Google's Rich Results Test on a set page, an article and `/` after deploy.
+   - **Batch D — separate tasks:** real article photos (all 4 share the default OG image, same date,
+     organisation author); perf — `/articles` index 80, Macho Heaven 83, image delivery flagged on
+     7 pages.
+   - **Cloudflare, optional:** add DMARC (`_dmarc` TXT, start `p=none`; developer to pick the report
+     address); DNSSEC (needs a DS record at the registrar — medium risk) and CAA (low value) deferred;
+     consider turning off Automatic HTTPS Rewrites (HTML rewriting; site has no `http://` links).
+     **Ask before changing any Cloudflare setting.**
+10. **Stop the recurring Heroku ACM "can't verify" emails** _(developer deciding; nothing changed)_.
+    Every ~90 days ACM (Let's Encrypt) renewal fails while the Cloudflare record is proxied; today's
+    manual fix is grey cloud → refresh ACM on Heroku → orange cloud. State on 2026-10-06: ACM on, both
+    domains "Cert issued", **certs expire 2026-11-15** (next renewal attempt due mid-October);
+    Cloudflare SSL = Full (strict); Heroku `web` dyno is Basic (paid, so manual certs are allowed).
+    Likely cause: Heroku's DNS check sees Cloudflare IPs, not Heroku's (the Heroku email's failure
+    reason would confirm it). Options:
+    - **A — Cloudflare Origin CA cert on Heroku, ACM off (recommended).** Create a free Origin cert
+      (`basementpickups.com` + `*.basementpickups.com`, up to 15 years), `heroku certs:add`, then
+      `heroku certs:auto:disable`. No renewals or emails; works with Full (strict). Browsers never
+      see it (they get Cloudflare's public edge cert), so **every browser is fine as long as the
+      records stay proxied** — grey cloud would show cert errors. Low risk: re-enable ACM to roll
+      back. Keep the private key out of the repo and chat.
+    - **B — keep ACM, exclude `/.well-known/acme-challenge/*`** from the two http→https redirect
+      rules and turn off "Always Use HTTPS". Common and safe practice, but **probably doesn't fix
+      it** if the cause is Heroku's DNS check (Let's Encrypt follows the https redirect anyway).
+      Only proven at the next renewal.
+    - **C — SSL mode Full (not strict) and ignore the emails.** Accepts an expired origin cert;
+      weaker security; emails continue. Not recommended.
 
 ---
 
 # Session Log
+
+## 2026-10-06 — SEO batch C (structured data)
+
+- `getJsonLdForUrl`: variant pages return only `BreadcrumbList` (the set's `Product` is the
+  one entity, matching the canonical); `Product.image` is now [largest WebP, OG JPEG];
+  `organizationRef` (`@id` `/#organization`, name, url, logo) is embedded as WebSite and
+  BlogPosting `publisher` and Product `manufacturer`; home `Organization` adds `email` +
+  `contactPoint`. New `src/data/site.ts` (`CONTACT_EMAIL`), also used by the contact page.
+- Tests updated (JSON-LD unit, variant integration). `pnpm run check` green: 528 Vitest +
+  52 Playwright. Rich Results Test pending deploy. Uncommitted.
+
+## 2026-10-06 — SEO batch B (set-page content, breadcrumbs, related links)
+
+- **B1** `ProductPage`: base view of a set renders a "Neck & bridge" section (h2) with one
+  block per variant — name (h3), magnet · DCR · inductance, full description, "View the
+  neck/bridge pickup →" link. Set pages ~100 → ~250 words, server-rendered.
+- **B2** new DS molecule `Breadcrumbs` (labelled `nav` > `ol`, `aria-current`, hidden
+  separators) on product + article pages. `src/seo/breadcrumbs.ts` is now the single trail
+  source; `getJsonLdForUrl` uses it (JSON-LD output unchanged).
+- **B3** `Pickup.related` (3 hand-picked set/single slugs, developer-approved) +
+  `getRelatedPickups`; product pages show "More from the bench" (`ProductGrid`) and "Further
+  reading" (`ArticleGrid`, via `getArticlesFeaturing`). Variants use their set's lists.
+- **B4** `Article.relatedProducts` (developer-approved) → "Pickups in this story", plus
+  "Related articles" (the other articles) and an "Explore our pickups" button.
+- Screenshots checked desktop + 390px: no horizontal overflow. Every product now has ≥3
+  inbound links (Little Karakonjul has no article yet, so no Further reading).
+- Tests: Breadcrumbs component, breadcrumbs unit, data invariants (related/relatedProducts),
+  page tests, integration (SSR copy + links), 2 e2e journeys. `pnpm run check` green:
+  528 Vitest + 52 Playwright, 98.4% lines. Uncommitted.
+
+## 2026-10-06 — SEO batch A (titles, descriptions, cart, icons, case redirects)
+
+- `Pickup.seoTitle` (optional, ≤41 chars, starts with the name) on the 7 set/single pickups;
+  `getSeoForUrl` uses it for `<title>`/`og:title`, variants fall back to `name`. Developer-
+  approved drafts, except two shortened to fit 60 chars: Rockroach → "Hard Rock Bridge
+  Humbucker", Karakonjul → "High-Output Bridge Humbucker".
+- New hand-written meta descriptions for `/`, `/shop`, `/about`, `/articles`.
+- `/cart`: dropped `Disallow: /cart` (crawlers must see its `noindex`) and its canonical.
+- `server/app.ts`: the trailing-slash redirect now also lower-cases page paths (`/Shop` →
+  `/shop`, query kept); paths with a file extension keep their case.
+- `public/favicon.ico` (16/32/48 PNG-in-ICO) + `public/apple-touch-icon.png` (180), generated
+  once from `icons/icon-512.png`; `index.html` apple-touch link updated.
+- Tests: SEO unit (cart, titles, description ≤160), catalog invariant for `seoTitle`,
+  integration (robots, cart canonical, set title, case redirects, asset case kept, icons).
+  `pnpm run check` green: 506 Vitest + 48 Playwright, 98.4% lines.
+- Docs: ROUTING_AND_SEO.md, DATA_MODEL.md, skills/add-product.md. Uncommitted.
+
+## 2026-10-06 — SEO audit (dev + live + Search Console) and Cloudflare fixes
+
+- Crawled all pages on dev and live (sitemap pages, variants, `/cart`, 404s): SSR head, titles,
+  single h1, absolute canonicals, real 404s, JSON-LD, OG images, robots/sitemap/llms all correct;
+  Lighthouse SEO 100 × 17. Content/linking findings → roadmap item 9.
+- **Search Console:** only `/` indexed; `/shop` etc. "URL is unknown to Google". The only submitted
+  sitemap was `sitemap.xml?utm_source=chatgpt.com` (last read 2026-07-06).
+- **Root cause found:** Cloudflare redirect rules "http to https" and "http to https for www"
+  targeted a literal `https://basementpickups.com/*` (404) and dropped the query string. Fixed via
+  the Cloudflare MCP to `…/${1}` with query preserved; verified one-hop 301s for every
+  http/https × www/apex combination.
+- Cloudflare (developer-approved): Browser Cache TTL → respect origin headers; minimum TLS 1.2;
+  legacy www Page Rule deleted (duplicated the redirect rule). Verified live.
+- Clean `sitemap.xml` resubmitted and old utm entry removed (developer); indexing requested for
+  `/shop` + 6 products. Macho Heaven + `/faq` pending (quota). 404 validation already running.
+- No code changes. Cloudflare plugin (skills + MCP) installed for Claude Code at user scope.
 
 ## 2026-09-21 — Test quality gate (Vitest + Playwright, coverage reports)
 

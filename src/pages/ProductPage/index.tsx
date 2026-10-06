@@ -3,17 +3,23 @@ import { useParams } from 'react-router';
 
 import { Badge } from '../../design-system/atoms/Badge';
 import { Button } from '../../design-system/atoms/Button';
+import { Grid } from '../../design-system/atoms/Grid';
 import { Heading } from '../../design-system/atoms/Heading';
 import { Price } from '../../design-system/atoms/Price';
 import { Stack } from '../../design-system/atoms/Stack';
 import { Swatch } from '../../design-system/atoms/Swatch';
 import { Text } from '../../design-system/atoms/Text';
+import { TextLink } from '../../design-system/atoms/TextLink';
 import { ProductLayout } from '../../design-system/layouts/ProductLayout';
 import { Section } from '../../design-system/layouts/Section';
+import { Breadcrumbs } from '../../design-system/molecules/Breadcrumbs';
 import { PickupConfigurator } from '../../design-system/molecules/PickupConfigurator';
 import { Disclosure } from '../../design-system/molecules/Disclosure';
 import { ProductGallery } from '../../design-system/molecules/ProductGallery';
+import { ArticleGrid } from '../../design-system/organisms/ArticleGrid';
+import { ProductGrid } from '../../design-system/organisms/ProductGrid';
 import { useCart } from '../../cart/CartContext';
+import { getArticlesFeaturing } from '../../data/articles';
 import { bobbinColorLabel } from '../../data/bobbinColors';
 import { availableBobbinColors } from '../../data/bobbins';
 import {
@@ -32,6 +38,7 @@ import {
 } from '../../data/pickupLabels';
 import {
   getPickupAndParent,
+  getRelatedPickups,
   type Choice,
   type Pickup,
   type PickupMagnet,
@@ -39,6 +46,7 @@ import {
   type PickupSevenString,
   type PickupType,
 } from '../../data/pickups';
+import { productCrumbs } from '../../seo/breadcrumbs';
 import styles from './ProductPage.module.css';
 
 const TYPE_LABEL: Record<PickupType, string> = {
@@ -227,6 +235,60 @@ function VariantSelector({ parent, active }: VariantSelectorProps) {
 }
 
 /**
+ * The set page is the URL search engines rank (variant pages canonicalise to
+ * it), so it carries each position's full voicing copy, a short spec line and a
+ * text link to that pickup.
+ */
+function PositionDetails({ parent }: { parent: Pickup }) {
+  const variants = parent.variants ?? [];
+  if (variants.length === 0) return null;
+
+  return (
+    <Stack as="section" direction="column" gap="lg" align="stretch" data-testid="product-positions">
+      <Heading level={2} variant="section" align="center">
+        Neck &amp; bridge
+      </Heading>
+      <Grid columns={2} gap="xl" align="start">
+        {variants.map((variant) => {
+          const position = variant.positions.length === 1 ? variant.positions[0] : undefined;
+          const summary = [
+            MAGNET_LABEL[variant.magnet],
+            variant.specs.dcr !== undefined ? `DCR ${variant.specs.dcr}` : undefined,
+            variant.specs.inductance,
+          ]
+            .filter((part): part is string => part !== undefined)
+            .join(' · ');
+
+          return (
+            <Stack
+              key={variant.slug}
+              direction="column"
+              gap="sm"
+              align="start"
+              data-testid={`position-${variant.slug}`}
+            >
+              <Heading level={3} variant="editorial">
+                {variant.name}
+              </Heading>
+              <Text variant="label" tone="gold">
+                {summary}
+              </Text>
+              <Text variant="body">{variant.description}</Text>
+              <TextLink
+                to={`/products/${variant.slug}`}
+                data-testid={`position-link-${variant.slug}`}
+              >
+                View the {position ?? variant.name} pickup <span aria-hidden="true">→</span>
+              </TextLink>
+            </Stack>
+          );
+        })}
+      </Grid>
+    </Stack>
+  );
+}
+
+/**
  * Build configuration + the Add-to-enquiry button for an addable pickup. Owns
  * the selection (seeded from the pickup's defaults); rendered with a
  * `key={slug}` so switching variants reseeds to the new pickup's defaults. The
@@ -306,79 +368,122 @@ export default function ProductPage() {
   // must choose a position before it can go into the enquiry.
   const isBaseWithVariants = pickup.slug === parent.slug && (parent.variants?.length ?? 0) > 0;
 
+  // Variant pages share their set's related pickups and articles.
+  const related = getRelatedPickups(parent);
+  const furtherReading = getArticlesFeaturing(parent.slug);
+  const crumbs = productCrumbs(pickup, parent).map((crumb) => ({
+    label: crumb.name,
+    to: crumb.path,
+  }));
+
   return (
     <Section spacing="lg" maxWidth="default" data-testid="product-page">
-      <ProductLayout
-        data-testid="product-layout"
-        gallery={<ProductGallery images={images} productName={pickup.name} />}
-        details={
-          <Stack direction="column" gap="lg" align="stretch">
-            <Stack direction="column" gap="xs" align="start">
-              <Text variant="label" tone="gold" data-testid="product-type">
-                {TYPE_LABEL[pickup.type]}
-              </Text>
-              <Heading level={1} variant="display" align="start" data-testid="product-title">
-                {pickup.name}
-              </Heading>
-              <Stack direction="row" gap="sm" align="center" wrap>
-                <Price amount={pickup.price} size="lg" tone="primary" data-testid="product-price" />
-                <Stack direction="row" gap="xs" wrap>
-                  {pickup.positions.map((position) => (
-                    <Badge
-                      key={position}
-                      variant="outline"
-                      tone="gold"
-                      size="sm"
-                      data-testid={`product-position-${position}`}
-                    >
-                      {position}
-                    </Badge>
-                  ))}
+      <Stack direction="column" gap="xl" align="stretch">
+        <Breadcrumbs items={crumbs} />
+        <ProductLayout
+          data-testid="product-layout"
+          gallery={<ProductGallery images={images} productName={pickup.name} />}
+          details={
+            <Stack direction="column" gap="lg" align="stretch">
+              <Stack direction="column" gap="xs" align="start">
+                <Text variant="label" tone="gold" data-testid="product-type">
+                  {TYPE_LABEL[pickup.type]}
+                </Text>
+                <Heading level={1} variant="display" align="start" data-testid="product-title">
+                  {pickup.name}
+                </Heading>
+                <Stack direction="row" gap="sm" align="center" wrap>
+                  <Price
+                    amount={pickup.price}
+                    size="lg"
+                    tone="primary"
+                    data-testid="product-price"
+                  />
+                  <Stack direction="row" gap="xs" wrap>
+                    {pickup.positions.map((position) => (
+                      <Badge
+                        key={position}
+                        variant="outline"
+                        tone="gold"
+                        size="sm"
+                        data-testid={`product-position-${position}`}
+                      >
+                        {position}
+                      </Badge>
+                    ))}
+                  </Stack>
                 </Stack>
               </Stack>
+              <Text variant="body" data-testid="product-description">
+                {pickup.description}
+              </Text>
+              <VariantSelector parent={parent} active={pickup} />
+              <Disclosure
+                title="Specifications"
+                desktop="heading"
+                headingLevel={2}
+                data-testid="product-specs"
+              >
+                <div className={styles['specs']}>
+                  <SpecRow label="Type" value={TYPE_LABEL[pickup.type]} />
+                  <SpecRow label="Magnet" value={formatMagnet(pickup, parent)} />
+                  <SpecRow label="Positions" value={pickup.positions.join(', ')} />
+                  <SpecRow
+                    label="Lead wire"
+                    value={choiceLabel(pickup.conductors, conductorLabel)}
+                  />
+                  {pickup.specs.dcr !== undefined && (
+                    <SpecRow label="DCR" value={pickup.specs.dcr} />
+                  )}
+                  {pickup.specs.inductance !== undefined && (
+                    <SpecRow label="Inductance" value={pickup.specs.inductance} />
+                  )}
+                  {pickup.specs.selfResonantPeak !== undefined && (
+                    <SpecRow label="Self-resonant peak" value={pickup.specs.selfResonantPeak} />
+                  )}
+                  {pickup.specs.loadedResonantPeak !== undefined && (
+                    <SpecRow label="Loaded resonant peak" value={pickup.specs.loadedResonantPeak} />
+                  )}
+                  <SpecRow label="Potting" value={choiceLabel(pickup.potting, pottingLabel)} />
+                  {spacingRow !== undefined && (
+                    <SpecRow label="String spacing" value={spacingRow} />
+                  )}
+                  <SpecRow
+                    label="Pole pieces"
+                    value={choiceLabel(pickup.hardware.polepieces, polepieceLabel)}
+                  />
+                  <SpecRow label="Cover" value={formatCoverOffer(pickup.hardware.cover)} />
+                  {sevenStringLabel !== undefined && (
+                    <SpecRow label="7-string" value={sevenStringLabel} />
+                  )}
+                  <SwatchRow
+                    label="Bobbin colours"
+                    colors={availableBobbinColors(pickup.hardware)}
+                  />
+                </div>
+              </Disclosure>
+              {!isBaseWithVariants && <AddToEnquiry pickup={pickup} key={pickup.slug} />}
             </Stack>
-            <Text variant="body" data-testid="product-description">
-              {pickup.description}
-            </Text>
-            <VariantSelector parent={parent} active={pickup} />
-            <Disclosure
-              title="Specifications"
-              desktop="heading"
-              headingLevel={2}
-              data-testid="product-specs"
-            >
-              <div className={styles['specs']}>
-                <SpecRow label="Type" value={TYPE_LABEL[pickup.type]} />
-                <SpecRow label="Magnet" value={formatMagnet(pickup, parent)} />
-                <SpecRow label="Positions" value={pickup.positions.join(', ')} />
-                <SpecRow label="Lead wire" value={choiceLabel(pickup.conductors, conductorLabel)} />
-                {pickup.specs.dcr !== undefined && <SpecRow label="DCR" value={pickup.specs.dcr} />}
-                {pickup.specs.inductance !== undefined && (
-                  <SpecRow label="Inductance" value={pickup.specs.inductance} />
-                )}
-                {pickup.specs.selfResonantPeak !== undefined && (
-                  <SpecRow label="Self-resonant peak" value={pickup.specs.selfResonantPeak} />
-                )}
-                {pickup.specs.loadedResonantPeak !== undefined && (
-                  <SpecRow label="Loaded resonant peak" value={pickup.specs.loadedResonantPeak} />
-                )}
-                <SpecRow label="Potting" value={choiceLabel(pickup.potting, pottingLabel)} />
-                {spacingRow !== undefined && <SpecRow label="String spacing" value={spacingRow} />}
-                <SpecRow
-                  label="Pole pieces"
-                  value={choiceLabel(pickup.hardware.polepieces, polepieceLabel)}
-                />
-                <SpecRow label="Cover" value={formatCoverOffer(pickup.hardware.cover)} />
-                {sevenStringLabel !== undefined && (
-                  <SpecRow label="7-string" value={sevenStringLabel} />
-                )}
-                <SwatchRow label="Bobbin colours" colors={availableBobbinColors(pickup.hardware)} />
-              </div>
-            </Disclosure>
-            {!isBaseWithVariants && <AddToEnquiry pickup={pickup} key={pickup.slug} />}
-          </Stack>
-        }
-      />
+          }
+        />
+        {isBaseWithVariants && <PositionDetails parent={parent} />}
+        {related.length > 0 && (
+          <ProductGrid
+            pickups={related}
+            eyebrow="Related pickups"
+            title="More from the bench"
+            data-testid="product-related"
+          />
+        )}
+        {furtherReading.length > 0 && (
+          <ArticleGrid
+            articles={furtherReading}
+            eyebrow="From the workshop"
+            title="Further reading"
+            data-testid="product-reading"
+          />
+        )}
+      </Stack>
     </Section>
   );
 }

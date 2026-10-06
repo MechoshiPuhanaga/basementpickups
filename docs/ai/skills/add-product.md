@@ -82,6 +82,13 @@ When asked to add products, do this in order:
 - `description`: the parent gets a **short editorial summary** (1–2 sentences,
   brand voice); each variant gets the longer per-position description from the
   source.
+- `seoDescription` (every pickup/variant, ≤155 chars) and `seoTitle` (set/single
+  pickups only, ≤41 chars, starts with the name, e.g. `Twin Bliss — Dual-Magnet PAF
+Humbucker`): drafted from the source, then **confirmed by the developer** (brand voice).
+  Variants omit `seoTitle` — they canonicalise to the set page.
+- `related` (set/single only): three hand-picked set/single slugs for "More from the
+  bench" — draft by voice/output family, **confirm with the developer**, and consider adding
+  the new slug to existing pickups' lists and to articles' `relatedProducts`.
 
 **NOT in the source — ASK the developer (don't invent):**
 

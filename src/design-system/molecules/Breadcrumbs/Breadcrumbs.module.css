@@ -1,0 +1,66 @@
+.nav {
+  inline-size: 100%;
+}
+
+.list {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-body);
+  font-size: var(--type-scale-step-down);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+}
+
+/* Items keep their width and the trail wraps between them; an item longer than
+   the line (a long article title) may wrap within itself rather than overflow. */
+.item {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  max-inline-size: 100%;
+}
+
+.separator {
+  color: var(--color-accent-gold);
+}
+
+.link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--motion-base) var(--motion-easing);
+}
+
+.link:hover {
+  color: var(--color-accent-gold);
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
+.current {
+  color: var(--color-accent-gold);
+}
+
+/* On phones the trail is secondary: smaller capitals with tighter tracking, so it
+   doesn't compete with the page title for the narrow line. */
+@media (width <= 540px) {
+  .list {
+    gap: var(--space-1);
+    font-size: var(--type-scale-caption);
+    letter-spacing: var(--letter-spacing-caption);
+  }
+
+  .item {
+    gap: var(--space-1);
+  }
+}

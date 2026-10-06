@@ -4,7 +4,7 @@ import { getArticleBySlug } from '../data/articles';
 
 const SITE_NAME = 'Basement Pickups';
 const DEFAULT_DESCRIPTION =
-  'Handcrafted boutique guitar pickups. Premium tone, restrained design, deliberate craftsmanship.';
+  'Hand-wound boutique guitar pickups, made to order — vintage PAF sets and high-output humbuckers, voiced on the bench.';
 const DEFAULT_OG_IMAGE = '/assets/images/spirit-photos/bp-spirit-1.png';
 const DEFAULT_OG_IMAGE_ALT = 'Basement Pickups — handcrafted boutique guitar pickups';
 
@@ -83,7 +83,8 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
   if (normalized === '/shop') {
     return build(origin, {
       title: withSiteName('Shop Pickups'),
-      description: 'Browse the full collection of handcrafted Basement Pickups.',
+      description:
+        'Browse every Basement Pickups model — hand-wound PAF sets and high-output bridge humbuckers, with magnet, DCR and price for each.',
       path: '/shop',
       ogType: 'website',
     });
@@ -92,7 +93,8 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
   if (normalized === '/about') {
     return build(origin, {
       title: withSiteName('About'),
-      description: 'The workshop, the craft, and the philosophy behind Basement Pickups.',
+      description:
+        'Meet the Basement Pickups workshop: why every pickup is hand-wound to order, how each one is voiced on the bench, and the craft behind it.',
       path: '/about',
       ogType: 'website',
     });
@@ -102,7 +104,7 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
     return build(origin, {
       title: withSiteName('Articles'),
       description:
-        'Editorial on winding, tone, magnets, and the workshop process from Basement Pickups.',
+        'Workshop notes on pickup winding, PAF tone, alnico magnets and installation, from the Basement Pickups bench.',
       path: '/articles',
       ogType: 'website',
     });
@@ -114,7 +116,9 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
       description: 'Review the pickups in your enquiry before sending it to the workshop.',
       path: '/cart',
       ogType: 'website',
+      // Per-visitor and never indexable, so it doesn't name a canonical URL either.
       robots: 'noindex, nofollow',
+      noCanonical: true,
     });
   }
 
@@ -148,7 +152,7 @@ export function getSeoForUrl(pathname: string, origin = ''): SeoMeta {
       // keep their own title/description but canonicalise to the parent (and
       // are left out of the sitemap).
       return build(origin, {
-        title: withSiteName(pickup.name),
+        title: withSiteName(pickup.seoTitle ?? pickup.name),
         description: pickup.seoDescription,
         path: `/products/${parent.slug}`,
         ogType: 'product',
