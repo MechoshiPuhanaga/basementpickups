@@ -385,8 +385,8 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
      pages, visible breadcrumbs, related pickups + further reading on product pages, featured
      pickups + related articles + "Explore our pickups" on article pages. See session log.
    - ~~**Batch C — structured data**~~ — **done 2026-10-06**: variant pages breadcrumbs-only,
-     product image list (WebP + OG), one `@id` Organization with contact email. **Left:**
-     run Google's Rich Results Test on a set page, an article and `/` after deploy.
+     product image list (WebP + OG), one `@id` Organization with contact email. Rich Results
+     Test on live (set page, article, `/`) all valid; article date/author warnings fixed after.
    - **Batch D — separate tasks:** real article photos (all 4 share the default OG image, same date,
      organisation author); perf — `/articles` index 80, Macho Heaven 83, image delivery flagged on
      7 pages.
@@ -417,6 +417,18 @@ Pulling visual decisions from `design/references/basement-pickups-web-app-concep
 ---
 
 # Session Log
+
+## 2026-10-06 — Post-deploy checks + article JSON-LD fix
+
+- Live verified: titles, lower-case redirects, icons, cart without canonical, breadcrumbs,
+  variant pages breadcrumbs-only. robots.txt briefly served stale from Cloudflare cache (HIT,
+  1h) — origin already correct; expires on its own.
+- Rich Results Test: White Pearl (Product snippets + Breadcrumbs), The Language of PAF
+  (Article + Breadcrumbs), `/` (Organization) all valid. Optional warnings: product
+  `review`/`aggregateRating` (expected), article `datePublished` without time/timezone and
+  author without `url` → fixed: `toIsoDateTime` + `organizationRef` as author. Check green
+  (529 Vitest + 52 Playwright). Uncommitted.
+- Indexing requests for Macho Heaven + `/faq` still pending (Chrome extension dropped).
 
 ## 2026-10-06 — SEO batch C (structured data)
 

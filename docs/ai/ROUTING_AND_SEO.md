@@ -512,6 +512,10 @@ Done 2026-10-06 (SEO batch C — structured data):
 - One `Organization` node with `@id` `<origin>/#organization`, embedded (not just referenced)
   as WebSite/BlogPosting `publisher` and Product `manufacturer`; home adds `email` +
   `contactPoint` (`CONTACT_EMAIL` in `src/data/site.ts`). No `sameAs` — no social profiles.
+- `BlogPosting` dates are full ISO datetimes (`toIsoDateTime`: a stored calendar day →
+  midnight UTC) and the author is the linked Organization (has `url`). Rich Results Test
+  (2026-10-06, live): product, article, breadcrumbs and Organization all valid; only optional
+  `review`/`aggregateRating` warnings remain (no real reviews — never fake them).
 - Deliberately skipped: shipping/return policy (merchant listings need a checkout),
   `ItemList`/`AboutPage`/`ContactPage`, `SearchAction` (no site search).
 - JSON-LD: `Organization.logo` → real logo, `WebSite` `inLanguage`/`description`/`publisher`,

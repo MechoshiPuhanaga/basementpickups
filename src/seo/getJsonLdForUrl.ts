@@ -201,6 +201,14 @@ function productLd(base: string, pickup: Pickup): JsonLd {
   };
 }
 
+/**
+ * Article dates are stored as calendar days (`2026-06-20`); Google wants a full
+ * ISO 8601 datetime with a timezone, so a bare date becomes midnight UTC.
+ */
+export function toIsoDateTime(date: string): string {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00+00:00` : date;
+}
+
 function breadcrumbLd(base: string, crumbs: readonly Crumb[]): JsonLd {
   return {
     '@context': 'https://schema.org',
@@ -266,11 +274,16 @@ export function getJsonLdForUrl(pathname: string, origin = ''): readonly JsonLd[
           '@type': 'BlogPosting',
           headline: article.headline,
           description: article.excerpt,
-          datePublished: article.metadata.publishedAt,
+          datePublished: toIsoDateTime(article.metadata.publishedAt),
           ...(article.metadata.updatedAt !== undefined
-            ? { dateModified: article.metadata.updatedAt }
+            ? { dateModified: toIsoDateTime(article.metadata.updatedAt) }
             : {}),
-          author: { '@type': 'Organization', name: article.metadata.author ?? SITE_NAME },
+          // Workshop-written posts credit the linked Organization (with its url);
+          // any other named author keeps a plain Organization by name.
+          author:
+            article.metadata.author === undefined || article.metadata.author === SITE_NAME
+              ? organizationRef(base)
+              : { '@type': 'Organization', name: article.metadata.author },
           publisher: organizationRef(base),
           // Articles still use placeholder SVGs, which fall back to the site's
           // default 1200x630 image; swap in real photos when they exist.

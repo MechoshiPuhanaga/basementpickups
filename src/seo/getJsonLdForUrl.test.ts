@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getJsonLdForUrl, type JsonLd } from './getJsonLdForUrl';
+import { getJsonLdForUrl, toIsoDateTime, type JsonLd } from './getJsonLdForUrl';
 import { articles } from '../data/articles';
 import { FAQ_ITEMS } from '../data/faq';
 import { getPickupBySlug } from '../data/pickups';
@@ -153,6 +153,13 @@ describe('getJsonLdForUrl — products', () => {
   });
 });
 
+describe('toIsoDateTime', () => {
+  it('turns a calendar day into midnight UTC and leaves full datetimes alone', () => {
+    expect(toIsoDateTime('2026-06-20')).toBe('2026-06-20T00:00:00+00:00');
+    expect(toIsoDateTime('2026-06-20T09:30:00+03:00')).toBe('2026-06-20T09:30:00+03:00');
+  });
+});
+
 describe('getJsonLdForUrl — articles', () => {
   it('describes a BlogPosting with publisher and breadcrumbs', () => {
     const article = articles[0];
@@ -160,9 +167,10 @@ describe('getJsonLdForUrl — articles', () => {
     const [post, crumbs] = getJsonLdForUrl(`/articles/${article.slug}`, ORIGIN);
     expect(typeOf(post)).toBe('BlogPosting');
     expect(post?.['headline']).toBe(article.headline);
-    expect(post?.['datePublished']).toBe(article.metadata.publishedAt);
+    expect(post?.['datePublished']).toBe(`${article.metadata.publishedAt}T00:00:00+00:00`);
     expect(post).not.toHaveProperty('dateModified');
-    expect(post?.['author']).toEqual({ '@type': 'Organization', name: article.metadata.author });
+    expect((post?.['author'] as JsonLd)['@id']).toBe(ORG_ID);
+    expect((post?.['author'] as JsonLd)['url']).toBe(`${ORIGIN}/`);
     expect(post?.['image']).toBe(`${ORIGIN}/assets/images/spirit-photos/bp-spirit-1-og.jpg`);
     expect(post?.['url']).toBe(`${ORIGIN}/articles/${article.slug}`);
     expect(post?.['mainEntityOfPage']).toBe(`${ORIGIN}/articles/${article.slug}`);
